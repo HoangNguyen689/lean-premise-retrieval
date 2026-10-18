@@ -119,8 +119,8 @@ Báo cáo trình bày một hệ thống premise retrieval cho Lean 4 trên thư
 cấu trúc có chi phí tính toán thấp. Dữ liệu là LeanDojo Benchmark 4 bản v10 với \num{180957} khai báo; sau khi lọc, tập
 test của split \code{random} còn \num{2641} truy vấn, mỗi truy vấn là một proof state. Chỉ mục đảo được xây theo mô hình
 MapReduce trên Apache Spark và bằng một chương trình tuần tự; hai cách cho kết quả trùng từng byte. Ở cấu hình V4, BM25F
-dùng tokenizer riêng cho Lean trên ba trường name, namespace và statement, bộ lọc chỉ giữ accessible premise (premise dùng
-được tại vị trí chứng minh theo quan hệ import), rồi hồi quy logistic rerank 100 candidate bằng đặc trưng cấu trúc,
+dùng tokenizer riêng cho Lean trên ba trường name, namespace và statement, bộ lọc chỉ giữ accessible premise, tức premise có thể
+dùng tại vị trí chứng minh hiện tại, rồi hồi quy logistic rerank 100 candidate bằng đặc trưng cấu trúc,
 popularity và PageRank. Trên tập test \code{random}, Recall@10 tăng từ 0,100 của BM25 mặc định lên 0,243. V5 bổ sung
 candidate từ lịch sử sử dụng trong tập train, đạt 0,281 trên tập test và 0,332 so với 0,310 của V4 trên holdout lấy từ
 phần train chưa dùng để huấn luyện reranker. Tuy vậy, trên holdout chưa có đủ bằng chứng cho thấy V5 tốt hơn đối chứng V4
@@ -208,8 +208,9 @@ theo bit với tỉ lệ nén chấp nhận được~\cite{scholer2002}. Hệ th
 premise theo mức trùng ký hiệu với mục tiêu và mở rộng dần theo các ký hiệu mới~\cite{meng2009}. DeepMath dùng mô hình
 chuỗi học sâu để chọn premise cho thư viện Mizar~\cite{irving2016}. Magnushammer học biểu diễn bằng transformer theo
 phương pháp tương phản và vượt Sledgehammer trên Isabelle~\cite{mikula2024}. LeanDojo xây công cụ trích xuất dữ liệu từ
-Lean, công bố LeanDojo Benchmark với hai split \code{random} và \code{novel\_premises}, và đề xuất ReProver, một dense
-retriever chỉ tìm trong các accessible premise, tức premise dùng được tại vị trí đang chứng minh~\cite{yang2023,leandojodocs}.
+Lean, giới thiệu LeanDojo Benchmark với hai split \code{random} và \code{novel\_premises}, đồng thời đề xuất ReProver, một
+hệ thống chứng minh kết hợp mô hình sinh tactic với dense retriever; thành phần retrieval chỉ tìm trong các accessible
+premise, tức premise có thể dùng tại vị trí đang chứng minh~\cite{yang2023,leandojodocs}.
 Nhóm dùng lại benchmark và ý tưởng accessible premise, nhưng giữ toàn bộ hệ thống ở dạng sparse retrieval và không dùng
 mô hình neural; hướng dense retrieval do Nhóm 4 của lớp khảo sát.
 
@@ -224,7 +225,7 @@ chuẩn hóa điểm, phù hợp để kết hợp hệ thống sparse retrieval
 hybrid retrieval.
 
 \paragraph{Khoảng trống.} Các hệ thống premise retrieval gần đây chủ yếu dùng dense retrieval và báo cáo chất lượng
-trên một cấu hình phần cứng cố định. Ít công trình đo riêng xem BM25F cộng các đặc trưng cấu trúc rẻ đạt tới mức nào, và
+trên một cấu hình phần cứng cố định. Ít công trình đo riêng xem BM25F cộng các đặc trưng cấu trúc có chi phí tính toán thấp đạt tới mức nào, và
 chi phí xây chỉ mục cùng độ trễ thay đổi ra sao khi kho tăng. Báo cáo này tập trung vào khoảng trống đó.
 
 % ================================================================ 3
@@ -330,7 +331,7 @@ popularity và PageRank (V4). V5 bổ sung candidate từ lịch sử sử dụn
   \node[khoi,below=of mg] (s2) {Giai đoạn 2: hồi quy logistic\\13 đặc trưng (V4) hoặc 15 (V5)};
   \node[dl,below=of s2] (out) {Top-$k$ premise qua FastAPI hoặc CLI};
   \node[phu,right=of mg] (ex) {Chỉ ở V5: premise dùng nhiều nhất ở cùng tệp (100), cùng thư mục (100), toàn thư viện (50)};
-  \node[phu,right=of out] (dep) {Train train A: phổ biến, PageRank (tĩnh); số lần dùng theo tệp, thư mục (chỉ theorem có trước)};
+  \node[phu,right=of out] (dep) {Thống kê từ train A: popularity, PageRank (tĩnh); số lần dùng theo tệp, thư mục (theorem có trước)};
   \draw[mui] (raw) -- (ext); \draw[mui] (ext) -- (map); \draw[mui] (map) -- (shuf);
   \draw[mui] (shuf) -- (red); \draw[mui] (red) -- (idx);
   \draw[mui] (q) -- (tok); \draw[mui] (tok) -- (s1); \draw[mui] (s1) -- (mg); \draw[mui] (mg) -- (s2); \draw[mui] (s2) -- (out);
@@ -463,7 +464,7 @@ Mọi thí nghiệm chạy trên một máy 6 nhân, 12 luồng, 32 GB RAM (Bả
 gói Python được khóa trong \code{requirements/}. Mỗi lần chạy ghi một bản ghi theo Phụ lục B của hướng dẫn gồm mã lần chạy,
 thời điểm, phiên bản mã và dữ liệu, cấu hình máy, phần mềm, tham số, seed, kết quả và trạng thái (Mục~\ref{app:record}).
 Bảng~\ref{tab:variants} liệt kê tám biến thể của chuỗi cải tiến và bốn cấu hình đối chứng. B0 là baseline bắt buộc của đề;
-B0t là B0 đã tinh tham số với cùng ngân sách như V1. Mỗi cấu hình đối chứng chỉ khác biến thể gốc đúng một điểm và được
+B0t là B0 đã tinh chỉnh tham số với cùng ngân sách như V1. Mỗi cấu hình đối chứng chỉ khác biến thể gốc đúng một điểm và được
 huấn luyện lại trên cùng dữ liệu.
 
 \begin{table}[htbp]
@@ -490,7 +491,7 @@ V4-pronly & V4 chỉ giữ PageRank trong hai đặc trưng phụ thuộc \\
 \end{tabularx}
 \end{table}
 
-\section{Tinh tham số và huấn luyện}\label{sec:tuning}
+\section{Tinh chỉnh tham số và huấn luyện}\label{sec:tuning}
 
 Tham số của giai đoạn 1 được chọn bằng tìm kiếm lưới trên validation của \code{random}: 40 điểm cho B0t và V1, mở rộng thêm
 8 điểm vì điểm tốt nhất nằm ở biên lưới, và 20 tổ hợp trọng số trường cho V2. Điểm cao nhất của lưới BM25F (Recall@10 bằng
@@ -564,13 +565,13 @@ Mục~\ref{sec:robust} phân tích mức tăng này kỹ hơn vì V5 được th
 \input{tables/quality}
 
 Bảng~\ref{tab:signif} cho chênh lệch Recall@10 giữa các bước của chuỗi cải tiến. Trên \code{random}, 6 trên 7 bước có ý
-nghĩa ở mức 0,05 sau hiệu chỉnh Holm ($p$ Holm 0,0007). Bước còn lại là tokenizer Lean sau khi đã tinh BM25: Recall@10 tăng
+nghĩa ở mức 0,05 sau hiệu chỉnh Holm ($p$ Holm 0,0007). Bước còn lại là tokenizer Lean sau khi đã tinh chỉnh BM25: Recall@10 tăng
 0,010 với $p$ bằng 0,053, dù MRR của bước này tăng có ý nghĩa ($p$ Holm 0,0095). Trên \code{novel\_premises}, tokenizer Lean
 và bước từ V4 sang V5 đều có $p$ Holm bằng 0,094, nên không có ý nghĩa ở mức 0,05.
 
 \input{tables/signif}
 
-\paragraph{Trả lời RQ1.} BM25 mặc định chưa đủ cho dữ liệu Lean: Recall@10 chỉ đạt 0,100. Tinh $k_1$, $b$ và dùng qtf
+\paragraph{Trả lời RQ1.} BM25 mặc định chưa đủ cho dữ liệu Lean: Recall@10 chỉ đạt 0,100. Tinh chỉnh $k_1$, $b$ và dùng qtf
 nhị phân thêm 0,023. Tokenizer Lean thêm 0,010 nhưng không có ý nghĩa sau hiệu chỉnh trên cả hai split. BM25F ba trường
 thêm 0,013 và có ý nghĩa, chủ yếu nhờ trường name: bỏ riêng trường namespace (V2-nons) chỉ làm Recall@10 giảm 0,001 trên
 \code{random}, khoảng tin cậy chứa 0 (Bảng~\ref{tab:controls}), và giảm 0,002 trên \code{novel\_premises} ($p$ chưa hiệu
@@ -765,6 +766,7 @@ nhưng làm giảm MRR có ý nghĩa khi bị bỏ, nghĩa là chúng giúp đư
 premise vào top 10. Đặc trưng namespace của reranker không có tác dụng đo được ở cả hai chỉ số. Tăng số candidate lên 200 làm
 Recall@10 tăng 0,010 ($p$ Holm bằng 0,019); V4 giữ 100 candidate vì giá trị này đã được chốt trước khi chạy tập test.
 
+\Needspace{5\baselineskip}
 Bảng~\ref{tab:controls} tách thêm hai thành phần mà ablation trên chưa tách. Bỏ trường namespace khỏi BM25F, một can thiệp
 khác với bỏ đặc trưng namespace của reranker, không tạo khác biệt có ý nghĩa trên \code{random}. Giữ riêng popularity hoặc
 riêng PageRank cho Recall@10 trong khoảng 0,002 quanh V4 với khoảng tin cậy chứa 0.
@@ -823,6 +825,7 @@ lỡ khoảng 35\% gold premise.
 
 \input{tables/candidates}
 
+\Needspace{6\baselineskip}
 \paragraph{Gán nhãn thủ công.} Ngoài phân loại tự động, nhóm đã lấy mẫu phân tầng 30 trường hợp thất bại kèm proof state,
 gold premise, hạng của nó và ba kết quả đầu của V4 (\code{results/figures/failure\_cases.md}). Kế hoạch là hai thành viên
 gán nhãn độc lập theo cùng bảng nhóm lỗi, rồi đối chiếu và báo tỉ lệ đồng thuận thô; việc gán nhãn này chưa được thực
@@ -872,8 +875,8 @@ tố mà các lần chạy lại sẽ ghi mã commit đầy đủ.
 % ================================================================ 8
 \chapter{Kết luận và hướng phát triển}\label{sec:conclusion}
 
-Với RQ1, BM25 mặc định chưa đủ cho dữ liệu Lean. Tinh tham số, trường name và đặc biệt là thông tin phụ thuộc có tác dụng
-đo được; với tokenizer Lean (trên Recall@10) và trường namespace thì chưa có đủ bằng chứng, còn popularity và PageRank chỉ
+Với RQ1, BM25 mặc định chưa đủ cho dữ liệu Lean. Việc tinh chỉnh tham số, sử dụng trường name và đặc biệt là thông tin
+phụ thuộc có tác dụng đo được; với tokenizer Lean (trên Recall@10) và trường namespace thì chưa có đủ bằng chứng, còn popularity và PageRank chỉ
 kết luận được theo cặp. Với RQ2, kết hợp BM25F với các đặc trưng cấu trúc (V4) đưa Recall@10 từ 0,100 lên 0,243 trên tập
 test \code{random} và từ 0,127 lên 0,269 trên \code{novel\_premises}; trong đợt đo tải chính, P95 latency ở 10 client tăng từ
 60,2 lên 95,5 ms, phần lớn do giai đoạn BM25F, còn các đặc trưng cấu trúc chỉ tốn khoảng 2 ms. V4 là lựa chọn cân bằng giữa
@@ -959,11 +962,12 @@ Two-Level Retrieval Process. \emph{Proceedings of the 12th ACM CIKM}, 2003.
 Theo yêu cầu của học phần, nhóm khai báo việc dùng công cụ AI. Nhóm dùng Claude (Anthropic) qua công cụ Claude Code cho
 các việc sau: lập kế hoạch 10 tuần, viết mã nguồn của pipeline, unit test, các script thí nghiệm và vẽ biểu đồ, bản nháp
 tài liệu trong thư mục \code{docs}, và soạn bản báo cáo này. Mọi bảng số liệu trong báo cáo được sinh bằng script từ tệp
-kết quả, không chép tay từ đầu ra của AI. Ba bản nhận xét phản biện báo cáo (\code{report/danh\_gia\_report.md}, \code{danh\_gia\_report\_lan\_2.md} và
-\code{danh\_gia\_report\_lan\_3.md}) được tạo với Codex (OpenAI); Codex đọc báo cáo, mã nguồn và kết quả rồi chỉ ra các điểm
-cần sửa, trong đó có lỗi tính $p$ hai phía của hàm bootstrap, các float đặt sai chỗ và cách dùng thuật ngữ. Các thay đổi
+kết quả, không chép tay từ đầu ra của AI. Codex (OpenAI) được dùng để hỗ trợ phản biện các bản thảo và góp ý biên tập: bốn bản nhận xét trong thư mục
+\code{report} (\code{danh\_gia\_report.md} và các bản \code{\_lan\_2} đến \code{\_lan\_4}) do Codex tạo sau khi đọc báo cáo,
+mã nguồn và kết quả; chúng chỉ ra các điểm cần sửa, trong đó có lỗi tính $p$ hai phía của hàm bootstrap, các float đặt sai
+chỗ và cách dùng thuật ngữ. Các thay đổi
 theo nhận xét, gồm đối chứng V4-K240, tập holdout, kiểm định hoán vị, ghim nguồn của bảng và hình, và phần viết lại báo cáo,
-được thực hiện với Claude Code. \canchot{Nhóm xác nhận Codex chỉ được dùng cho ba bản phản biện này.}
+được thực hiện với Claude Code. \canchot{Nhóm xác nhận phạm vi dùng Codex.}
 
 Các bước kiểm chứng tự động đã thực hiện gồm 58 unit test (trong đó có các ví dụ tính tay của giáo trình về mã VB, mã gamma
 và tần suất tài liệu, ví dụ tính tay cho bootstrap theo cụm, kiểm định hoán vị theo cụm và hiệu chỉnh Holm), so sánh chỉ mục với một cài đặt tham
@@ -988,7 +992,7 @@ Vai trò & Người chính & Dự phòng & Phần phụ trách \\
 \midrule
 Dữ liệu và trích xuất & Nguyễn Đức Hoàng & Nguyễn Ngọc Minh & tải dữ liệu, trích xuất, tập con, data card, data dictionary, 20 truy vấn kiểm tra \\
 Xây chỉ mục & Trần Duy Khánh & \canchot{người phụ trách phục vụ} & xây chỉ mục tuần tự và Spark, nén posting, thí nghiệm xây chỉ mục \\
-Baseline BM25 & Nguyễn Mạnh Cường & \canchot{người phụ trách đặc trưng} & bộ tách từ, BM25 và BM25F, tinh tham số, đối chiếu Lucene \\
+Baseline BM25 & Nguyễn Mạnh Cường & \canchot{người phụ trách đặc trưng} & tokenizer, BM25 và BM25F, tinh chỉnh tham số, đối chiếu Lucene \\
 Đặc trưng cấu trúc & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũng} & Nguyễn Mạnh Cường & đặc trưng, bộ lọc accessible premise, thống kê phụ thuộc, reranker, V5 \\
 Phục vụ và hiệu năng & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũng} & Trần Duy Khánh & API, CLI, kiểm tra tải, profile độ trễ \\
 Đánh giá và phân tích lỗi & Nguyễn Ngọc Minh & Nguyễn Đức Hoàng & chỉ số, kiểm định, ablation, phân tích lỗi, holdout, so sánh với Nhóm 4, báo cáo \\
@@ -1000,15 +1004,12 @@ Phục vụ và hiệu năng & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũ
 
 \section{Lệnh tái lập}\label{app:repro}
 
-Các lệnh dưới đây chạy trong thư mục gốc của kho mã với môi trường cài theo \code{README.md} từ các tệp khóa phiên bản.
-Có hai mục đích khác nhau. Để dựng lại đúng bản báo cáo đã phát hành, chạy \code{bash report/latex/build.sh}: lệnh này
-không chạy lại thí nghiệm, chỉ đọc các lần chạy đã ghim trong \path{results/figures/report_manifest.json} và
-\path{report_records.json}. Trước khi sinh lại bảng và hình, nó so SHA-256 của mọi tệp đầu vào với giá trị ghi trong
-\path{tables/SOURCES.md} và \path{figures/SOURCES.md}, và dừng nếu có tệp lệch; tùy chọn \code{-{}-compile-only} chỉ biên dịch
-từ bảng và hình đã có. Để tái tạo kết quả từ đầu hoặc cập nhật báo cáo bằng lần chạy mới, chạy \code{scripts/reproduce.sh};
-script này gọi \code{pin\_runs.py}, tức ghim lại các lần chạy mới nhất, rồi dựng báo cáo bằng \code{build.sh -{}-update},
-nên bảng có thể thay đổi. Tùy chọn \code{-{}-with-tuning} chạy lại cả quá trình chọn tham số, \code{-{}-with-scale} chạy các thí nghiệm quy mô,
-tải và Lucene, \code{-{}-report} sinh bảng, hình và biên dịch báo cáo.
+Các lệnh dưới đây chạy trong thư mục gốc của kho mã, với môi trường cài theo \code{README.md}. Để dựng lại đúng bản đã
+phát hành, chạy \code{build.sh}: lệnh này không chạy lại thí nghiệm, chỉ đọc các lần chạy đã ghim, và trước khi sinh lại bảng
+và hình sẽ so SHA-256 của mọi tệp đầu vào với \path{tables/SOURCES.md}, \path{figures/SOURCES.md}, dừng nếu có tệp lệch. Để
+tái tạo từ đầu, chạy \code{scripts/reproduce.sh}; script này ghim lại các lần chạy mới nhất rồi dựng báo cáo bằng
+\code{build.sh -{}-update}, nên bảng có thể thay đổi. Các tùy chọn \code{-{}-with-tuning}, \code{-{}-with-scale} chạy lại quá
+trình chọn tham số và các thí nghiệm quy mô, tải, Lucene.
 
 \begin{Verbatim}[fontsize=\footnotesize,frame=single,framesep=2mm,commandchars=\\\{\}]
 \textrm{\# dựng lại đúng bản đã phát hành từ các lần chạy đã ghim}
@@ -1039,11 +1040,13 @@ Bảng nào được sinh từ tệp kết quả nào, các \code{run\_id} đã 
 bảng được liệt kê trong \code{report/latex/tables/SOURCES.md}; thứ tự thời gian của các lần chạy nằm trong
 \code{docs/process\_log.md}.
 
+\Needspace{14\baselineskip}
 \section{Ví dụ một bản ghi lần chạy}\label{app:record}
 
 Bản ghi dưới đây của lần đánh giá V5 trên tập holdout được rút gọn; bản đầy đủ gồm cả cấu hình, thông tin chỉ mục và mọi
 chỉ số nằm trong \code{results/raw/eval}.
 
+\noindent\begin{minipage}{\linewidth}
 \begin{Verbatim}[fontsize=\footnotesize,frame=single,framesep=2mm]
 {"run_id": "eval-V5-20261018-230340-4bf3", "kind": "eval",
  "timestamp": "2026-10-18T16:04:39+00:00", "git_commit": "uncommitted",
@@ -1052,6 +1055,7 @@ chỉ số nằm trong \code{results/raw/eval}.
  "seed": 42, "status": "ok",
  "metrics": {"R@10": 0.3323, "MRR": 0.2609, "n_queries": 2500}}
 \end{Verbatim}
+\end{minipage}
 
 \chapter{Bảng bổ sung}\label{app:tables}
 
