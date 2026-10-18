@@ -1,7 +1,7 @@
 % Sinh bởi scripts/make_report_tables.py, không sửa tay.
 \begin{table}[htbp]
 \centering
-\caption[BM25 của Lucene so với BM25 tự cài đặt]{BM25 của Lucene 10.5 (Anserini 2.3.0) so với B0 trên tập kiểm tra \code{random}, trường phát biểu, một luồng. Trùng top 10 là tỉ lệ phần tử chung giữa top 10 của Lucene và của B0, trung bình theo truy vấn; thời gian là trung bình một luồng ở trạng thái ổn định (bỏ 100 truy vấn đầu), không gồm khởi động JVM}\label{tab:lucene}
+\caption[BM25 của Lucene so với BM25 tự cài đặt]{BM25 của Lucene 10.5 (Anserini 2.3.0) so với B0 trên tập test \code{random}}\label{tab:lucene}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xrrrrr@{}}
 \toprule
 Hệ thống & R@10 & R@50 & MRR & Trùng top 10 & ms/truy vấn \\
@@ -12,4 +12,5 @@ Lucene, token của B0, $k_1 = 1{,}2$, $b = 0{,}75$ & 0,1003 & 0,1760 & 0,0657 &
 B0 của nhóm, $k_1 = 1{,}2$, $b = 0{,}75$ & 0,1004 & 0,1763 & 0,0654 & 1 & 13,2 \\
 \bottomrule
 \end{tabularx}
+\par\smallskip{\footnotesize\raggedright Ghi chú: trường statement, một thread. Trùng top 10 là tỉ lệ phần tử chung giữa top 10 của Lucene và của B0, query-macro; thời gian là trung bình ở trạng thái ổn định (bỏ 100 truy vấn đầu), không gồm khởi động JVM.\par}
 \end{table}

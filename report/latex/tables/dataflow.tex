@@ -1,7 +1,7 @@
 % Sinh bởi scripts/make_report_tables.py, không sửa tay.
 \begin{table}[htbp]
 \centering
-\caption[Luồng lọc dữ liệu theo split]{Luồng lọc dữ liệu theo split và tập. Phần lớn theorem bị loại vì được chứng minh không qua tactic (chứng minh dạng term) nên không sinh truy vấn nào}\label{tab:dataflow}
+\caption[Luồng lọc dữ liệu theo split]{Luồng lọc dữ liệu theo split và tập}\label{tab:dataflow}
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
 & \multicolumn{3}{c}{\code{random}} & \multicolumn{3}{c}{\code{novel\_premises}} \\
@@ -16,11 +16,12 @@ Theorem gốc & 118.517 & 2.000 & 2.000 & 118.517 & 2.000 & 2.000 \\
 \midrule
 Tactic & 250.814 & 4.260 & 4.506 & 246.714 & 6.240 & 6.626 \\
 \quad được chú thích premise & 162.262 & 2.681 & 2.836 & 159.234 & 4.165 & 4.380 \\
-\quad bị loại vì mọi premise đúng nằm ngoài corpus & 9.932 & 145 & 195 & 9.775 & 258 & 239 \\
+\quad bị loại vì mọi gold premise nằm ngoài corpus & 9.932 & 145 & 195 & 9.775 & 258 & 239 \\
 Truy vấn giữ lại & 152.330 & 2.536 & 2.641 & 149.459 & 3.907 & 4.141 \\
 \quad proof state khác nhau & 151.134 & 2.530 & 2.623 & 148.288 & 3.876 & 4.109 \\
 \midrule
-Lượt premise đúng nằm ngoài corpus & 55.971 & 867 & 1.030 & 54.047 & 1.886 & 1.935 \\
+Lượt gold premise nằm ngoài corpus & 55.971 & 867 & 1.030 & 54.047 & 1.886 & 1.935 \\
 \bottomrule
 \end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: phần lớn theorem bị loại vì được chứng minh không qua tactic (chứng minh dạng term) nên không sinh truy vấn nào.\par}
 \end{table}

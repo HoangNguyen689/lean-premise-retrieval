@@ -47,134 +47,134 @@ Tổng số lượt truy vấn của hai split là 315,014; số proof state kh�
 
 ## 3. Kiểm định bootstrap theo cụm theorem (10.000 mẫu)
 
-Họ chính: Recall@10, p một phía, Holm trong từng tập và từng cách lấy trung bình. Họ phụ: p hai phía, không hiệu chỉnh.
+KTC từ bootstrap theo cụm; p hai phía từ kiểm định hoán vị theo cụm. Họ chính: Holm trong từng tập, metric và cách lấy trung bình. Họ phụ: không hiệu chỉnh.
 
-| Tập | Họ | So sánh | Metric | Trung bình | Δ | KTC 95% | p | p Holm | p hai phía |
-|---|---|---|---|---|---|---|---|---|---|
-| random_test_all | chính | B0 → B0t | R@10 | truy vấn | +0.0233 | [+0.0132; +0.0332] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | B0 → B0t | R@10 | theorem | +0.0315 | [+0.0167; +0.0464] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | B0 → B0t | MRR | truy vấn | +0.0130 | [+0.0072; +0.0193] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | B0 → B0t | MRR | theorem | +0.0191 | [+0.0094; +0.0290] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | B0t → V1 | R@10 | truy vấn | +0.0105 | [+0.0001; +0.0217] | 0.0244 | 0.0244 | 0.0488 |
-| random_test_all | chính | B0t → V1 | R@10 | theorem | +0.0137 | [-0.0012; +0.0290] | 0.0356 | 0.0356 | 0.0712 |
-| random_test_all | chính | B0t → V1 | MRR | truy vấn | +0.0082 | [+0.0020; +0.0144] | 0.0044 | 0.0044 | 0.0088 |
-| random_test_all | chính | B0t → V1 | MRR | theorem | +0.0088 | [-0.0020; +0.0198] | 0.0546 | 0.0546 | 0.1092 |
-| random_test_all | chính | V1 → V2 | R@10 | truy vấn | +0.0128 | [+0.0059; +0.0202] | 0.0001 | 0.0002 | 0.0002 |
-| random_test_all | chính | V1 → V2 | R@10 | theorem | +0.0228 | [+0.0134; +0.0325] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V1 → V2 | MRR | truy vấn | +0.0061 | [+0.0023; +0.0101] | 0.0006 | 0.0012 | 0.0012 |
-| random_test_all | chính | V1 → V2 | MRR | theorem | +0.0086 | [+0.0030; +0.0145] | 0.0016 | 0.0048 | 0.0032 |
-| random_test_all | chính | V2 → V3 | R@10 | truy vấn | +0.0213 | [+0.0103; +0.0325] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V3 | R@10 | theorem | +0.0439 | [+0.0278; +0.0601] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V3 | MRR | truy vấn | +0.0197 | [+0.0135; +0.0263] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V3 | MRR | theorem | +0.0373 | [+0.0289; +0.0461] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V2a | R@10 | truy vấn | +0.0356 | [+0.0287; +0.0435] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V2a | R@10 | theorem | +0.0508 | [+0.0412; +0.0612] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V2a | MRR | truy vấn | +0.0553 | [+0.0483; +0.0629] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2 → V2a | MRR | theorem | +0.0984 | [+0.0867; +0.1105] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2a → V4 | R@10 | truy vấn | +0.0599 | [+0.0456; +0.0742] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2a → V4 | R@10 | theorem | +0.0893 | [+0.0702; +0.1085] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2a → V4 | MRR | truy vấn | +0.0476 | [+0.0394; +0.0561] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V2a → V4 | MRR | theorem | +0.0737 | [+0.0598; +0.0882] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V4 → V5 | R@10 | truy vấn | +0.0382 | [+0.0244; +0.0526] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V4 → V5 | R@10 | theorem | +0.0344 | [+0.0174; +0.0516] | 0.0001 | 0.0002 | 0.0002 |
-| random_test_all | chính | V4 → V5 | MRR | truy vấn | +0.0210 | [+0.0115; +0.0306] | < 1e-4 | < 1e-4 | < 1e-4 |
-| random_test_all | chính | V4 → V5 | MRR | theorem | +0.0143 | [+0.0007; +0.0281] | 0.0199 | 0.0398 | 0.0398 |
-| random_test_all | phụ | B0 → V4 | R@10 | truy vấn | +0.1421 | [+0.1265; +0.1583] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V4 | R@10 | theorem | +0.2080 | [+0.1853; +0.2307] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V4 | MRR | truy vấn | +0.1302 | [+0.1163; +0.1453] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V4 | MRR | theorem | +0.2087 | [+0.1889; +0.2288] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V5 | R@10 | truy vấn | +0.1803 | [+0.1620; +0.1998] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V5 | R@10 | theorem | +0.2425 | [+0.2197; +0.2659] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V5 | MRR | truy vấn | +0.1512 | [+0.1361; +0.1677] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | B0 → V5 | MRR | theorem | +0.2231 | [+0.2015; +0.2446] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | V4 → V4-K240 | R@10 | truy vấn | +0.0112 | [+0.0037; +0.0188] | 0.0020 |  | 0.0040 |
-| random_test_all | phụ | V4 → V4-K240 | R@10 | theorem | +0.0134 | [+0.0011; +0.0253] | 0.0157 |  | 0.0314 |
-| random_test_all | phụ | V4 → V4-K240 | MRR | truy vấn | +0.0060 | [+0.0018; +0.0103] | 0.0029 |  | 0.0058 |
-| random_test_all | phụ | V4 → V4-K240 | MRR | theorem | +0.0051 | [-0.0026; +0.0128] | 0.0956 |  | 0.1912 |
-| random_test_all | phụ | V4-K240 → V5 | R@10 | truy vấn | +0.0270 | [+0.0138; +0.0408] | < 1e-4 |  | < 1e-4 |
-| random_test_all | phụ | V4-K240 → V5 | R@10 | theorem | +0.0210 | [+0.0045; +0.0379] | 0.0052 |  | 0.0104 |
-| random_test_all | phụ | V4-K240 → V5 | MRR | truy vấn | +0.0150 | [+0.0049; +0.0249] | 0.0016 |  | 0.0032 |
-| random_test_all | phụ | V4-K240 → V5 | MRR | theorem | +0.0093 | [-0.0039; +0.0227] | 0.0866 |  | 0.1732 |
-| random_test_all | phụ | V2-nons → V2 | R@10 | truy vấn | +0.0014 | [-0.0025; +0.0049] | 0.2313 |  | 0.4626 |
-| random_test_all | phụ | V2-nons → V2 | R@10 | theorem | +0.0030 | [-0.0012; +0.0077] | 0.0875 |  | 0.1750 |
-| random_test_all | phụ | V2-nons → V2 | MRR | truy vấn | +0.0002 | [-0.0010; +0.0015] | 0.3957 |  | 0.7914 |
-| random_test_all | phụ | V2-nons → V2 | MRR | theorem | -0.0013 | [-0.0038; +0.0010] | 0.8555 |  | 0.2890 |
-| random_test_all | phụ | V4-poponly → V4 | R@10 | truy vấn | -0.0016 | [-0.0037; +0.0001] | 0.9637 |  | 0.0726 |
-| random_test_all | phụ | V4-poponly → V4 | R@10 | theorem | -0.0013 | [-0.0035; +0.0006] | 0.9058 |  | 0.1884 |
-| random_test_all | phụ | V4-poponly → V4 | MRR | truy vấn | -0.0000 | [-0.0013; +0.0012] | 0.5305 |  | 0.9390 |
-| random_test_all | phụ | V4-poponly → V4 | MRR | theorem | -0.0003 | [-0.0032; +0.0027] | 0.5792 |  | 0.8416 |
-| random_test_all | phụ | V4-pronly → V4 | R@10 | truy vấn | -0.0011 | [-0.0081; +0.0058] | 0.6271 |  | 0.7458 |
-| random_test_all | phụ | V4-pronly → V4 | R@10 | theorem | -0.0064 | [-0.0152; +0.0024] | 0.9234 |  | 0.1532 |
-| random_test_all | phụ | V4-pronly → V4 | MRR | truy vấn | +0.0043 | [-0.0001; +0.0087] | 0.0292 |  | 0.0584 |
-| random_test_all | phụ | V4-pronly → V4 | MRR | theorem | +0.0001 | [-0.0084; +0.0086] | 0.4873 |  | 0.9746 |
-| novel_premises_test_all | chính | B0 → B0t | R@10 | truy vấn | +0.0271 | [+0.0189; +0.0354] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | B0 → B0t | R@10 | theorem | +0.0260 | [+0.0133; +0.0391] | 0.0001 | 0.0003 | 0.0002 |
-| novel_premises_test_all | chính | B0 → B0t | MRR | truy vấn | +0.0157 | [+0.0093; +0.0220] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | B0 → B0t | MRR | theorem | +0.0115 | [+0.0022; +0.0203] | 0.0072 | 0.0216 | 0.0144 |
-| novel_premises_test_all | chính | B0t → V1 | R@10 | truy vấn | +0.0082 | [+0.0003; +0.0161] | 0.0204 | 0.0408 | 0.0408 |
-| novel_premises_test_all | chính | B0t → V1 | R@10 | theorem | +0.0084 | [-0.0039; +0.0206] | 0.0877 | 0.1754 | 0.1754 |
-| novel_premises_test_all | chính | B0t → V1 | MRR | truy vấn | +0.0044 | [-0.0016; +0.0101] | 0.0728 | 0.1456 | 0.1456 |
-| novel_premises_test_all | chính | B0t → V1 | MRR | theorem | +0.0001 | [-0.0088; +0.0091] | 0.4893 | 0.9786 | 0.9786 |
-| novel_premises_test_all | chính | V1 → V2 | R@10 | truy vấn | +0.0198 | [+0.0126; +0.0273] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V1 → V2 | R@10 | theorem | +0.0208 | [+0.0116; +0.0301] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V1 → V2 | MRR | truy vấn | +0.0139 | [+0.0089; +0.0190] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V1 → V2 | MRR | theorem | +0.0171 | [+0.0119; +0.0224] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V3 | R@10 | truy vấn | +0.0223 | [+0.0122; +0.0323] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V3 | R@10 | theorem | +0.0431 | [+0.0300; +0.0563] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V3 | MRR | truy vấn | +0.0163 | [+0.0108; +0.0217] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V3 | MRR | theorem | +0.0312 | [+0.0225; +0.0402] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V2a | R@10 | truy vấn | +0.0386 | [+0.0324; +0.0452] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V2a | R@10 | theorem | +0.0546 | [+0.0459; +0.0640] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V2a | MRR | truy vấn | +0.0520 | [+0.0466; +0.0579] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2 → V2a | MRR | theorem | +0.0889 | [+0.0803; +0.0974] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2a → V4 | R@10 | truy vấn | +0.0483 | [+0.0375; +0.0593] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2a → V4 | R@10 | theorem | +0.0649 | [+0.0509; +0.0791] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2a → V4 | MRR | truy vấn | +0.0350 | [+0.0282; +0.0419] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V2a → V4 | MRR | theorem | +0.0516 | [+0.0409; +0.0626] | < 1e-4 | < 1e-4 | < 1e-4 |
-| novel_premises_test_all | chính | V4 → V5 | R@10 | truy vấn | +0.0107 | [-0.0005; +0.0223] | 0.0320 | 0.0408 | 0.0640 |
-| novel_premises_test_all | chính | V4 → V5 | R@10 | theorem | -0.0139 | [-0.0263; -0.0018] | 0.9878 | 0.9878 | 0.0244 |
-| novel_premises_test_all | chính | V4 → V5 | MRR | truy vấn | +0.0046 | [-0.0027; +0.0121] | 0.1114 | 0.1456 | 0.2228 |
-| novel_premises_test_all | chính | V4 → V5 | MRR | theorem | -0.0166 | [-0.0261; -0.0068] | 0.9997 | 0.9997 | 0.0006 |
-| novel_premises_test_all | phụ | B0 → V4 | R@10 | truy vấn | +0.1420 | [+0.1281; +0.1565] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V4 | R@10 | theorem | +0.1747 | [+0.1581; +0.1917] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V4 | MRR | truy vấn | +0.1208 | [+0.1094; +0.1330] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V4 | MRR | theorem | +0.1692 | [+0.1535; +0.1849] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V5 | R@10 | truy vấn | +0.1527 | [+0.1379; +0.1685] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V5 | R@10 | theorem | +0.1607 | [+0.1432; +0.1785] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V5 | MRR | truy vấn | +0.1255 | [+0.1141; +0.1373] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | B0 → V5 | MRR | theorem | +0.1526 | [+0.1371; +0.1680] | < 1e-4 |  | < 1e-4 |
-| novel_premises_test_all | phụ | V4 → V4-K240 | R@10 | truy vấn | +0.0067 | [+0.0019; +0.0117] | 0.0026 |  | 0.0052 |
-| novel_premises_test_all | phụ | V4 → V4-K240 | R@10 | theorem | +0.0050 | [-0.0023; +0.0123] | 0.0888 |  | 0.1776 |
-| novel_premises_test_all | phụ | V4 → V4-K240 | MRR | truy vấn | +0.0017 | [-0.0013; +0.0048] | 0.1371 |  | 0.2742 |
-| novel_premises_test_all | phụ | V4 → V4-K240 | MRR | theorem | -0.0019 | [-0.0065; +0.0027] | 0.7889 |  | 0.4222 |
-| novel_premises_test_all | phụ | V4-K240 → V5 | R@10 | truy vấn | +0.0040 | [-0.0076; +0.0158] | 0.2524 |  | 0.5048 |
-| novel_premises_test_all | phụ | V4-K240 → V5 | R@10 | theorem | -0.0189 | [-0.0311; -0.0067] | 0.9986 |  | 0.0028 |
-| novel_premises_test_all | phụ | V4-K240 → V5 | MRR | truy vấn | +0.0030 | [-0.0039; +0.0099] | 0.1982 |  | 0.3964 |
-| novel_premises_test_all | phụ | V4-K240 → V5 | MRR | theorem | -0.0147 | [-0.0238; -0.0052] | 0.9993 |  | 0.0014 |
-| novel_premises_test_all | phụ | V2-nons → V2 | R@10 | truy vấn | +0.0025 | [+0.0003; +0.0047] | 0.0133 |  | 0.0266 |
-| novel_premises_test_all | phụ | V2-nons → V2 | R@10 | theorem | +0.0042 | [+0.0005; +0.0082] | 0.0115 |  | 0.0230 |
-| novel_premises_test_all | phụ | V2-nons → V2 | MRR | truy vấn | +0.0014 | [+0.0002; +0.0026] | 0.0110 |  | 0.0220 |
-| novel_premises_test_all | phụ | V2-nons → V2 | MRR | theorem | +0.0017 | [-0.0006; +0.0038] | 0.0710 |  | 0.1420 |
-| random_holdoutB | chính | V4 → V5 | R@10 | truy vấn | +0.0222 | [+0.0094; +0.0349] | 0.0004 | 0.0004 | 0.0008 |
-| random_holdoutB | chính | V4 → V5 | R@10 | theorem | +0.0170 | [+0.0022; +0.0323] | 0.0122 | 0.0122 | 0.0244 |
-| random_holdoutB | chính | V4 → V5 | MRR | truy vấn | +0.0148 | [+0.0069; +0.0230] | 0.0001 | 0.0001 | 0.0002 |
-| random_holdoutB | chính | V4 → V5 | MRR | theorem | +0.0096 | [-0.0018; +0.0211] | 0.0489 | 0.0489 | 0.0978 |
-| random_holdoutB | phụ | B0 → V4 | R@10 | truy vấn | +0.1971 | [+0.1809; +0.2144] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V4 | R@10 | theorem | +0.2377 | [+0.2183; +0.2575] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V4 | MRR | truy vấn | +0.1753 | [+0.1609; +0.1902] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V4 | MRR | theorem | +0.2253 | [+0.2068; +0.2443] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V5 | R@10 | truy vấn | +0.2193 | [+0.2026; +0.2372] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V5 | R@10 | theorem | +0.2547 | [+0.2345; +0.2759] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V5 | MRR | truy vấn | +0.1901 | [+0.1756; +0.2050] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | B0 → V5 | MRR | theorem | +0.2350 | [+0.2164; +0.2540] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | V4 → V4-K240 | R@10 | truy vấn | +0.0110 | [+0.0039; +0.0183] | 0.0011 |  | 0.0022 |
-| random_holdoutB | phụ | V4 → V4-K240 | R@10 | theorem | +0.0099 | [+0.0002; +0.0200] | 0.0229 |  | 0.0458 |
-| random_holdoutB | phụ | V4 → V4-K240 | MRR | truy vấn | +0.0088 | [+0.0045; +0.0131] | < 1e-4 |  | < 1e-4 |
-| random_holdoutB | phụ | V4 → V4-K240 | MRR | theorem | +0.0061 | [+0.0008; +0.0119] | 0.0130 |  | 0.0260 |
-| random_holdoutB | phụ | V4-K240 → V5 | R@10 | truy vấn | +0.0111 | [-0.0017; +0.0239] | 0.0465 |  | 0.0930 |
-| random_holdoutB | phụ | V4-K240 → V5 | R@10 | theorem | +0.0071 | [-0.0072; +0.0217] | 0.1623 |  | 0.3246 |
-| random_holdoutB | phụ | V4-K240 → V5 | MRR | truy vấn | +0.0061 | [-0.0023; +0.0146] | 0.0756 |  | 0.1512 |
-| random_holdoutB | phụ | V4-K240 → V5 | MRR | theorem | +0.0035 | [-0.0082; +0.0152] | 0.2718 |  | 0.5436 |
+| Tập | Họ | So sánh | Metric | Trung bình | Δ | KTC 95% | p | p Holm |
+|---|---|---|---|---|---|---|---|---|
+| random_test_all | chính | B0 → B0t | R@10 | truy vấn | +0.0233 | [+0.0132; +0.0332] | 0.0001 | 0.0007 |
+| random_test_all | chính | B0 → B0t | R@10 | theorem | +0.0315 | [+0.0167; +0.0464] | 0.0001 | 0.0007 |
+| random_test_all | chính | B0 → B0t | MRR | truy vấn | +0.0130 | [+0.0072; +0.0193] | 0.0001 | 0.0007 |
+| random_test_all | chính | B0 → B0t | MRR | theorem | +0.0191 | [+0.0094; +0.0290] | 0.0002 | 0.0008 |
+| random_test_all | chính | B0t → V1 | R@10 | truy vấn | +0.0105 | [+0.0001; +0.0217] | 0.0527 | 0.0527 |
+| random_test_all | chính | B0t → V1 | R@10 | theorem | +0.0137 | [-0.0012; +0.0290] | 0.0781 | 0.0781 |
+| random_test_all | chính | B0t → V1 | MRR | truy vấn | +0.0082 | [+0.0020; +0.0144] | 0.0095 | 0.0095 |
+| random_test_all | chính | B0t → V1 | MRR | theorem | +0.0088 | [-0.0020; +0.0198] | 0.1085 | 0.1085 |
+| random_test_all | chính | V1 → V2 | R@10 | truy vấn | +0.0128 | [+0.0059; +0.0202] | 0.0003 | 0.0007 |
+| random_test_all | chính | V1 → V2 | R@10 | theorem | +0.0228 | [+0.0134; +0.0325] | 0.0001 | 0.0007 |
+| random_test_all | chính | V1 → V2 | MRR | truy vấn | +0.0061 | [+0.0023; +0.0101] | 0.0013 | 0.0026 |
+| random_test_all | chính | V1 → V2 | MRR | theorem | +0.0086 | [+0.0030; +0.0145] | 0.0032 | 0.0096 |
+| random_test_all | chính | V2 → V3 | R@10 | truy vấn | +0.0213 | [+0.0103; +0.0325] | 0.0002 | 0.0007 |
+| random_test_all | chính | V2 → V3 | R@10 | theorem | +0.0439 | [+0.0278; +0.0601] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2 → V3 | MRR | truy vấn | +0.0197 | [+0.0135; +0.0263] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2 → V3 | MRR | theorem | +0.0373 | [+0.0289; +0.0461] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2 → V2a | R@10 | truy vấn | +0.0356 | [+0.0287; +0.0435] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2 → V2a | R@10 | theorem | +0.0508 | [+0.0412; +0.0612] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2 → V2a | MRR | truy vấn | +0.0553 | [+0.0483; +0.0629] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2 → V2a | MRR | theorem | +0.0984 | [+0.0867; +0.1105] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2a → V4 | R@10 | truy vấn | +0.0599 | [+0.0456; +0.0742] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2a → V4 | R@10 | theorem | +0.0893 | [+0.0702; +0.1085] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2a → V4 | MRR | truy vấn | +0.0476 | [+0.0394; +0.0561] | 0.0001 | 0.0007 |
+| random_test_all | chính | V2a → V4 | MRR | theorem | +0.0737 | [+0.0598; +0.0882] | 0.0001 | 0.0007 |
+| random_test_all | chính | V4 → V5 | R@10 | truy vấn | +0.0382 | [+0.0244; +0.0526] | 0.0001 | 0.0007 |
+| random_test_all | chính | V4 → V5 | R@10 | theorem | +0.0344 | [+0.0174; +0.0516] | 0.0002 | 0.0007 |
+| random_test_all | chính | V4 → V5 | MRR | truy vấn | +0.0210 | [+0.0115; +0.0306] | 0.0001 | 0.0007 |
+| random_test_all | chính | V4 → V5 | MRR | theorem | +0.0143 | [+0.0007; +0.0281] | 0.0427 | 0.0854 |
+| random_test_all | phụ | B0 → V4 | R@10 | truy vấn | +0.1421 | [+0.1265; +0.1583] | 0.0001 |  |
+| random_test_all | phụ | B0 → V4 | R@10 | theorem | +0.2080 | [+0.1853; +0.2307] | 0.0001 |  |
+| random_test_all | phụ | B0 → V4 | MRR | truy vấn | +0.1302 | [+0.1163; +0.1453] | 0.0001 |  |
+| random_test_all | phụ | B0 → V4 | MRR | theorem | +0.2087 | [+0.1889; +0.2288] | 0.0001 |  |
+| random_test_all | phụ | B0 → V5 | R@10 | truy vấn | +0.1803 | [+0.1620; +0.1998] | 0.0001 |  |
+| random_test_all | phụ | B0 → V5 | R@10 | theorem | +0.2425 | [+0.2197; +0.2659] | 0.0001 |  |
+| random_test_all | phụ | B0 → V5 | MRR | truy vấn | +0.1512 | [+0.1361; +0.1677] | 0.0001 |  |
+| random_test_all | phụ | B0 → V5 | MRR | theorem | +0.2231 | [+0.2015; +0.2446] | 0.0001 |  |
+| random_test_all | phụ | V4 → V4-K240 | R@10 | truy vấn | +0.0112 | [+0.0037; +0.0188] | 0.0038 |  |
+| random_test_all | phụ | V4 → V4-K240 | R@10 | theorem | +0.0134 | [+0.0011; +0.0253] | 0.0267 |  |
+| random_test_all | phụ | V4 → V4-K240 | MRR | truy vấn | +0.0060 | [+0.0018; +0.0103] | 0.0051 |  |
+| random_test_all | phụ | V4 → V4-K240 | MRR | theorem | +0.0051 | [-0.0026; +0.0128] | 0.2008 |  |
+| random_test_all | phụ | V4-K240 → V5 | R@10 | truy vấn | +0.0270 | [+0.0138; +0.0408] | 0.0002 |  |
+| random_test_all | phụ | V4-K240 → V5 | R@10 | theorem | +0.0210 | [+0.0045; +0.0379] | 0.0157 |  |
+| random_test_all | phụ | V4-K240 → V5 | MRR | truy vấn | +0.0150 | [+0.0049; +0.0249] | 0.0025 |  |
+| random_test_all | phụ | V4-K240 → V5 | MRR | theorem | +0.0093 | [-0.0039; +0.0227] | 0.1827 |  |
+| random_test_all | phụ | V2-nons → V2 | R@10 | truy vấn | +0.0014 | [-0.0025; +0.0049] | 0.4933 |  |
+| random_test_all | phụ | V2-nons → V2 | R@10 | theorem | +0.0030 | [-0.0012; +0.0077] | 0.1983 |  |
+| random_test_all | phụ | V2-nons → V2 | MRR | truy vấn | +0.0002 | [-0.0010; +0.0015] | 0.7974 |  |
+| random_test_all | phụ | V2-nons → V2 | MRR | theorem | -0.0013 | [-0.0038; +0.0010] | 0.3022 |  |
+| random_test_all | phụ | V4-poponly → V4 | R@10 | truy vấn | -0.0016 | [-0.0037; +0.0001] | 0.1133 |  |
+| random_test_all | phụ | V4-poponly → V4 | R@10 | theorem | -0.0013 | [-0.0035; +0.0006] | 0.2256 |  |
+| random_test_all | phụ | V4-poponly → V4 | MRR | truy vấn | -0.0000 | [-0.0013; +0.0012] | 0.9386 |  |
+| random_test_all | phụ | V4-poponly → V4 | MRR | theorem | -0.0003 | [-0.0032; +0.0027] | 0.8416 |  |
+| random_test_all | phụ | V4-pronly → V4 | R@10 | truy vấn | -0.0011 | [-0.0081; +0.0058] | 0.7497 |  |
+| random_test_all | phụ | V4-pronly → V4 | R@10 | theorem | -0.0064 | [-0.0152; +0.0024] | 0.1623 |  |
+| random_test_all | phụ | V4-pronly → V4 | MRR | truy vấn | +0.0043 | [-0.0001; +0.0087] | 0.0626 |  |
+| random_test_all | phụ | V4-pronly → V4 | MRR | theorem | +0.0001 | [-0.0084; +0.0086] | 0.9896 |  |
+| novel_premises_test_all | chính | B0 → B0t | R@10 | truy vấn | +0.0271 | [+0.0189; +0.0354] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | B0 → B0t | R@10 | theorem | +0.0260 | [+0.0133; +0.0391] | 0.0004 | 0.0012 |
+| novel_premises_test_all | chính | B0 → B0t | MRR | truy vấn | +0.0157 | [+0.0093; +0.0220] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | B0 → B0t | MRR | theorem | +0.0115 | [+0.0022; +0.0203] | 0.0105 | 0.0210 |
+| novel_premises_test_all | chính | B0t → V1 | R@10 | truy vấn | +0.0082 | [+0.0003; +0.0161] | 0.0470 | 0.0940 |
+| novel_premises_test_all | chính | B0t → V1 | R@10 | theorem | +0.0084 | [-0.0039; +0.0206] | 0.1742 | 0.1742 |
+| novel_premises_test_all | chính | B0t → V1 | MRR | truy vấn | +0.0044 | [-0.0016; +0.0101] | 0.1367 | 0.2734 |
+| novel_premises_test_all | chính | B0t → V1 | MRR | theorem | +0.0001 | [-0.0088; +0.0091] | 0.9785 | 0.9785 |
+| novel_premises_test_all | chính | V1 → V2 | R@10 | truy vấn | +0.0198 | [+0.0126; +0.0273] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V1 → V2 | R@10 | theorem | +0.0208 | [+0.0116; +0.0301] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V1 → V2 | MRR | truy vấn | +0.0139 | [+0.0089; +0.0190] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V1 → V2 | MRR | theorem | +0.0171 | [+0.0119; +0.0224] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V3 | R@10 | truy vấn | +0.0223 | [+0.0122; +0.0323] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V3 | R@10 | theorem | +0.0431 | [+0.0300; +0.0563] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V3 | MRR | truy vấn | +0.0163 | [+0.0108; +0.0217] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V3 | MRR | theorem | +0.0312 | [+0.0225; +0.0402] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V2a | R@10 | truy vấn | +0.0386 | [+0.0324; +0.0452] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V2a | R@10 | theorem | +0.0546 | [+0.0459; +0.0640] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V2a | MRR | truy vấn | +0.0520 | [+0.0466; +0.0579] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2 → V2a | MRR | theorem | +0.0889 | [+0.0803; +0.0974] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2a → V4 | R@10 | truy vấn | +0.0483 | [+0.0375; +0.0593] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2a → V4 | R@10 | theorem | +0.0649 | [+0.0509; +0.0791] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2a → V4 | MRR | truy vấn | +0.0350 | [+0.0282; +0.0419] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V2a → V4 | MRR | theorem | +0.0516 | [+0.0409; +0.0626] | 0.0001 | 0.0007 |
+| novel_premises_test_all | chính | V4 → V5 | R@10 | truy vấn | +0.0107 | [-0.0005; +0.0223] | 0.0742 | 0.0940 |
+| novel_premises_test_all | chính | V4 → V5 | R@10 | theorem | -0.0139 | [-0.0263; -0.0018] | 0.0265 | 0.0530 |
+| novel_premises_test_all | chính | V4 → V5 | MRR | truy vấn | +0.0046 | [-0.0027; +0.0121] | 0.2405 | 0.2734 |
+| novel_premises_test_all | chính | V4 → V5 | MRR | theorem | -0.0166 | [-0.0261; -0.0068] | 0.0010 | 0.0030 |
+| novel_premises_test_all | phụ | B0 → V4 | R@10 | truy vấn | +0.1420 | [+0.1281; +0.1565] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V4 | R@10 | theorem | +0.1747 | [+0.1581; +0.1917] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V4 | MRR | truy vấn | +0.1208 | [+0.1094; +0.1330] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V4 | MRR | theorem | +0.1692 | [+0.1535; +0.1849] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V5 | R@10 | truy vấn | +0.1527 | [+0.1379; +0.1685] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V5 | R@10 | theorem | +0.1607 | [+0.1432; +0.1785] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V5 | MRR | truy vấn | +0.1255 | [+0.1141; +0.1373] | 0.0001 |  |
+| novel_premises_test_all | phụ | B0 → V5 | MRR | theorem | +0.1526 | [+0.1371; +0.1680] | 0.0001 |  |
+| novel_premises_test_all | phụ | V4 → V4-K240 | R@10 | truy vấn | +0.0067 | [+0.0019; +0.0117] | 0.0084 |  |
+| novel_premises_test_all | phụ | V4 → V4-K240 | R@10 | theorem | +0.0050 | [-0.0023; +0.0123] | 0.1817 |  |
+| novel_premises_test_all | phụ | V4 → V4-K240 | MRR | truy vấn | +0.0017 | [-0.0013; +0.0048] | 0.2826 |  |
+| novel_premises_test_all | phụ | V4 → V4-K240 | MRR | theorem | -0.0019 | [-0.0065; +0.0027] | 0.4251 |  |
+| novel_premises_test_all | phụ | V4-K240 → V5 | R@10 | truy vấn | +0.0040 | [-0.0076; +0.0158] | 0.5006 |  |
+| novel_premises_test_all | phụ | V4-K240 → V5 | R@10 | theorem | -0.0189 | [-0.0311; -0.0067] | 0.0022 |  |
+| novel_premises_test_all | phụ | V4-K240 → V5 | MRR | truy vấn | +0.0030 | [-0.0039; +0.0099] | 0.4096 |  |
+| novel_premises_test_all | phụ | V4-K240 → V5 | MRR | theorem | -0.0147 | [-0.0238; -0.0052] | 0.0017 |  |
+| novel_premises_test_all | phụ | V2-nons → V2 | R@10 | truy vấn | +0.0025 | [+0.0003; +0.0047] | 0.0298 |  |
+| novel_premises_test_all | phụ | V2-nons → V2 | R@10 | theorem | +0.0042 | [+0.0005; +0.0082] | 0.0288 |  |
+| novel_premises_test_all | phụ | V2-nons → V2 | MRR | truy vấn | +0.0014 | [+0.0002; +0.0026] | 0.0243 |  |
+| novel_premises_test_all | phụ | V2-nons → V2 | MRR | theorem | +0.0017 | [-0.0006; +0.0038] | 0.1416 |  |
+| random_holdoutB | chính | V4 → V5 | R@10 | truy vấn | +0.0222 | [+0.0094; +0.0349] | 0.0010 | 0.0010 |
+| random_holdoutB | chính | V4 → V5 | R@10 | theorem | +0.0170 | [+0.0022; +0.0323] | 0.0250 | 0.0250 |
+| random_holdoutB | chính | V4 → V5 | MRR | truy vấn | +0.0148 | [+0.0069; +0.0230] | 0.0006 | 0.0006 |
+| random_holdoutB | chính | V4 → V5 | MRR | theorem | +0.0096 | [-0.0018; +0.0211] | 0.0988 | 0.0988 |
+| random_holdoutB | phụ | B0 → V4 | R@10 | truy vấn | +0.1971 | [+0.1809; +0.2144] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V4 | R@10 | theorem | +0.2377 | [+0.2183; +0.2575] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V4 | MRR | truy vấn | +0.1753 | [+0.1609; +0.1902] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V4 | MRR | theorem | +0.2253 | [+0.2068; +0.2443] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V5 | R@10 | truy vấn | +0.2193 | [+0.2026; +0.2372] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V5 | R@10 | theorem | +0.2547 | [+0.2345; +0.2759] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V5 | MRR | truy vấn | +0.1901 | [+0.1756; +0.2050] | 0.0001 |  |
+| random_holdoutB | phụ | B0 → V5 | MRR | theorem | +0.2350 | [+0.2164; +0.2540] | 0.0001 |  |
+| random_holdoutB | phụ | V4 → V4-K240 | R@10 | truy vấn | +0.0110 | [+0.0039; +0.0183] | 0.0025 |  |
+| random_holdoutB | phụ | V4 → V4-K240 | R@10 | theorem | +0.0099 | [+0.0002; +0.0200] | 0.0461 |  |
+| random_holdoutB | phụ | V4 → V4-K240 | MRR | truy vấn | +0.0088 | [+0.0045; +0.0131] | 0.0002 |  |
+| random_holdoutB | phụ | V4 → V4-K240 | MRR | theorem | +0.0061 | [+0.0008; +0.0119] | 0.0272 |  |
+| random_holdoutB | phụ | V4-K240 → V5 | R@10 | truy vấn | +0.0111 | [-0.0017; +0.0239] | 0.0983 |  |
+| random_holdoutB | phụ | V4-K240 → V5 | R@10 | theorem | +0.0071 | [-0.0072; +0.0217] | 0.3426 |  |
+| random_holdoutB | phụ | V4-K240 → V5 | MRR | truy vấn | +0.0061 | [-0.0023; +0.0146] | 0.1602 |  |
+| random_holdoutB | phụ | V4-K240 → V5 | MRR | theorem | +0.0035 | [-0.0082; +0.0152] | 0.5607 |  |
 
 ## 4. Premise đã thấy và chưa thấy trong train cùng split
 
@@ -191,14 +191,14 @@ Họ chính: Recall@10, p một phía, Holm trong từng tập và từng cách 
 | novel_premises_test_all | 9735 | 2506 | 1933 | 1887 | 1093 | 1196 | V4-K240 | 0.4276 | 0.1934 | 0.6823 | 0.3352 |
 | novel_premises_test_all | 9735 | 2506 | 1933 | 1887 | 1093 | 1196 | V5 | 0.3591 | 0.2305 | 0.6033 | 0.4508 |
 
-| tập | từ | đến | metric | delta | ci95_low | ci95_high | p_value | p_two_sided | n_clusters | n_boot |
-|---|---|---|---|---|---|---|---|---|---|---|
-| random_test_all | V4 | V5 | R@10_chưa_thấy | -0.0701 | -0.0980 | -0.0436 | 1.0000 | 0.0000 | 314 | 10000 |
-| random_test_all | V4 | V4-K240 | R@10_chưa_thấy | -0.0200 | -0.0381 | -0.0036 | 0.9922 | 0.0156 | 314 | 10000 |
-| random_test_all | V4-K240 | V5 | R@10_chưa_thấy | -0.0501 | -0.0769 | -0.0239 | 1.0000 | 0.0000 | 314 | 10000 |
-| novel_premises_test_all | V4 | V5 | R@10_chưa_thấy | -0.0850 | -0.0997 | -0.0710 | 1.0000 | 0.0000 | 1093 | 10000 |
-| novel_premises_test_all | V4 | V4-K240 | R@10_chưa_thấy | -0.0166 | -0.0258 | -0.0075 | 0.9997 | 0.0006 | 1093 | 10000 |
-| novel_premises_test_all | V4-K240 | V5 | R@10_chưa_thấy | -0.0684 | -0.0819 | -0.0553 | 1.0000 | 0.0000 | 1093 | 10000 |
+| tập | từ | đến | metric | delta | ci95_low | ci95_high | n_clusters | n_boot | p |
+|---|---|---|---|---|---|---|---|---|---|
+| random_test_all | V4 | V5 | R@10_chưa_thấy | -0.0701 | -0.0980 | -0.0436 | 314 | 10000 | 0.0001 |
+| random_test_all | V4 | V4-K240 | R@10_chưa_thấy | -0.0200 | -0.0381 | -0.0036 | 314 | 10000 | 0.0286 |
+| random_test_all | V4-K240 | V5 | R@10_chưa_thấy | -0.0501 | -0.0769 | -0.0239 | 314 | 10000 | 0.0003 |
+| novel_premises_test_all | V4 | V5 | R@10_chưa_thấy | -0.0850 | -0.0997 | -0.0710 | 1093 | 10000 | 0.0001 |
+| novel_premises_test_all | V4 | V4-K240 | R@10_chưa_thấy | -0.0166 | -0.0258 | -0.0075 | 1093 | 10000 | 0.0005 |
+| novel_premises_test_all | V4-K240 | V5 | R@10_chưa_thấy | -0.0684 | -0.0819 | -0.0553 | 1093 | 10000 | 0.0001 |
 
 ## 5. Theo số truy vấn của theorem (R@10 trung bình theo truy vấn trong nhóm)
 

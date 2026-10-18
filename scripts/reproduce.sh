@@ -73,7 +73,7 @@ $PY scripts/make_figures.py > /dev/null
 
 if [ $REPORT = 1 ]; then
   echo "== 7. Báo cáo"
-  $PY scripts/make_report_tables.py   # build.sh dưới đây chạy lại bước này cùng ví dụ xuyên suốt và hình
-  bash report/latex/build.sh   # sinh hình PDF và biên dịch report/report.pdf
+  # các lần chạy vừa tái tạo đã được ghim lại ở bước 4, nên cập nhật báo cáo thay vì đối chiếu với bản đã phát hành
+  bash report/latex/build.sh --update   # sinh bảng, ví dụ xuyên suốt, hình PDF và biên dịch report/report.pdf
 fi
 echo "Xong. Xem results/figures/ và report/report.pdf"

@@ -46,7 +46,8 @@ def title(ax, text: str):
 
 
 def save(fig, name: str):
-    fig.savefig(FIG / (name + EXT))
+    # PDF không ghi ngày tạo, để cùng dữ liệu luôn cho cùng tệp hình
+    fig.savefig(FIG / (name + EXT), **({"metadata": {"CreationDate": None}} if EXT == ".pdf" else {}))
 
 
 plt.rcParams.update({
@@ -59,8 +60,21 @@ plt.rcParams.update({
 })
 
 
+INPUTS: set[Path] = set()
+
+
 def load(kind: str) -> list[dict]:
-    return [json.loads(p.read_text(encoding="utf-8")) for p in sorted((RAW / kind).glob("*.json"))]
+    """Run record của một loại. Ở chế độ báo cáo chỉ đọc danh sách đã ghim trong results/figures/report_records.json
+    (scripts/pin_runs.py), để một lần chạy phát sinh sau khi phát hành không làm hình thay đổi."""
+    files = sorted((RAW / kind).glob("*.json"))
+    pins = ROOT / "results" / "figures" / "report_records.json"
+    if REPORT and pins.exists():
+        ids = json.loads(pins.read_text(encoding="utf-8"))["records"].get("eval-scale" if kind == "eval" else kind)
+        if ids is not None:
+            files = [RAW / kind / f"{i}.json" for i in ids]
+            INPUTS.add(pins)
+    INPUTS.update(files)
+    return [json.loads(f.read_text(encoding="utf-8")) for f in files]
 
 
 def agg(vals):
@@ -487,10 +501,11 @@ def main() -> None:
     ap.add_argument("--report", action="store_true", help="xuất PDF cho báo cáo LaTeX vào report/latex/figures")
     if ap.parse_args().report:
         REPORT, EXT, FIG, SURFACE = True, ".pdf", ROOT / "report" / "latex" / "figures", "#ffffff"
-        FIGSIZE, LABEL_FS, LEGEND_FS = (3.6, 2.7), 8, 7.5
+        # hình in ở nửa bề rộng trang (khoảng 0,87 lần kích thước gốc): chữ 10pt còn khoảng 8,7pt trên giấy
+        FIGSIZE, LABEL_FS, LEGEND_FS = (3.6, 2.8), 9, 8.5
         plt.rcParams.update({"figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
-                             "pdf.fonttype": 42, "font.size": 9, "axes.labelsize": 9, "xtick.labelsize": 8,
-                             "ytick.labelsize": 8, "lines.linewidth": 1.6, "lines.markersize": 5})
+                             "pdf.fonttype": 42, "font.size": 10, "axes.labelsize": 10, "xtick.labelsize": 9,
+                             "ytick.labelsize": 9, "lines.linewidth": 1.6, "lines.markersize": 5})
     FIG.mkdir(parents=True, exist_ok=True)
     md = ["# Kết quả quy mô (sinh bởi scripts/make_figures.py)\n"]
     build_section(md)
@@ -501,6 +516,13 @@ def main() -> None:
     if not REPORT:
         (FIG / "scale_tables.md").write_text("\n".join(md) + "\n", encoding="utf-8")
         print("\n".join(md))
+    else:   # nguồn của từng hình kèm SHA-256, đối chiếu bằng scripts/verify_report_inputs.py
+        import hashlib
+        lines = ["# Tệp đầu vào của các hình (sinh bởi scripts/make_figures.py --report)", "",
+                 "| Tệp | SHA-256 |", "|---|---|"]
+        lines += [f"| `{x.relative_to(ROOT).as_posix()}` | `{hashlib.sha256(x.read_bytes()).hexdigest()}` |"
+                  for x in sorted(INPUTS)]
+        (FIG / "SOURCES.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

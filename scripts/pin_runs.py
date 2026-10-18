@@ -35,6 +35,28 @@ def main() -> None:
     out.write_text(json.dumps(dict(sorted(latest.items())), ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{len(latest)} lần chạy được ghim vào {out.relative_to(ROOT)}")
 
+    # Các bảng tải, xây chỉ mục, Lucene và ablation tổng hợp nhiều run record: ghim danh sách run_id hiện có, để một lần
+    # chạy phát sinh sau đó không lọt vào bảng của bản báo cáo.
+    raw = ROOT / "results" / "raw"
+    records = {kind: sorted(f.stem for f in (raw / kind).glob("*.json"))
+               for kind in ("loadtest", "build", "lucene", "serve-memory", "serve-cpu", "codec")}
+    # lần chạy chất lượng theo kích thước chỉ mục, dùng cho Hình chất lượng và độ trễ theo kích thước
+    records["eval-scale"] = sorted(f.stem for f in (raw / "eval").glob("*.json")
+                                   if json.loads(f.read_text(encoding="utf-8"))["parameters"].get("tag") == "scale-quality")
+    ablation: dict[str, dict] = {}
+    for f in (raw / "eval").glob("*.json"):
+        r = json.loads(f.read_text(encoding="utf-8"))
+        prm = r["parameters"]
+        if prm.get("tag") == "ablation" and prm["eval_set"] == "random_test_all":
+            name = prm["config"]["name"]
+            if name not in ablation or r["timestamp"] > ablation[name]["timestamp"]:
+                ablation[name] = {"run_id": r["run_id"], "timestamp": r["timestamp"]}
+    out2 = ROOT / "results" / "figures" / "report_records.json"
+    out2.write_text(json.dumps({"records": records, "ablation": {k: v["run_id"] for k, v in sorted(ablation.items())}},
+                               ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"{sum(map(len, records.values()))} run record và {len(ablation)} lần chạy ablation được ghim vào "
+          f"{out2.relative_to(ROOT)}")
+
 
 if __name__ == "__main__":
     main()

@@ -2,9 +2,11 @@
 
 1. Luồng lọc dữ liệu: theorem gốc, tactic, tactic có premise, truy vấn giữ lại, theorem còn truy vấn, proof state khác nhau.
 2. Trung bình theo truy vấn (query-macro, metric chính) và theo theorem (theorem-macro, kiểm tra độ bền).
-3. Kiểm định: paired bootstrap theo cụm theorem (lấy mẫu theorem, mang theo các truy vấn của nó), 10.000 mẫu.
-   Họ so sánh chính là chuỗi cải tiến B0 → B0t → V1 → V2 → V3, V2 → V2a → V4 → V5 trên Recall@10, p một phía, hiệu
-   chỉnh Holm trong từng tập đánh giá. MRR, các đối chứng và ablation là phân tích phụ, báo p hai phía chưa hiệu chỉnh.
+3. Khoảng tin cậy: paired bootstrap theo cụm theorem (lấy mẫu theorem, mang theo các truy vấn của nó), 10.000 mẫu.
+   Giá trị p: kiểm định hoán vị ghép cặp theo cụm theorem (đổi nhãn hai hệ thống cho mọi truy vấn của một theorem),
+   10.000 phép hoán vị, p hai phía có hiệu chỉnh Monte Carlo. Họ so sánh chính là 7 bước của chuỗi cải tiến
+   B0 → B0t → V1 → V2 → V3, V2 → V2a → V4 → V5, hiệu chỉnh Holm trong từng tập, từng metric và từng cách lấy trung
+   bình. Các đối chứng là phân tích phụ, báo p chưa hiệu chỉnh.
 4. Premise đã thấy và chưa thấy: một premise đúng là "chưa thấy" nếu không là nhãn của truy vấn train nào cùng split.
 
 Dùng:  python scripts/robustness.py
@@ -22,7 +24,7 @@ import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from n3.eval.metrics import holm, paired_cluster_bootstrap  # noqa: E402
+from n3.eval.metrics import holm, paired_cluster_bootstrap, paired_cluster_permutation  # noqa: E402
 
 P = ROOT / "data" / "processed"
 OUT = ROOT / "results" / "figures" / "robustness"
@@ -41,8 +43,8 @@ def md_table(df: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
-def fmt_p(p: float, n_boot: int = 10000) -> str:
-    return f"< {1 / n_boot:.0e}".replace("e-0", "e-") if p == 0 else f"{p:.4f}"
+def fmt_p(p: float) -> str:
+    return f"{p:.4f}"
 
 
 def main() -> None:
@@ -105,8 +107,9 @@ def main() -> None:
                 assert da.index.equals(db.index)
                 for metric in ("R@10", "MRR"):
                     for est in ("query", "cluster"):
-                        r = paired_cluster_bootstrap(da[metric].to_numpy(), db[metric].to_numpy(), da.theorem.to_numpy(),
-                                                     estimand=est)
+                        args = (da[metric].to_numpy(), db[metric].to_numpy(), da.theorem.to_numpy())
+                        r = paired_cluster_bootstrap(*args, estimand=est)
+                        r["p"] = paired_cluster_permutation(*args, estimand=est)["p"]
                         sig.append({"tập": ev, "họ": family, "từ": a, "đến": b, "metric": metric,
                                     "trung_bình": "truy vấn" if est == "query" else "theorem", **r})
     macro = pd.DataFrame(macro)
@@ -114,7 +117,7 @@ def main() -> None:
     sig = pd.DataFrame(sig)
     sig["p_holm"] = np.nan
     for (ev, metric, est), g in sig[(sig["họ"] == "chính")].groupby(["tập", "metric", "trung_bình"]):
-        sig.loc[g.index, "p_holm"] = holm(g.p_value.tolist())
+        sig.loc[g.index, "p_holm"] = holm(g.p.tolist())
     sig.to_csv(OUT / "significance_cluster.csv", index=False)
 
     md += ["## 2. Trung bình theo truy vấn và theo theorem", "",
@@ -123,13 +126,14 @@ def main() -> None:
     for r in macro.itertuples():
         md.append(f"| {r[1]} | {r[2]} | {r[3]} | {r[4]} | {r[5]:.4f} | {r[6]:.4f} | {r[7]:.4f} | {r[8]:.4f} |")
     md += ["", "## 3. Kiểm định bootstrap theo cụm theorem (10.000 mẫu)", "",
-           "Họ chính: Recall@10, p một phía, Holm trong từng tập và từng cách lấy trung bình. Họ phụ: p hai phía, không hiệu chỉnh.",
-           "", "| Tập | Họ | So sánh | Metric | Trung bình | Δ | KTC 95% | p | p Holm | p hai phía |",
-           "|---|---|---|---|---|---|---|---|---|---|"]
+           "KTC từ bootstrap theo cụm; p hai phía từ kiểm định hoán vị theo cụm. Họ chính: Holm trong từng tập, metric và cách lấy "
+           "trung bình. Họ phụ: không hiệu chỉnh.",
+           "", "| Tập | Họ | So sánh | Metric | Trung bình | Δ | KTC 95% | p | p Holm |",
+           "|---|---|---|---|---|---|---|---|---|"]
     for r in sig.itertuples():
         md.append(f"| {r.tập} | {r.họ} | {r.từ} → {r.đến} | {r.metric} | {r.trung_bình} | {r.delta:+.4f} | "
-                  f"[{r.ci95_low:+.4f}; {r.ci95_high:+.4f}] | {fmt_p(r.p_value)} | "
-                  f"{'' if np.isnan(r.p_holm) else fmt_p(r.p_holm)} | {fmt_p(r.p_two_sided)} |")
+                  f"[{r.ci95_low:+.4f}; {r.ci95_high:+.4f}] | {fmt_p(r.p)} | "
+                  f"{'' if np.isnan(r.p_holm) else fmt_p(r.p_holm)} |")
 
     # ---- 4. premise đã thấy và chưa thấy
     seen_rows, unseen_sig = [], []
@@ -167,7 +171,9 @@ def main() -> None:
             seen_rows.append(row)
         for a, b in (("V4", "V5"), ("V4", "V4-K240"), ("V4-K240", "V5")):
             if a in per_sys and b in per_sys:
-                r = paired_cluster_bootstrap(per_sys[a][10], per_sys[b][10], thm[q_u].to_numpy())
+                args = (per_sys[a][10], per_sys[b][10], thm[q_u].to_numpy())
+                r = paired_cluster_bootstrap(*args)
+                r["p"] = paired_cluster_permutation(*args)["p"]
                 unseen_sig.append({"tập": ev, "từ": a, "đến": b, "metric": "R@10_chưa_thấy", **r})
     su = pd.DataFrame(seen_rows)
     su.to_csv(OUT / "seen_unseen.csv", index=False)

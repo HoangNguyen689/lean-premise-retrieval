@@ -2,10 +2,10 @@
 \begin{table}[htbp]
 \centering
 \setlength{\tabcolsep}{5pt}
-\caption[Đối chứng namespace và đặc trưng phụ thuộc]{Đối chứng tách thành phần: V2-nons bỏ trường namespace khỏi BM25F; V4-poponly và V4-pronly chỉ giữ một trong hai đặc trưng phụ thuộc, mỗi cấu hình huấn luyện lại trên cùng dữ liệu. $\Delta$ là cấu hình rút gọn trừ cấu hình đầy đủ trên tập kiểm tra, kèm khoảng tin cậy 95\% từ bootstrap theo cụm theorem}\label{tab:controls}
+\caption[Đối chứng namespace và đặc trưng phụ thuộc]{Đối chứng cho trường namespace và hai đặc trưng phụ thuộc}\label{tab:controls}
 \begin{tabular}{@{}lrrrrll@{}}
 \toprule
-& \multicolumn{2}{c}{Validation} & \multicolumn{4}{c}{Kiểm tra \code{random}} \\
+& \multicolumn{2}{c}{Validation} & \multicolumn{4}{c}{Test \code{random}} \\
 \cmidrule(lr){2-3}\cmidrule(l){4-7}
 Cấu hình & R@10 & MRR & R@10 & MRR & $\Delta$R@10 & $\Delta$MRR \\
 \midrule
@@ -13,8 +13,9 @@ V2 & 0,172 & 0,115 & 0,147 & 0,093 &  &  \\
 V2-nons & 0,172 & 0,114 & 0,146 & 0,093 & $-$0,001 [$-$0,005; 0,002] & $-$0,000 [$-$0,001; 0,001] \\
 \midrule
 V4 & 0,273 & 0,220 & 0,243 & 0,196 &  &  \\
-V4-poponly & 0,273 & 0,220 & 0,244 & 0,196 & $+$0,002 [$-$0,000; 0,004] & $+$0,000 [$-$0,001; 0,001] \\
-V4-pronly & 0,276 & 0,217 & 0,244 & 0,191 & $+$0,001 [$-$0,006; 0,008] & $-$0,004 [$-$0,009; 0,000] \\
+V4-poponly & 0,273 & 0,220 & 0,244 & 0,196 & $+$0,002 [$-$0,0001; 0,004] & $+$0,000 [$-$0,001; 0,001] \\
+V4-pronly & 0,276 & 0,217 & 0,244 & 0,191 & $+$0,001 [$-$0,006; 0,008] & $-$0,004 [$-$0,009; 0,0001] \\
 \bottomrule
 \end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: V2-nons bỏ trường namespace khỏi BM25F; V4-poponly và V4-pronly chỉ giữ popularity hoặc PageRank. $\Delta$ là cấu hình rút gọn trừ cấu hình đầy đủ trên tập test, kèm KTC 95\%.\par}
 \end{table}

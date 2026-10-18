@@ -1,13 +1,13 @@
 % Sinh bởi scripts/make_report_tables.py, không sửa tay.
 \begin{table}[htbp]
 \centering
-\caption[Phân loại tự động các lỗi của V4]{Phân loại tự động 4.369 cặp (truy vấn, premise đúng) mà V4 bỏ lỡ ở top 10 trên tập kiểm tra \code{random}; một cặp có thể thuộc nhiều nhóm}\label{tab:errors}
+\caption[Phân loại tự động các lỗi của V4]{Phân loại tự động 4.369 cặp (truy vấn, gold premise) mà V4 bỏ lỡ ở top 10 trên tập test \code{random}; một cặp có thể thuộc nhiều nhóm}\label{tab:errors}
 \begin{tabularx}{\linewidth}{@{}Xrr@{}}
 \toprule
 Nhóm lỗi & Số cặp & Tỉ lệ \\
 \midrule
-Premise đúng nằm ngoài 100 ứng viên của giai đoạn 1 & 3.613 & 82,7\% \\
-Truy vấn có nhiều premise đúng & 2.430 & 55,6\% \\
+Gold premise nằm ngoài 100 candidate của giai đoạn 1 & 3.613 & 82,7\% \\
+Truy vấn có nhiều gold premise & 2.430 & 55,6\% \\
 Premise tổng quát, thuộc 1\% premise được dùng nhiều nhất & 1.352 & 30,9\% \\
 Premise không có từ nào chung với truy vấn & 1.080 & 24,7\% \\
 Premise là định nghĩa, instance hoặc structure & 706 & 16,2\% \\

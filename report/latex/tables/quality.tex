@@ -1,7 +1,7 @@
 % Sinh bởi scripts/make_report_tables.py, không sửa tay.
 \begin{table}[htbp]
 \centering
-\caption[Chất lượng truy hồi trên toàn bộ tập kiểm tra]{Chất lượng truy hồi trên toàn bộ tập kiểm tra (\num{2641} truy vấn \code{random}, \num{4141} truy vấn \code{novel\_premises}); trung bình theo truy vấn}\label{tab:quality}
+\caption[Chất lượng truy hồi trên toàn bộ tập test]{Chất lượng truy hồi trên toàn bộ tập test, query-macro}\label{tab:quality}
 \begin{tabular}{@{}lrrrrrrrrr@{}}
 \toprule
 & \multicolumn{6}{c}{\code{random}} & \multicolumn{3}{c}{\code{novel\_premises}} \\
@@ -15,7 +15,8 @@ V2 & 0,023 & 0,101 & 0,147 & 0,270 & 0,093 & 0,087 & 0,183 & 0,335 & 0,124 \\
 V3 & 0,029 & 0,116 & 0,168 & 0,296 & 0,112 & 0,103 & 0,205 & 0,352 & 0,140 \\
 V2a & 0,053 & 0,135 & 0,183 & 0,328 & 0,148 & 0,125 & 0,221 & 0,381 & 0,176 \\
 V4 & 0,072 & 0,184 & 0,243 & 0,373 & 0,196 & 0,169 & 0,269 & 0,417 & 0,211 \\
-\textbf{V5} & \textbf{0,073} & \textbf{0,198} & \textbf{0,281} & \textbf{0,508} & \textbf{0,217} & \textbf{0,188} & \textbf{0,280} & \textbf{0,509} & \textbf{0,215} \\
+V5 & \textbf{0,073} & \textbf{0,198} & \textbf{0,281} & \textbf{0,508} & \textbf{0,217} & \textbf{0,188} & \textbf{0,280} & \textbf{0,509} & \textbf{0,215} \\
 \bottomrule
 \end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: \num{2641} truy vấn \code{random}, \num{4141} truy vấn \code{novel\_premises}. Chữ đậm là giá trị cao nhất của từng cột; cấu hình đề xuất dùng chung là V4 (Mục~\ref{sec:robust}).\par}
 \end{table}

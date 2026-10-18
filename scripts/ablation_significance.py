@@ -1,7 +1,9 @@
-"""Kiểm định ablation: paired bootstrap của từng biến thể so với abl_full trên metric từng truy vấn.
+"""Kiểm định ablation: so sánh từng biến thể với abl_full trên metric từng truy vấn.
 
-Đọc run record mới nhất có tag "ablation" của mỗi biến thể (results/raw/eval/*.json) và file per-query tương ứng,
-nên số liệu không phụ thuộc vào phần làm tròn khi in ra màn hình.
+Khoảng tin cậy từ paired bootstrap theo cụm theorem; p hai phía từ kiểm định hoán vị ghép cặp theo cụm theorem
+(n3.eval.metrics.paired_cluster_permutation), hiệu chỉnh Holm trên 9 phép so sánh của từng metric.
+Đọc các lần chạy ablation đã ghim trong results/figures/report_records.json (scripts/pin_runs.py); nếu chưa ghim thì
+lấy run record mới nhất có tag "ablation" của mỗi biến thể, cùng file per-query tương ứng.
 
 Dùng:  python scripts/ablation_significance.py
 Ra:    results/figures/ablation_significance.md, results/figures/ablation_significance.csv
@@ -19,7 +21,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 import pyarrow.parquet as pq  # noqa: E402
 
-from n3.eval.metrics import holm, paired_cluster_bootstrap  # noqa: E402
+from n3.eval.metrics import holm, paired_cluster_bootstrap, paired_cluster_permutation  # noqa: E402
 
 ORDER = ["abl_full", "abl_no_bm25", "abl_no_namespace", "abl_no_location", "abl_no_symbols", "abl_no_kind",
          "abl_no_dependency", "abl_no_filter", "abl_k50", "abl_k200"]
@@ -32,6 +34,12 @@ METRICS = ["R@10", "MRR"]
 
 
 def latest() -> dict[str, dict]:
+    pinned = ROOT / "results" / "figures" / "report_records.json"
+    if pinned.exists():
+        ids = json.loads(pinned.read_text(encoding="utf-8")).get("ablation", {})
+        if ids:
+            return {n: json.loads((ROOT / "results" / "raw" / "eval" / f"{rid}.json").read_text(encoding="utf-8"))
+                    for n, rid in ids.items()}
     recs: dict[str, dict] = {}
     for f in (ROOT / "results" / "raw" / "eval").glob("*.json"):
         r = json.loads(f.read_text(encoding="utf-8"))
@@ -61,10 +69,11 @@ def main() -> None:
         for m in METRICS:
             row[m] = float(d[m].mean())
             if n != "abl_full":
-                # bootstrap theo cụm theorem (các truy vấn cùng một chứng minh không độc lập); p hai phía
-                bs = paired_cluster_bootstrap(base[m].to_numpy(), d[m].to_numpy(), clusters)
+                # các truy vấn cùng một chứng minh không độc lập: KTC bootstrap và hoán vị đều theo cụm theorem
+                args = (base[m].to_numpy(), d[m].to_numpy(), clusters)
+                bs = paired_cluster_bootstrap(*args)
                 row.update({f"d_{m}": bs["delta"], f"lo_{m}": bs["ci95_low"], f"hi_{m}": bs["ci95_high"],
-                            f"p_{m}": bs["p_two_sided"]})
+                            f"p_{m}": paired_cluster_permutation(*args)["p"]})
         rows.append(row)
     df = pd.DataFrame(rows)
     for m in METRICS:   # Holm trên họ 9 phép so sánh của từng metric
@@ -75,26 +84,27 @@ def main() -> None:
 
     def verdict(r) -> str:
         if r["variant"] == "abl_full":
-            return "—"
+            return ""
         if r["pholm_R@10"] < 0.05:
             return "tốt hơn có ý nghĩa" if r["d_R@10"] > 0 else "kém hơn có ý nghĩa"
         return "không phân biệt được sau hiệu chỉnh"
 
     lines = ["# Ablation kèm kiểm định (sinh bởi scripts/ablation_significance.py)", "",
-             f"random_test_all, n = {len(base)}. Δ = biến thể − V4 đầy đủ; KTC 95% và p hai phía từ paired bootstrap theo "
-             "cụm theorem, 10.000 mẫu (seed 42); p Holm hiệu chỉnh trên 9 phép so sánh của từng metric. Mỗi biến thể huấn "
-             "luyện lại reranker trên cùng 6.000 truy vấn train nửa B.", "",
+             f"random_test_all, n = {len(base)}. Δ = biến thể trừ V4 đầy đủ; KTC 95% từ paired bootstrap theo cụm theorem, "
+             "p hai phía từ kiểm định hoán vị ghép cặp theo cụm theorem (10.000 phép hoán vị, seed 42, p = (1 + số lần cực "
+             "trị) / 10.001); p Holm hiệu chỉnh trên 9 phép so sánh của từng metric. Mỗi biến thể huấn luyện lại reranker "
+             "trên cùng 6.000 truy vấn train nửa B.", "",
              "| Biến thể | Thay đổi | R@10 | ΔR@10 [KTC 95%] | p (Holm) | MRR | ΔMRR [KTC 95%] | p (Holm) | Kết luận theo R@10 |",
              "|---|---|---|---|---|---|---|---|---|"]
     for r in df.to_dict("records"):
         if r["variant"] == "abl_full":
-            lines.append(f"| {r['variant']} | {r['change']} | {r['R@10']:.4f} | — | — | {r['MRR']:.4f} | — | — | — |")
+            lines.append(f"| {r['variant']} | {r['change']} | {r['R@10']:.4f} |  |  | {r['MRR']:.4f} |  |  |  |")
             continue
         cells = []
         for m in METRICS:
             p_, ph = r[f"p_{m}"], r[f"pholm_{m}"]
             cells += [f"{r[m]:.4f}", f"{r[f'd_{m}']:+.4f} [{r[f'lo_{m}']:+.4f}, {r[f'hi_{m}']:+.4f}]",
-                      ("< 1e-4" if p_ == 0 else f"{p_:.4f}") + " (" + ("< 1e-4" if ph == 0 else f"{ph:.4f}") + ")"]
+                      f"{p_:.4f} ({ph:.4f})"]
         lines.append(f"| {r['variant']} | {r['change']} | " + " | ".join(cells) + f" | {verdict(r)} |")
     (out / "ablation_significance.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))

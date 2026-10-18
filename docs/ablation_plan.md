@@ -19,7 +19,7 @@ lại thành văn bản ngày 2026-10-18, sau khi đã chạy; cột *Kết qu�
 | Huấn luyện lại | Mỗi biến thể của reranker huấn luyện lại trên cùng 6.000 truy vấn train nửa B (seed 42), stage 1 và bộ lọc như lúc chạy. |
 | Chống rò rỉ | Thống kê phụ thuộc lấy từ train nửa A; `novel_premises` dùng train riêng của nó (`docs/benchmark_spec.md` §4). |
 | Metric chính | Recall@10 (chất lượng) và P95 ở 10 client (độ trễ). Metric phụ: R@1/5/50, MRR, nDCG@10, QPS, kích thước index, thời gian build. |
-| Kiểm định | Paired bootstrap theo cụm theorem, 10.000 mẫu, seed 42 (`n3.eval.metrics.paired_cluster_bootstrap`): lấy mẫu theorem, mang theo mọi truy vấn của nó. Trước bản đánh giá phản biện ngày 2026-10-18, kiểm định lấy mẫu từng truy vấn độc lập (`paired_bootstrap`). |
+| Kiểm định | Khoảng tin cậy: paired bootstrap theo cụm theorem, 10.000 mẫu, seed 42 (`n3.eval.metrics.paired_cluster_bootstrap`). Giá trị p: kiểm định hoán vị ghép cặp theo cụm theorem (`paired_cluster_permutation`), đổi nhãn hai hệ thống cho mọi truy vấn của một theorem, 10.000 phép hoán vị, p hai phía = (1 + số lần cực trị) / 10.001. Trước ngày 2026-10-19, p được lấy từ tỉ lệ đuôi của bootstrap; cách đó sai khi chênh lệch bằng 0 nên đã bị thay (bản đánh giá lần 2, mục 3). |
 | Quy tắc kết luận | Leave-one-out (mục B, C): p hai phía hiệu chỉnh Holm trên 9 phép so sánh của từng metric; p Holm < 0,05 → thành phần có tác dụng, ngược lại là "không phân biệt được", không kết luận là vô dụng. Chuỗi tích lũy (mục A): p một phía, Holm trên 7 bước trong từng split. Các so sánh còn lại báo KTC 95% và p chưa hiệu chỉnh. |
 | Thời gian chạy | Mọi phép đo thời gian lặp ít nhất 3 lần; báo trung vị và khoảng min–max. |
 
@@ -27,19 +27,19 @@ lại thành văn bản ngày 2026-10-18, sau khi đã chạy; cột *Kết qu�
 
 ### A. Chuỗi tích lũy chất lượng (RQ1)
 
-Đánh giá trên `random_test_all` (2.641 truy vấn) và `novel_premises_test_all` (4.141). Nguồn: `results/figures/quality.md`,
-`significance_*.csv`.
+Đánh giá trên `random_test_all` (2.641 truy vấn) và `novel_premises_test_all` (4.141). Nguồn:
+`results/figures/robustness/significance_cluster.csv` (KTC bootstrap theo cụm, p hoán vị theo cụm, Holm trên 7 bước).
 
-| Bước | Thay đổi duy nhất | Giả thuyết | Kết quả random: ΔR@10 [KTC 95%] |
+| Bước | Thay đổi duy nhất | Giả thuyết | Kết quả random: ΔR@10 [KTC 95%], p Holm |
 |---|---|---|---|
-| B0 → B0t | tinh k1, b, query_tf trên val | Tham số mặc định chưa hợp với proof state dài | +0,023 [+0,015; +0,032] ✓ |
-| B0t → V1 | tokenizer Lean (tên có dấu chấm, camelCase, ký hiệu) | Tokenizer `\w+` làm mất ký hiệu và tên ghép | +0,010 [+0,002; +0,019] ✓ |
-| V1 → V2 | BM25F ba trường name / namespace / statement | Tên và namespace là tín hiệu riêng, không nên trộn vào statement | +0,013 [+0,007; +0,018] ✓ |
-| V2 → V3 | reranker 11 đặc trưng cấu trúc | Vị trí, namespace, ký hiệu, loại khai báo sắp lại top-100 tốt hơn BM25 | +0,021 [+0,012; +0,031] ✓ |
-| V2 → V2a | bộ lọc premise truy cập được | Premise không import được không thể là đáp án | +0,036 [+0,030; +0,042] ✓ |
-| V2a → V4 | reranker 13 đặc trưng gồm popularity, PageRank | Premise được dùng nhiều trong train có xác suất cao hơn | +0,060 [+0,048; +0,072] ✓ |
+| B0 → B0t | tinh k1, b, query_tf trên val | Tham số mặc định chưa hợp với proof state dài | +0,023 [+0,013; +0,033], 0,0007 ✓ |
+| B0t → V1 | tokenizer Lean (tên có dấu chấm, camelCase, ký hiệu) | Tokenizer `\w+` làm mất ký hiệu và tên ghép | +0,010 [+0,0001; +0,022], 0,053: không phân biệt được (MRR có ý nghĩa) |
+| V1 → V2 | BM25F ba trường name / namespace / statement | Tên và namespace là tín hiệu riêng, không nên trộn vào statement | +0,013 [+0,006; +0,020], 0,0007 ✓ |
+| V2 → V3 | reranker 11 đặc trưng cấu trúc | Vị trí, namespace, ký hiệu, loại khai báo sắp lại top-100 tốt hơn BM25 | +0,021 [+0,010; +0,033], 0,0007 ✓ |
+| V2 → V2a | bộ lọc premise truy cập được | Premise không import được không thể là đáp án | +0,036 [+0,029; +0,044], 0,0007 ✓ |
+| V2a → V4 | reranker 13 đặc trưng gồm popularity, PageRank | Premise được dùng nhiều trong train có xác suất cao hơn | +0,060 [+0,046; +0,074], 0,0007 ✓ |
 
-Trên `novel_premises` mọi bước cũng tăng R@10 có ý nghĩa. Riêng B0t → V1 có ΔMRR với KTC chứa 0.
+Trên `novel_premises`, B0t → V1 và V4 → V5 có p Holm 0,094 (không phân biệt được); các bước còn lại có ý nghĩa.
 
 ### B. Leave-one-group-out trên reranker V4 (RQ2)
 
@@ -90,7 +90,7 @@ Nguồn: `results/figures/ablation.md`, `ablation_significance.md`. Bỏ một n
 
 - **Nhiều phép so sánh.** Mục B và C có 9 phép kiểm định. Với bootstrap theo cụm và hiệu chỉnh Holm
   (`results/figures/ablation_significance.csv`), hai kết luận yếu nhất về Recall@10 không còn đứng: `abl_no_symbols` và
-  `abl_k50` (p Holm = 0,119), dù vẫn có ý nghĩa với MRR; `abl_k200` còn p Holm = 0,036.
+  `abl_k50` (p Holm = 0,132), dù vẫn có ý nghĩa với MRR; `abl_k200` còn p Holm = 0,019.
 - **Đối chứng bổ sung sau phản biện.** V4-K240 (cùng ngân sách ứng viên với V5), V2-nons (BM25F không có trường namespace),
   V4-poponly và V4-pronly (tách hai đặc trưng phụ thuộc); cấu hình trong `configs/review/`, chạy bằng
   `scripts/review_experiments.py`, kết quả trong `results/figures/robustness.md`. Tập holdout mới

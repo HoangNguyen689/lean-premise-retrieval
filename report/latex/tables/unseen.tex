@@ -1,10 +1,10 @@
 % Sinh bởi scripts/make_report_tables.py, không sửa tay.
 \begin{table}[htbp]
 \centering
-\caption[Recall trên premise chưa thấy và đã thấy]{Recall trên premise chưa thấy và đã thấy trong train của split \code{novel\_premises} (tập kiểm tra). Premise chưa thấy chiếm 2.506 trên 9.735 cặp nhãn, nằm trong 1.887 truy vấn và 1.093 trên 1.196 theorem; mỗi cột chỉ lấy trung bình trên các truy vấn có loại nhãn tương ứng}\label{tab:unseen}
+\caption[Recall trên unseen premise và seen premise]{Recall trên unseen premise và seen premise, tập test \code{novel\_premises}}\label{tab:unseen}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-Hệ thống & R@10, chưa thấy & R@50, chưa thấy & R@10, đã thấy & R@50, đã thấy \\
+Hệ thống & R@10, unseen & R@50, unseen & R@10, seen & R@50, seen \\
 \midrule
 B0 & 0,293 & 0,443 & 0,044 & 0,101 \\
 V2 & 0,356 & 0,603 & 0,092 & 0,205 \\
@@ -13,4 +13,5 @@ V4-K240 & 0,428 & 0,682 & 0,193 & 0,335 \\
 V5 & 0,359 & 0,603 & 0,231 & 0,451 \\
 \bottomrule
 \end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: unseen premise chiếm 2.506 trên 9.735 cặp nhãn, thuộc 1.887 truy vấn và 1.093 trên 1.196 theorem; mỗi cột chỉ lấy trung bình trên các truy vấn có loại nhãn tương ứng.\par}
 \end{table}

@@ -8,6 +8,7 @@ Dùng:  python scripts/make_report_tables.py
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -20,6 +21,18 @@ FIG = ROOT / "results" / "figures"
 RAW = ROOT / "results" / "raw"
 OUT = ROOT / "report" / "latex" / "tables"
 SOURCES: list[tuple[str, str]] = []
+INPUTS: set[Path] = set()
+
+
+def inp(path: Path) -> Path:
+    """Ghi nhận một tệp đầu vào để liệt kê kèm SHA-256 trong SOURCES.md."""
+    INPUTS.add(path)
+    return path
+
+
+def pinned_records() -> dict:
+    f = FIG / "report_records.json"
+    return json.loads(inp(f).read_text(encoding="utf-8"))["records"] if f.exists() else {}
 
 
 # ---------- định dạng số kiểu tiếng Việt ----------
@@ -35,9 +48,10 @@ def sg(x: float, nd: int = 3) -> str:
 
 
 def ci(lo: float, hi: float, nd: int = 3) -> str:
-    """Giữ dấu âm cả khi cận làm tròn về 0, để thấy được khoảng tin cậy có chứa 0 hay không."""
+    """Khoảng tin cậy; cận sát 0 (làm tròn về 0 ở nd chữ số) được in thêm một chữ số để thấy rõ dấu của nó."""
     def b(x: float) -> str:
-        return ("$-$" if x < 0 else "") + f"{abs(x):.{nd}f}".replace(".", ",")
+        k = nd + 1 if x != 0 and round(abs(x), nd) == 0 else nd
+        return ("$-$" if x < 0 else "") + f"{abs(x):.{k}f}".replace(".", ",")
     return f"[{b(lo)}; {b(hi)}]"
 
 
@@ -46,38 +60,42 @@ def n(x: float) -> str:
 
 
 def p(x: float) -> str:
-    return "$<$ 0,0001" if x == 0 else f(x, 4)
+    return f(x, 4)
 
 
 def write(name: str, caption: str, label: str, body: list[str], colspec: str, sources: str, short: str | None = None,
-          env: str = "tabular", sep: str | None = None) -> None:
+          env: str = "tabular", sep: str | None = None, note: str | None = None) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     cap = f"\\caption[{short}]{{{caption}}}" if short else f"\\caption{{{caption}}}"
     tex = ["% Sinh bởi scripts/make_report_tables.py, không sửa tay.", "\\begin{table}[htbp]", "\\centering",
            *([f"\\setlength{{\\tabcolsep}}{{{sep}}}"] if sep else []),
            f"{cap}\\label{{{label}}}",
            f"\\begin{{{env}}}{{{colspec}}}" if env == "tabular" else f"\\begin{{{env}}}{{\\linewidth}}{{{colspec}}}",
-           "\\toprule", *body, "\\bottomrule", f"\\end{{{env}}}", "\\end{table}", ""]
+           "\\toprule", *body, "\\bottomrule", f"\\end{{{env}}}",
+           *([f"\\par\\smallskip{{\\footnotesize\\raggedright Ghi chú: {note}\\par}}"] if note else []), "\\end{table}", ""]
     (OUT / f"{name}.tex").write_text("\n".join(tex), encoding="utf-8")
     SOURCES.append((name, sources))
 
 
 def load_records(kind: str) -> list[dict]:
-    return [json.loads(x.read_text(encoding="utf-8")) for x in sorted((RAW / kind).glob("*.json"))]
+    """Run record của một loại; nếu đã ghim (scripts/pin_runs.py) thì chỉ đọc đúng danh sách đã ghim."""
+    ids = pinned_records().get(kind)
+    files = [RAW / kind / f"{i}.json" for i in ids] if ids is not None else sorted((RAW / kind).glob("*.json"))
+    return [json.loads(inp(x).read_text(encoding="utf-8")) for x in files]
 
 
 # ---------- bảng ----------
 def t_dataflow():
-    d = pd.read_csv(FIG / "robustness" / "data_flow.csv")
+    d = pd.read_csv(inp(FIG / "robustness" / "data_flow.csv"))
     cols = d.to_dict("records")
     steps = [("theorem_gốc", "Theorem gốc"), ("theorem_có_tactic", "\\quad có ít nhất một tactic"),
              ("theorem_có_tactic_có_premise", "\\quad có tactic được chú thích premise"),
              ("theorem_còn_truy_vấn", "\\quad còn ít nhất một truy vấn"),
              ("tỉ_lệ_theorem_giữ_lại", "\\quad tỉ lệ so với theorem gốc"), (None, None), ("tactic", "Tactic"),
              ("tactic_có_premise", "\\quad được chú thích premise"),
-             ("truy_vấn_bị_loại", "\\quad bị loại vì mọi premise đúng nằm ngoài corpus"),
+             ("truy_vấn_bị_loại", "\\quad bị loại vì mọi gold premise nằm ngoài corpus"),
              ("truy_vấn_giữ_lại", "Truy vấn giữ lại"), ("proof_state_khác_nhau", "\\quad proof state khác nhau"),
-             (None, None), ("nhãn_không_có_trong_corpus", "Lượt premise đúng nằm ngoài corpus")]
+             (None, None), ("nhãn_không_có_trong_corpus", "Lượt gold premise nằm ngoài corpus")]
     body = ["& \\multicolumn{3}{c}{\\code{random}} & \\multicolumn{3}{c}{\\code{novel\\_premises}} \\\\",
             "\\cmidrule(lr){2-4}\\cmidrule(l){5-7}", "Bước & train & val & test & train & val & test \\\\", "\\midrule"]
     for key, lab in steps:
@@ -89,13 +107,14 @@ def t_dataflow():
         else:
             cells = [n(r[key]) for r in cols]
         body.append(f"{lab} & " + " & ".join(cells) + " \\\\")
-    write("dataflow", "Luồng lọc dữ liệu theo split và tập. Phần lớn theorem bị loại vì được chứng minh không qua tactic "
-          "(chứng minh dạng term) nên không sinh truy vấn nào", "tab:dataflow", body, "@{}lrrrrrr@{}",
+    write("dataflow", "Luồng lọc dữ liệu theo split và tập", "tab:dataflow", body, "@{}lrrrrrr@{}", note=
+          "phần lớn theorem bị loại vì được chứng minh không qua tactic (chứng minh dạng term) nên không sinh truy vấn nào.",
+          sources=
           "results/figures/robustness/data_flow.csv (scripts/robustness.py)", short="Luồng lọc dữ liệu theo split")
 
 
 def manifest() -> dict:
-    return json.loads((FIG / "report_manifest.json").read_text(encoding="utf-8"))
+    return json.loads(inp(FIG / "report_manifest.json").read_text(encoding="utf-8"))
 
 
 def t_quality():
@@ -104,22 +123,22 @@ def t_quality():
     body = ["& \\multicolumn{6}{c}{\\code{random}} & \\multicolumn{3}{c}{\\code{novel\\_premises}} \\\\",
             "\\cmidrule(lr){2-7}\\cmidrule(l){8-10}",
             "Biến thể & R@1 & R@5 & R@10 & R@50 & MRR & nDCG@10 & R@10 & R@50 & MRR \\\\", "\\midrule"]
+    cols = [("random_test_all", k) for k in ("R@1", "R@5", "R@10", "R@50", "MRR", "nDCG@10")] + \
+           [("novel_premises_test_all", k) for k in ("R@10", "R@50", "MRR")]
+    vals = {s: [m[f"{s}|{ev}"]["metrics"][k] for ev, k in cols] for s in systems}
+    best = [max(round(vals[s][j], 3) for s in systems) for j in range(len(cols))]
     for s in systems:
-        a, b = m[f"{s}|random_test_all"]["metrics"], m[f"{s}|novel_premises_test_all"]["metrics"]
-        cells = [f(a[k]) for k in ("R@1", "R@5", "R@10", "R@50", "MRR", "nDCG@10")] + \
-                [f(b[k]) for k in ("R@10", "R@50", "MRR")]
-        if s == "V5":
-            cells = [f"\\textbf{{{c}}}" for c in cells]
-            s = "\\textbf{V5}"
+        cells = [f"\\textbf{{{f(v)}}}" if round(v, 3) == best[j] else f(v) for j, v in enumerate(vals[s])]
         body.append(f"{s} & " + " & ".join(cells) + " \\\\")
-    write("quality", "Chất lượng truy hồi trên toàn bộ tập kiểm tra (\\num{2641} truy vấn \\code{random}, \\num{4141} "
-          "truy vấn \\code{novel\\_premises}); trung bình theo truy vấn", "tab:quality", body, "@{}l" + "r" * 9 + "@{}",
+    write("quality", "Chất lượng truy hồi trên toàn bộ tập test, query-macro", "tab:quality", body, "@{}l" + "r" * 9 + "@{}",
+          note="\\num{2641} truy vấn \\code{random}, \\num{4141} truy vấn \\code{novel\\_premises}. Chữ đậm là giá trị cao "
+          "nhất của từng cột; cấu hình đề xuất dùng chung là V4 (Mục~\\ref{sec:robust}).", sources=
           "results/figures/report_manifest.json (các khóa <hệ thống>|random_test_all, |novel_premises_test_all)",
-          short="Chất lượng truy hồi trên toàn bộ tập kiểm tra")
+          short="Chất lượng truy hồi trên toàn bộ tập test")
 
 
 def t_signif():
-    s = pd.read_csv(FIG / "robustness" / "significance_cluster.csv")
+    s = pd.read_csv(inp(FIG / "robustness" / "significance_cluster.csv"))
     s = s[(s.metric == "R@10") & (s.trung_bình == "truy vấn")]
     pairs = [("B0", "B0t"), ("B0t", "V1"), ("V1", "V2"), ("V2", "V3"), ("V2", "V2a"), ("V2a", "V4"), ("V4", "V5"),
              ("B0", "V5")]
@@ -132,23 +151,23 @@ def t_signif():
         cells = []
         for ev in ("random_test_all", "novel_premises_test_all"):
             r = s[(s.tập == ev) & (s.từ == a) & (s.đến == b)].iloc[0]
-            pv = r.p_holm if not np.isnan(r.p_holm) else r.p_value
+            pv = r.p_holm if not np.isnan(r.p_holm) else r.p
             cells += [f"{sg(r.delta)} \\ {ci(r.ci95_low, r.ci95_high)}", p(pv) + ("" if not np.isnan(r.p_holm) else "*")]
         body.append(f"{b} so với {a} & " + " & ".join(cells) + " \\\\")
-    write("signif", "Chênh lệch Recall@10 giữa các bước, trung bình theo truy vấn. Khoảng tin cậy và $p$ một phía từ "
-          "paired bootstrap theo cụm theorem (\\num{10000} mẫu); $p$ hiệu chỉnh Holm trên họ 7 bước của chuỗi trong từng "
-          "split. Dấu * là $p$ một phía chưa hiệu chỉnh vì so sánh nằm ngoài họ chính", "tab:signif", body, "@{}lllll@{}",
+    write("signif", "Chênh lệch Recall@10 giữa các bước cải tiến trên tập test, query-macro", "tab:signif", body,
+          "@{}lllll@{}", note="KTC 95\\% và $p$ hai phía theo Mục~\\ref{sec:metrics}; $p$ hiệu chỉnh Holm trên 7 bước của "
+          "chuỗi trong từng split, giá trị nhỏ nhất có thể là $1/\\num{10001}$. Dấu * là $p$ chưa hiệu chỉnh.", sources=
           "results/figures/robustness/significance_cluster.csv (scripts/robustness.py)",
           short="Chênh lệch Recall@10 giữa các bước cải tiến")
 
 
 def t_robust():
-    mac = pd.read_csv(FIG / "robustness" / "macro.csv").set_index(["tập", "hệ_thống"])
-    s = pd.read_csv(FIG / "robustness" / "significance_cluster.csv")
+    mac = pd.read_csv(inp(FIG / "robustness" / "macro.csv")).set_index(["tập", "hệ_thống"])
+    s = pd.read_csv(inp(FIG / "robustness" / "significance_cluster.csv"))
     s = s[s.metric == "R@10"]
     names = {"random_test_all": "\\code{random}", "novel_premises_test_all": "\\code{novel\\_premises}",
              "random_holdoutB": "Holdout"}
-    body = ["Tập & Đơn vị & V4 & V4-K240 & V5 & V5 $-$ V4 & V5 $-$ V4-K240 \\\\", "\\midrule"]
+    body = ["Tập & Macro & V4 & V4-K240 & V5 & V5 $-$ V4 & V5 $-$ V4-K240 \\\\", "\\midrule"]
     for ev, label in names.items():
         for est, col in (("truy vấn", "R@10_query"), ("theorem", "R@10_theorem")):
             vals = [f(mac.loc[(ev, sy), col]) for sy in ("V4", "V4-K240", "V5")]
@@ -156,42 +175,43 @@ def t_robust():
             for a in ("V4", "V4-K240"):
                 r = s[(s.tập == ev) & (s.từ == a) & (s.đến == "V5") & (s.trung_bình == est)].iloc[0]
                 ds.append(f"{sg(r.delta)} {ci(r.ci95_low, r.ci95_high)}")
-            body.append(f"{label if est == 'truy vấn' else ''} & {est} & " + " & ".join(vals + ds) + " \\\\")
+            body.append(f"{label if est == 'truy vấn' else ''} & {'query' if est == 'truy vấn' else 'theorem'} & "
+                        + " & ".join(vals + ds) + " \\\\")
         if ev != "random_holdoutB":
             body.append("\\midrule")
-    write("robust", "Recall@10 của V4, V4-K240 (V4 với 240 ứng viên BM25F, cùng ngân sách ứng viên với V5) và V5 trên "
-          "hai tập kiểm tra và tập holdout, trung bình theo truy vấn và theo theorem. Chênh lệch kèm khoảng tin cậy 95\\% từ "
-          "bootstrap theo cụm theorem. Holdout gồm \\num{2500} truy vấn của \\num{1138} theorem train nửa B chưa dùng để "
-          "huấn luyện hay thiết kế", "tab:robust", body, "@{}llrrrll@{}", sep="3.5pt", sources=
+    write("robust", "Recall@10 của V4, V4-K240 và V5 trên hai tập test và holdout, theo query-macro và theorem-macro",
+          "tab:robust", body, "@{}llrrrll@{}", sep="3.5pt", note="KTC 95\\% từ bootstrap theo cụm theorem. Holdout gồm "
+          "\\num{2500} truy vấn của \\num{1138} theorem; số candidate của V4-K240 so với V5 xem Mục~\\ref{sec:setup}.",
+          sources=
           "results/figures/robustness/macro.csv, significance_cluster.csv; data/processed/eval_sets/random_holdoutB.json",
           short="Độ bền của kết quả V5")
 
 
 def t_unseen():
-    d = pd.read_csv(FIG / "robustness" / "seen_unseen.csv")
+    d = pd.read_csv(inp(FIG / "robustness" / "seen_unseen.csv"))
     d = d[d.tập == "novel_premises_test_all"].set_index("hệ_thống")
     info = d.iloc[0]
-    body = ["Hệ thống & R@10, chưa thấy & R@50, chưa thấy & R@10, đã thấy & R@50, đã thấy \\\\", "\\midrule"]
+    body = ["Hệ thống & R@10, unseen & R@50, unseen & R@10, seen & R@50, seen \\\\", "\\midrule"]
     for sy in ("B0", "V2", "V4", "V4-K240", "V5"):
         if sy in d.index:
             r = d.loc[sy]
             body.append(f"{sy} & {f(r['R@10_chưa_thấy'])} & {f(r['R@50_chưa_thấy'])} & {f(r['R@10_đã_thấy'])} & "
                         f"{f(r['R@50_đã_thấy'])} \\\\")
-    write("unseen", f"Recall trên premise chưa thấy và đã thấy trong train của split \\code{{novel\\_premises}} (tập kiểm "
-          f"tra). Premise chưa thấy chiếm {n(info['cặp_chưa_thấy'])} trên {n(info['cặp_nhãn'])} cặp nhãn, nằm trong "
-          f"{n(info['truy_vấn_có_nhãn_chưa_thấy'])} truy vấn và {n(info['theorem_có_nhãn_chưa_thấy'])} trên "
-          f"{n(info['theorem_được_chấm'])} theorem; mỗi cột chỉ lấy trung bình trên các truy vấn có loại nhãn tương ứng",
-          "tab:unseen", body, "@{}lrrrr@{}", "results/figures/robustness/seen_unseen.csv (scripts/robustness.py)",
-          short="Recall trên premise chưa thấy và đã thấy")
+    write("unseen", "Recall trên unseen premise và seen premise, tập test \\code{novel\\_premises}", "tab:unseen", body,
+          "@{}lrrrr@{}", note=f"unseen premise chiếm {n(info['cặp_chưa_thấy'])} trên {n(info['cặp_nhãn'])} cặp nhãn, "
+          f"thuộc {n(info['truy_vấn_có_nhãn_chưa_thấy'])} truy vấn và {n(info['theorem_có_nhãn_chưa_thấy'])} trên "
+          f"{n(info['theorem_được_chấm'])} theorem; mỗi cột chỉ lấy trung bình trên các truy vấn có loại nhãn tương ứng.",
+          sources= "results/figures/robustness/seen_unseen.csv (scripts/robustness.py)",
+          short="Recall trên unseen premise và seen premise")
 
 
 def t_controls():
     m = manifest()
-    s = pd.read_csv(FIG / "robustness" / "significance_cluster.csv")
+    s = pd.read_csv(inp(FIG / "robustness" / "significance_cluster.csv"))
     s = s[(s.trung_bình == "truy vấn") & (s.tập == "random_test_all")]
     rows = [("V2", None, "V2"), ("V2-nons", "V2", "V2-nons"), (None, None, None), ("V4", None, "V4"),
             ("V4-poponly", "V4", "V4-poponly"), ("V4-pronly", "V4", "V4-pronly")]
-    body = ["& \\multicolumn{2}{c}{Validation} & \\multicolumn{4}{c}{Kiểm tra \\code{random}} \\\\",
+    body = ["& \\multicolumn{2}{c}{Validation} & \\multicolumn{4}{c}{Test \\code{random}} \\\\",
             "\\cmidrule(lr){2-3}\\cmidrule(l){4-7}",
             "Cấu hình & R@10 & MRR & R@10 & MRR & $\\Delta$R@10 & $\\Delta$MRR \\\\", "\\midrule"]
     for sy, ref, lab in rows:
@@ -208,48 +228,47 @@ def t_controls():
             r = s[(s.từ == sy) & (s.đến == ref) & (s.metric == metric)].iloc[0]
             cells.append(f"{sg(-r.delta)} {ci(-r.ci95_high, -r.ci95_low)}")
         body.append(f"{lab} & " + " & ".join(cells) + " \\\\")
-    write("controls", "Đối chứng tách thành phần: V2-nons bỏ trường namespace khỏi BM25F; V4-poponly và V4-pronly chỉ giữ "
-          "một trong hai đặc trưng phụ thuộc, mỗi cấu hình huấn luyện lại trên cùng dữ liệu. $\\Delta$ là cấu hình rút gọn "
-          "trừ cấu hình đầy đủ trên tập kiểm tra, kèm khoảng tin cậy 95\\% từ bootstrap theo cụm theorem", "tab:controls",
-          body, "@{}lrrrrll@{}", sep="5pt", sources=
+    write("controls", "Đối chứng cho trường namespace và hai đặc trưng phụ thuộc", "tab:controls", body,
+          "@{}lrrrrll@{}", sep="5pt", note="V2-nons bỏ trường namespace khỏi BM25F; V4-poponly và V4-pronly chỉ giữ "
+          "popularity hoặc PageRank. $\\Delta$ là cấu hình rút gọn trừ cấu hình đầy đủ trên tập test, kèm KTC 95\\%.",
+          sources=
           "results/figures/report_manifest.json; results/figures/robustness/significance_cluster.csv",
           short="Đối chứng namespace và đặc trưng phụ thuộc")
 
 
 def t_candidates():
-    c = pd.read_csv(FIG / "robustness" / "candidates.csv")
+    c = pd.read_csv(inp(FIG / "robustness" / "candidates.csv"))
     names = {"random_test_all": "\\code{random}", "novel_premises_test_all": "\\code{novel\\_premises}",
              "random_holdoutB": "Holdout"}
-    body = ["Tập & Hệ thống & Ứng viên & Độ phủ & Oracle@10 & R@10 & Mất do xếp hạng & R@50 \\\\", "\\midrule"]
+    body = ["Tập & Hệ thống & Candidate & Candidate recall & Oracle@10 & R@10 & Ranking gap & R@50 \\\\", "\\midrule"]
     for ev, label in names.items():
         for i, r in enumerate(c[c.tập == ev].to_dict("records")):
             body.append(f"{label if i == 0 else ''} & {r['hệ_thống']} & {f(r['ứng_viên_TB'], 0)} & {f(r['độ_phủ'])} & "
                         f"{f(r['Oracle@10'])} & {f(r['R@10'])} & {f(r['mất_ở_xếp_hạng@10'])} & {f(r['R@50'])} \\\\")
         if ev != "random_holdoutB":
             body.append("\\midrule")
-    write("candidates", "Phân rã giới hạn của hệ thống hai giai đoạn, trung bình theo truy vấn. Độ phủ là tỉ lệ premise "
-          "đúng nằm trong tập ứng viên; Oracle@k $= \\min(k, |G \\cap C|)/|G|$ là trần của một reranker hoàn hảo; mất do "
-          "xếp hạng = Oracle@10 $-$ Recall@10. Oracle@50 trùng độ phủ đến ba chữ số nên không ghi", "tab:candidates", body,
-          "@{}llrrrrrr@{}", sep="5pt", sources=
+    write("candidates", "Candidate recall, Oracle@10 và ranking gap, query-macro", "tab:candidates", body,
+          "@{}llrrrrrr@{}", sep="5pt", note="định nghĩa ở Mục~\\ref{sec:metrics}; Oracle@50 trùng candidate recall đến ba "
+          "chữ số nên không ghi.", sources=
           "results/figures/robustness/candidates.csv (scripts/candidate_analysis.py)",
-          short="Phân rã giới hạn: ứng viên và xếp hạng")
+          short="Phân rã giới hạn: candidate và xếp hạng")
 
 
 def t_v5grid():
-    d = pd.read_csv(RAW / "tuning" / "V5__extra__random_val_all.csv")
+    d = pd.read_csv(inp(RAW / "tuning" / "V5__extra__random_val_all.csv"))
     m = manifest()["V4|random_val_all"]["metrics"]
     best = d.sort_values(["R@10", "MRR"], ascending=False).index[0]
-    body = ["Tệp & Thư mục & Phổ biến & Số ứng viên & Độ phủ & R@10 & R@50 & MRR \\\\", "\\midrule"]
+    body = ["Tệp & Thư mục & Phổ biến & Số candidate & Candidate recall & R@10 & R@50 & MRR \\\\", "\\midrule"]
     for i, r in d.iterrows():
         cells = [str(int(r.file)), str(int(r.dir)), str(int(r.popular)), f(r.pool_size, 0), f(r.pool_recall), f(r["R@10"]),
                  f(r["R@50"]), f(r.MRR)]
         if i == best:
             cells = [f"\\textbf{{{c}}}" for c in cells]
         body.append(" & ".join(cells) + " \\\\")
-    write("v5grid", f"Tinh chỉnh số ứng viên bổ sung của V5 trên validation \\code{{random}} (\\num{{2536}} truy vấn). V4 "
+    write("v5grid", f"Tinh chỉnh số candidate bổ sung của V5 trên validation \\code{{random}} (\\num{{2536}} truy vấn). V4 "
           f"trên cùng tập: Recall@10 = {f(m['R@10'])}; Recall@50 = {f(m['R@50'])}; MRR = {f(m['MRR'])}", "tab:v5grid",
           body, "@{}rrrrrrrr@{}", "results/raw/tuning/V5__extra__random_val_all.csv (scripts/tune_v5.py); manifest V4|random_val_all",
-          short="Tinh chỉnh số ứng viên bổ sung của V5")
+          short="Tinh chỉnh số candidate bổ sung của V5")
 
 
 def t_leandojo():
@@ -269,7 +288,7 @@ def t_leandojo():
     body = ["& \\multicolumn{3}{c}{\\code{random}} & \\multicolumn{3}{c}{\\code{novel\\_premises}} \\\\",
             "\\cmidrule(lr){2-4}\\cmidrule(l){5-7}", "Hệ thống & R@1 & R@10 & MRR & R@1 & R@10 & MRR \\\\", "\\midrule",
             f"BM25, toàn bộ premise (LeanDojo, Bảng 1, Lean 3) & {pubrow('bm25_all')} \\\\", f"B0 của nhóm & {ours('B0')} \\\\",
-            "\\midrule", f"BM25, premise truy cập được (LeanDojo, Bảng 1, Lean 3) & {pubrow('bm25_acc')} \\\\",
+            "\\midrule", f"BM25, accessible premise (LeanDojo, Bảng 1, Lean 3) & {pubrow('bm25_acc')} \\\\",
             f"V2a của nhóm & {ours('V2a')} \\\\", f"V4 của nhóm & {ours('V4')} \\\\", f"V5 của nhóm & {ours('V5')} \\\\",
             "\\midrule", f"ReProver (LeanDojo, Bảng B, Lean 4, snapshot cũ hơn v10) & {pubrow('reprover')} \\\\"]
     write("leandojo", "Số liệu công bố trong bài báo LeanDojo đặt cạnh kết quả của nhóm, chỉ để làm bối cảnh: các dòng của "
@@ -298,9 +317,10 @@ def t_lucene():
     b0ms = recs["b0-inprocess"]["metrics"]["ms_per_query"]   # đo một luồng cùng quy tắc với Lucene
     body.append(f"B0 của nhóm, $k_1 = 1{{,}}2$, $b = 0{{,}}75$ & {f(x['R@10'], 4)} & {f(x['R@50'], 4)} & {f(x['MRR'], 4)} & "
                 f"1 & {f(b0ms, 1)} \\\\")
-    write("lucene", "BM25 của Lucene 10.5 (Anserini 2.3.0) so với B0 trên tập kiểm tra \\code{random}, trường phát biểu, "
-          "một luồng. Trùng top 10 là tỉ lệ phần tử chung giữa top 10 của Lucene và của B0, trung bình theo truy vấn; thời "
-          "gian là trung bình một luồng ở trạng thái ổn định (bỏ 100 truy vấn đầu), không gồm khởi động JVM", "tab:lucene", body,
+    write("lucene", "BM25 của Lucene 10.5 (Anserini 2.3.0) so với B0 trên tập test \\code{random}", "tab:lucene", body,
+          note="trường statement, một thread. Trùng top 10 là tỉ lệ phần tử chung giữa top 10 của Lucene và của B0, "
+          "query-macro; thời gian là trung bình ở trạng thái ổn định (bỏ 100 truy vấn đầu), không gồm khởi động JVM.",
+          colspec=
           "@{}>{\\raggedright\\arraybackslash}Xrrrrr@{}", env="tabularx", sources=
           "results/raw/lucene/*.json (scripts/lucene_baseline.py); manifest B0|random_test_all",
           short="BM25 của Lucene so với BM25 tự cài đặt")
@@ -319,21 +339,30 @@ def loadtest_rows(prefix: str) -> pd.DataFrame:
 
 
 def t_v5load():
-    d = loadtest_rows("v5cmp2-")
+    rows = []
+    for r in load_records("loadtest"):
+        tag = r["parameters"].get("tag") or ""
+        if tag.startswith("v5cmp2-"):
+            for lv in r["metrics"]["levels"]:
+                rows.append({"mode": r["parameters"]["mode"], "clients": lv["clients"], "p95": lv["e2e_ms_p95"],
+                             "qps": lv["qps"], "err": lv.get("errors", 0), "ok": lv.get("requests_ok", 0)})
+    d = pd.DataFrame(rows)
     if d.empty:
         return
-    body = ["& \\multicolumn{2}{c}{1 client} & \\multicolumn{2}{c}{10 client} & \\multicolumn{2}{c}{50 client} \\\\",
-            "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}\\cmidrule(l){6-7}",
-            "Biến thể & P95 (ms) & QPS & P95 (ms) & QPS & P95 (ms) & QPS \\\\", "\\midrule"]
-    for mode in ("V4", "V4-K240", "V5"):
-        cells = []
+    body = ["Biến thể & Client & P95 (ms) [nhỏ nhất; lớn nhất] & QPS [nhỏ nhất; lớn nhất] & Yêu cầu lỗi \\\\", "\\midrule"]
+    for k, mode in enumerate(("V4", "V4-K240", "V5")):
         for c in (1, 10, 50):
             g = d[(d["mode"] == mode) & (d.clients == c)]
-            cells += [f"{f(g.p95.median(), 1)} [{f(g.p95.min(), 1)}; {f(g.p95.max(), 1)}]", n(g.qps.median())]
-        body.append(f"{mode} & " + " & ".join(cells) + " \\\\")
-    write("v5load", "V4, V4-K240 và V5 dưới tải trong cùng một phiên đo: một server 4 worker nạp cả ba cấu hình, thứ tự đo "
-          "xoay vòng giữa 3 lần lặp. P95 là trung vị [nhỏ nhất; lớn nhất] của 3 lần, QPS là trung vị", "tab:v5load", body,
-          "@{}lrrrrrr@{}", "results/raw/loadtest/*.json, tag v5cmp2-r* (run_scale.py --part serve_v5_k240)",
+            body.append(f"{mode if c == 1 else ''} & {c} & {f(g.p95.median(), 1)} [{f(g.p95.min(), 1)}; {f(g.p95.max(), 1)}] & "
+                        f"{f(g.qps.median(), 1)} [{f(g.qps.min(), 1)}; {f(g.qps.max(), 1)}] & "
+                        f"{int(g.err.sum())} / {n(g.ok.sum() + g.err.sum())} \\\\")
+        if k < 2:
+            body.append("\\midrule")
+    write("v5load", "V4, V4-K240 và V5 dưới tải trong cùng một phiên đo", "tab:v5load", body, "@{}lrlll@{}",
+          note="một server 4 worker nạp cả ba cấu hình, thứ tự đo xoay vòng giữa 3 lần lặp, mỗi lần 400 yêu cầu ở mỗi mức "
+          "client. P95 tính trên các yêu cầu thành công; QPS tính trên toàn bộ thời gian chạy, kể cả thời gian chờ yêu cầu "
+          "bị timeout. Mỗi ô là trung vị [nhỏ nhất; lớn nhất] của 3 lần.", sources=
+          "results/raw/loadtest/*.json, tag v5cmp2-r* (run_scale.py --part serve_v5_k240)",
           short="V4, V4-K240 và V5 dưới tải cùng phiên")
 
 
@@ -415,10 +444,10 @@ def t_engines():
 
 
 def t_profile():
-    d = pd.read_parquet(RAW / "profile" / "latency_profile.parquet")
+    d = pd.read_parquet(inp(RAW / "profile" / "latency_profile.parquet"))
     d = d[d["pass"] == "nóng"]
-    steps = [("tokenize", "Tách từ"), ("bm25_score", "Cộng điểm BM25/BM25F"), ("accessible_mask", "Tính mặt nạ truy cập được"),
-             ("filter_topk", "Lọc và chọn top 100"), ("features", "Tính 13 đặc trưng"), ("rerank_sort", "Chấm lại và sắp xếp"),
+    steps = [("tokenize", "Tokenize"), ("bm25_score", "Cộng điểm BM25/BM25F"), ("accessible_mask", "Tính mặt nạ accessible premise"),
+             ("filter_topk", "Lọc và chọn top 100"), ("features", "Tính 13 đặc trưng"), ("rerank_sort", "Rerank và sắp xếp"),
              ("total", "Tổng")]
     body = ["Bước & B0 & V2 & V4 \\\\", "\\midrule"]
     for key, lab in steps:
@@ -439,9 +468,9 @@ def t_profile():
 
 
 def t_errors():
-    e = pd.read_parquet(RAW / "error_analysis.parquet")
-    labels = [("ngoai_top100", "Premise đúng nằm ngoài 100 ứng viên của giai đoạn 1"),
-              ("nhieu_premise_dung", "Truy vấn có nhiều premise đúng"),
+    e = pd.read_parquet(inp(RAW / "error_analysis.parquet"))
+    labels = [("ngoai_top100", "Gold premise nằm ngoài 100 candidate của giai đoạn 1"),
+              ("nhieu_premise_dung", "Truy vấn có nhiều gold premise"),
               ("premise_tong_quat", "Premise tổng quát, thuộc 1\\% premise được dùng nhiều nhất"),
               ("khong_trung_tu_vung", "Premise không có từ nào chung với truy vấn"),
               ("dinh_nghia_instance", "Premise là định nghĩa, instance hoặc structure"),
@@ -451,20 +480,20 @@ def t_errors():
     for key, lab in labels:
         k = int(cats.map(lambda c: key in c).sum())
         body.append(f"{lab} & {n(k)} & {f(100 * k / len(e), 1)}\\% \\\\")
-    write("errors", f"Phân loại tự động {n(len(e))} cặp (truy vấn, premise đúng) mà V4 bỏ lỡ ở top 10 trên tập kiểm tra "
+    write("errors", f"Phân loại tự động {n(len(e))} cặp (truy vấn, gold premise) mà V4 bỏ lỡ ở top 10 trên tập test "
           "\\code{random}; một cặp có thể thuộc nhiều nhóm", "tab:errors", body, "@{}Xrr@{}",
           "results/raw/error_analysis.parquet (scripts/error_analysis.py)", short="Phân loại tự động các lỗi của V4",
           env="tabularx")
 
 
 def t_ablation():
-    d = pd.read_csv(FIG / "ablation_significance.csv").set_index("variant")
+    d = pd.read_csv(inp(FIG / "ablation_significance.csv")).set_index("variant")
     full = d.loc["abl_full"]
-    lab = [("abl_no_filter", "Tắt bộ lọc truy cập được"), ("abl_no_bm25", "Bỏ điểm và hạng BM25"),
+    lab = [("abl_no_filter", "Tắt bộ lọc accessible premise"), ("abl_no_bm25", "Bỏ điểm và hạng BM25"),
            ("abl_no_dependency", "Bỏ độ phổ biến và PageRank"), ("abl_no_symbols", "Bỏ độ trùng ký hiệu"),
            ("abl_no_kind", "Bỏ loại khai báo"), ("abl_no_location", "Bỏ cùng tệp, cùng thư mục"),
-           ("abl_no_namespace", "Bỏ namespace"), (None, None), ("abl_k50", "50 ứng viên thay vì 100"),
-           ("abl_k200", "200 ứng viên thay vì 100")]
+           ("abl_no_namespace", "Bỏ namespace"), (None, None), ("abl_k50", "50 candidate thay vì 100"),
+           ("abl_k200", "200 candidate thay vì 100")]
     body = ["Thay đổi so với V4 & $\\Delta$Recall@10 [KTC 95\\%] & $p$ Holm & $\\Delta$MRR [KTC 95\\%] & $p$ Holm \\\\",
             "\\midrule"]
     for k, l in lab:
@@ -474,10 +503,10 @@ def t_ablation():
         r = d.loc[k]
         body.append(f"{l} & {sg(r['d_R@10'])} \\ {ci(r['lo_R@10'], r['hi_R@10'])} & {p(r['pholm_R@10'])} & "
                     f"{sg(r['d_MRR'])} \\ {ci(r['lo_MRR'], r['hi_MRR'])} & {p(r['pholm_MRR'])} \\\\")
-    write("ablation", f"Ablation trên tập kiểm tra \\code{{random}} (\\num{{2641}} truy vấn). V4 đầy đủ: Recall@10 = "
-          f"{f(full['R@10'])}; MRR = {f(full['MRR'])}. $\\Delta$ là biến thể trừ V4; khoảng tin cậy và $p$ hai phía từ "
-          "bootstrap theo cụm theorem, $p$ hiệu chỉnh Holm trên 9 phép so sánh của từng metric", "tab:ablation", body,
-          "@{}lllll@{}", "results/figures/ablation_significance.csv (scripts/ablation_significance.py)",
+    write("ablation", "Ablation của reranker V4 trên tập test \\code{random}", "tab:ablation", body, "@{}lllll@{}",
+          note=f"\\num{{2641}} truy vấn; V4 đầy đủ có Recall@10 = {f(full['R@10'])}, MRR = {f(full['MRR'])}. $\\Delta$ là "
+          "biến thể trừ V4. Khoảng tin cậy từ bootstrap theo cụm theorem; $p$ hai phía từ kiểm định hoán vị ghép cặp theo "
+          "cụm theorem, hiệu chỉnh Holm trên 9 phép so sánh của từng metric.", sources= "results/figures/ablation_significance.csv (scripts/ablation_significance.py)",
           short="Ablation của reranker", sep="4pt")
 
 
@@ -492,6 +521,9 @@ def main() -> None:
     man = manifest()
     lines += ["", "## Lần chạy đánh giá đã ghim (results/figures/report_manifest.json)", "", "| Hệ thống và tập | run_id |",
               "|---|---|"] + [f"| {k} | `{v['run_id']}` |" for k, v in man.items()]
+    lines += ["", "## Tệp đầu vào và SHA-256 tại thời điểm sinh bảng", "", "| Tệp | SHA-256 |", "|---|---|"]
+    for x in sorted(INPUTS):
+        lines.append(f"| `{x.relative_to(ROOT).as_posix()}` | `{hashlib.sha256(x.read_bytes()).hexdigest()}` |")
     (OUT / "SOURCES.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(SOURCES)} bảng trong {OUT.relative_to(ROOT)}")
 

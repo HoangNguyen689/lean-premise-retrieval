@@ -2,10 +2,10 @@
 \begin{table}[htbp]
 \centering
 \setlength{\tabcolsep}{5pt}
-\caption[Phân rã giới hạn: ứng viên và xếp hạng]{Phân rã giới hạn của hệ thống hai giai đoạn, trung bình theo truy vấn. Độ phủ là tỉ lệ premise đúng nằm trong tập ứng viên; Oracle@k $= \min(k, |G \cap C|)/|G|$ là trần của một reranker hoàn hảo; mất do xếp hạng = Oracle@10 $-$ Recall@10. Oracle@50 trùng độ phủ đến ba chữ số nên không ghi}\label{tab:candidates}
+\caption[Phân rã giới hạn: candidate và xếp hạng]{Candidate recall, Oracle@10 và ranking gap, query-macro}\label{tab:candidates}
 \begin{tabular}{@{}llrrrrrr@{}}
 \toprule
-Tập & Hệ thống & Ứng viên & Độ phủ & Oracle@10 & R@10 & Mất do xếp hạng & R@50 \\
+Tập & Hệ thống & Candidate & Candidate recall & Oracle@10 & R@10 & Ranking gap & R@50 \\
 \midrule
 \code{random} & V4 & 100 & 0,397 & 0,397 & 0,243 & 0,154 & 0,373 \\
  & V4-K240 & 240 & 0,485 & 0,485 & 0,254 & 0,232 & 0,419 \\
@@ -20,4 +20,5 @@ Holdout & V4 & 100 & 0,452 & 0,452 & 0,310 & 0,142 & 0,432 \\
  & V5 & 236 & 0,666 & 0,666 & 0,332 & 0,333 & 0,545 \\
 \bottomrule
 \end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: định nghĩa ở Mục~\ref{sec:metrics}; Oracle@50 trùng candidate recall đến ba chữ số nên không ghi.\par}
 \end{table}

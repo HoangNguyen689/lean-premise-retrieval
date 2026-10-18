@@ -24,6 +24,8 @@
 \usepackage{fancyvrb}
 \usepackage{float}
 \usepackage{etoolbox}
+\usepackage{placeins}
+\usepackage{needspace}
 \AtBeginEnvironment{table}{\small}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
@@ -42,6 +44,11 @@
 \renewcommand{\floatpagefraction}{0.75}
 \setlength{\textfloatsep}{12pt plus 2pt minus 4pt}
 \setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{14pt plus 4pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
 \addto\captionsvietnamese{%
   \renewcommand{\bibname}{Tài liệu tham khảo}%
   \renewcommand{\contentsname}{Mục lục}%
@@ -80,7 +87,7 @@
 \vspace{2.2cm}
 {\Large\bfseries BÁO CÁO BÀI TẬP LỚN\par}
 \vspace{0.8cm}
-{\LARGE\bfseries Truy hồi premise cho Lean 4 bằng chỉ mục thưa\\[4pt] và tín hiệu cấu trúc ở quy mô thư viện mathlib4\par}
+{\LARGE\bfseries Premise retrieval cho Lean 4 bằng BM25F\\[4pt] và đặc trưng cấu trúc trên mathlib4\par}
 \vspace{0.8cm}
 {\large Nhóm 3. Lean Premise Retrieval: truy hồi thưa và truy hồi lai\par}
 \vspace{2cm}
@@ -108,18 +115,20 @@
 \phantomsection\addcontentsline{toc}{chapter}{Tóm tắt}
 \markboth{Tóm tắt}{}
 \noindent
-Báo cáo trình bày một hệ thống truy hồi premise cho trợ lý chứng minh Lean 4 trên thư viện mathlib4, chỉ dùng chỉ mục
-thưa và tín hiệu cấu trúc có chi phí thấp. Dữ liệu là LeanDojo Benchmark 4 bản v10 với \num{180957} khai báo; sau khi
-lọc, tập kiểm tra của split \code{random} còn \num{2641} truy vấn là trạng thái chứng minh. Chỉ mục đảo được xây theo mô
-hình MapReduce trên Apache Spark và bằng một chương trình tuần tự, hai cách cho kết quả trùng từng byte. Mỗi truy vấn
-đi qua BM25F ba trường với bộ tách từ riêng cho Lean và bộ lọc theo quan hệ import, rồi một mô hình hồi quy logistic chấm
-lại 100 ứng viên bằng đặc trưng cấu trúc, độ phổ biến và PageRank (V4). Trên tập kiểm tra \code{random}, Recall@10 tăng
-từ 0,100 của BM25 mặc định lên 0,243. Biến thể V5 mở rộng ứng viên bằng lịch sử sử dụng trong tập huấn luyện, đạt 0,281
-trên tập kiểm tra và 0,332 so với 0,310 của V4 trên một tập holdout mới; tuy vậy khoảng một nửa mức tăng trên holdout
-đến từ việc có nhiều ứng viên hơn, và recall trên premise chưa thấy giảm từ 0,444 xuống 0,359. Trong cùng một phiên đo
-tải, P95 ở 10 client của V4 và V5 là 103,2 và 116,7 ms; ở 50 client, V5 giảm thông lượng từ 132 xuống 116 truy vấn mỗi
-giây. Dịch vụ bị giới hạn bởi CPU, và Spark local[8] nhanh hơn bản tuần tự 3,84 lần trên corpus nhân bản 3,6 triệu bản
-ghi. Mọi phép đo thực hiện trên một máy; so sánh với hệ thống truy hồi dày đặc của Nhóm 4 chưa hoàn tất.
+Báo cáo trình bày một hệ thống premise retrieval cho Lean 4 trên thư viện mathlib4, kết hợp BM25F với các đặc trưng
+cấu trúc có chi phí tính toán thấp. Dữ liệu là LeanDojo Benchmark 4 bản v10 với \num{180957} khai báo; sau khi lọc, tập
+test của split \code{random} còn \num{2641} truy vấn, mỗi truy vấn là một proof state. Chỉ mục đảo được xây theo mô hình
+MapReduce trên Apache Spark và bằng một chương trình tuần tự; hai cách cho kết quả trùng từng byte. Ở cấu hình V4, BM25F
+dùng tokenizer riêng cho Lean trên ba trường name, namespace và statement, bộ lọc chỉ giữ accessible premise (premise dùng
+được tại vị trí chứng minh theo quan hệ import), rồi hồi quy logistic rerank 100 candidate bằng đặc trưng cấu trúc,
+popularity và PageRank. Trên tập test \code{random}, Recall@10 tăng từ 0,100 của BM25 mặc định lên 0,243. V5 bổ sung
+candidate từ lịch sử sử dụng trong tập train, đạt 0,281 trên tập test và 0,332 so với 0,310 của V4 trên holdout lấy từ
+phần train chưa dùng để huấn luyện reranker. Tuy vậy, trên holdout chưa có đủ bằng chứng cho thấy V5 tốt hơn đối chứng V4
+lấy top 240 candidate, và trên tập test \code{novel\_premises}, Recall@10 trên unseen premise giảm từ 0,444 xuống 0,359.
+Trong cùng một phiên đo tải, P95 latency ở 10 client của V4 và V5 là 103,2 và 116,7 ms; ở 50 client, thông lượng của V5
+giảm từ 132 xuống 116 truy vấn mỗi giây. Dịch vụ bị giới hạn bởi CPU, và Spark local[8] nhanh hơn bản tuần tự 3,84 lần
+trên corpus nhân bản 3,6 triệu bản ghi. Mọi phép đo thực hiện trên một máy; so sánh với hệ thống dense retrieval của
+Nhóm 4 chưa hoàn tất.
 
 \medskip\noindent
 \textbf{Từ khóa:} premise retrieval, Lean 4, mathlib4, BM25F, chỉ mục đảo, MapReduce, Apache Spark.
@@ -128,8 +137,10 @@ ghi. Mọi phép đo thực hiện trên một máy; so sánh với hệ thống
 \tableofcontents
 \clearpage\phantomsection\addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
-\clearpage\phantomsection\addcontentsline{toc}{chapter}{\listtablename}
+\begingroup\let\clearpage\relax\let\cleardoublepage\relax
+\vspace{1.5cm}\phantomsection\addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
+\endgroup
 \clearpage
 \pagenumbering{arabic}
 
@@ -139,26 +150,28 @@ ghi. Mọi phép đo thực hiện trên một máy; so sánh với hệ thống
 Lean 4 là một trợ lý chứng minh đồng thời là ngôn ngữ lập trình~\cite{demoura2021}, và mathlib4 là thư viện toán học
 lớn nhất viết bằng Lean~\cite{mathlib2020}. Khi chứng minh một định lý mới, người dùng hoặc bộ chứng minh tự động phải
 chọn trong thư viện những định lý, bổ đề và định nghĩa có thể dùng ở bước tiếp theo. Các đối tượng này được gọi là
-\emph{premise}. Bài toán \emph{premise retrieval} được phát biểu như sau: cho trạng thái chứng minh hiện tại (proof
-state), trả về một danh sách ngắn các premise có khả năng được dùng trong tactic kế tiếp~\cite{yang2023}. Chất lượng
-của danh sách này ảnh hưởng trực tiếp tới khả năng thành công của bộ chứng minh, vì bộ chứng minh không thể xét toàn bộ
-thư viện ở mỗi bước.
+\emph{premise}. Bài toán \emph{premise retrieval} được phát biểu như sau: cho proof state (trạng thái chứng minh) hiện
+tại, trả về một danh sách ngắn các premise có khả năng được dùng trong tactic kế tiếp~\cite{yang2023}. Chất lượng của danh
+sách này ảnh hưởng trực tiếp tới khả năng thành công của bộ chứng minh, vì bộ chứng minh không thể xét toàn bộ thư viện ở
+mỗi bước. Có hai hướng tiếp cận chính: sparse retrieval so khớp từ khóa trên chỉ mục đảo, điển hình là BM25; dense
+retrieval mã hóa truy vấn và premise thành vector bằng mô hình neural rồi tìm láng giềng gần nhất; hybrid retrieval kết
+hợp cả hai. Báo cáo này thuộc hướng sparse retrieval, có bổ sung đặc trưng cấu trúc.
 
 Bài toán có ba đặc điểm của dữ liệu lớn. Thứ nhất là khối lượng: snapshot mathlib4 được dùng có \num{180957} khai báo,
 và mỗi bước chứng minh sinh ra một truy vấn, nên nếu so khớp từng truy vấn với mọi khai báo thì chi phí tăng tuyến tính
-theo kích thước kho và theo số truy vấn cần phục vụ. Thứ hai là phân bố lệch: từ khóa \code{theorem} xuất hiện trong \num{109826} phát biểu, ký hiệu \code{=}
-trong hơn \num{80000} phát biểu. Các token này tạo ra khóa nóng (hot key) ở pha shuffle khi xây chỉ mục và posting list
-dài khi truy vấn. Thứ ba là yêu cầu phục vụ: hệ thống phải trả lời nhiều truy vấn đồng thời với độ trễ đuôi thấp, đồng
-thời chỉ mục phải xây lại được khi thư viện đổi phiên bản.
+theo kích thước kho và theo số truy vấn cần phục vụ. Thứ hai là phân bố lệch: từ khóa \code{theorem} xuất hiện trong
+\num{109826} phát biểu, ký hiệu \code{=} trong hơn \num{80000} phát biểu. Các token này tạo ra khóa nóng (hot key) ở pha
+shuffle khi xây chỉ mục và posting list dài khi truy vấn. Thứ ba là yêu cầu phục vụ: hệ thống phải trả lời nhiều truy vấn
+đồng thời và giữ P95 latency ở mức thấp, đồng thời chỉ mục phải xây lại được khi thư viện đổi phiên bản.
 
 Nhóm đặt hai câu hỏi nghiên cứu theo đề bài:
 \begin{enumerate}[label=\textbf{RQ\arabic*.},leftmargin=*]
   \item BM25 có đủ mạnh cho dữ liệu Lean, hay cần bổ sung trường ký hiệu, namespace và thông tin phụ thuộc?
-  \item Kết hợp điểm truy hồi thưa với tín hiệu cấu trúc có làm tăng Recall@$k$ mà vẫn giữ được độ trễ thấp hay không?
+  \item Kết hợp điểm BM25F với các đặc trưng cấu trúc có làm tăng Recall@$k$ mà vẫn giữ được P95 latency thấp hay không?
 \end{enumerate}
-Hai câu hỏi cùng hướng tới câu hỏi trung tâm của đề: tín hiệu cấu trúc thực sự cải thiện recall hay chỉ làm tăng chi
-phí. Nhóm chọn hai chỉ số chính là Recall@10 cho chất lượng và P95 ở 10 client đồng thời cho chi phí; các chỉ số khác
-dùng để giải thích đánh đổi.
+Hai câu hỏi cùng hướng tới câu hỏi trung tâm của đề: đặc trưng cấu trúc thực sự cải thiện recall hay chỉ làm tăng chi
+phí. Nhóm chọn hai chỉ số chính là Recall@10 cho chất lượng và P95 latency ở 10 client đồng thời cho chi phí; các chỉ số
+khác dùng để giải thích đánh đổi.
 
 Đóng góp của nhóm gồm bốn phần:
 \begin{enumerate}[leftmargin=*]
@@ -167,37 +180,38 @@ dùng để giải thích đánh đổi.
   \item Một chỉ mục đảo xây theo mô hình MapReduce bằng hai engine Spark, trùng từng byte với bản tuần tự, cùng thí
         nghiệm xây chỉ mục tới 3,6 triệu bản ghi (corpus nhân bản) trên Windows và Linux của cùng một máy, có đo
         shuffle, bộ nhớ, độ lệch và nén.
-  \item Một hệ thống truy hồi hai giai đoạn gồm BM25F và reranker cấu trúc (V4), cùng biến thể V5 bổ sung ứng viên từ
-        lịch sử sử dụng trong tập huấn luyện, được kiểm tra bằng đối chứng cùng ngân sách ứng viên và trên một tập holdout
-        chưa dùng trong quá trình thiết kế.
-  \item Một bộ đánh giá gồm chất lượng và độ trễ trên bốn kích thước chỉ mục và ba mức tải, kiểm định bootstrap theo
-        cụm theorem có hiệu chỉnh Holm, ablation, phân rã giới hạn giữa tạo ứng viên và xếp hạng, và phân tích lỗi.
+  \item Một hệ thống truy hồi hai giai đoạn gồm BM25F và reranker cấu trúc (V4), cùng biến thể V5 bổ sung candidate từ
+        lịch sử sử dụng trong tập train, được đối chiếu với V4 lấy top 240 candidate và kiểm tra trên một holdout chưa
+        dùng để huấn luyện hay chọn cấu hình.
+  \item Một bộ đánh giá gồm chất lượng và độ trễ trên bốn kích thước chỉ mục và ba mức tải, khoảng tin cậy bootstrap
+        theo cụm theorem và kiểm định hoán vị theo cụm có hiệu chỉnh Holm, ablation, phân rã giới hạn giữa bước tạo
+        candidate và bước xếp hạng, và phân tích lỗi.
 \end{enumerate}
 
-Phần còn lại của báo cáo được tổ chức như sau. Chương~\ref{sec:related} điểm qua công trình liên quan. Chương~\ref{sec:data}
-mô tả dữ liệu và định nghĩa benchmark. Chương~\ref{sec:method} trình bày kiến trúc và thuật toán. Chương~\ref{sec:setup} nêu
-thiết lập thí nghiệm, Chương~\ref{sec:results} trình bày kết quả, Chương~\ref{sec:ablation} trình bày ablation, phân tích lỗi
-và các nguy cơ đối với tính đúng đắn của kết luận. Chương~\ref{sec:conclusion} kết luận.
+Phần còn lại của báo cáo được tổ chức như sau. Chương~\ref{sec:related} điểm qua công trình liên quan.
+Chương~\ref{sec:data} mô tả dữ liệu và định nghĩa benchmark. Chương~\ref{sec:method} trình bày kiến trúc và thuật toán.
+Chương~\ref{sec:setup} nêu thiết lập thí nghiệm, Chương~\ref{sec:results} trình bày kết quả, Chương~\ref{sec:ablation}
+trình bày ablation, phân tích lỗi, hạn chế và threats to validity. Chương~\ref{sec:conclusion} kết luận.
 
 % ================================================================ 2
 \chapter{Công trình liên quan}\label{sec:related}
 
-\paragraph{Truy hồi thưa.} BM25 và mở rộng nhiều trường BM25F được Robertson và Zaragoza tổng kết trong khung xác suất
-về độ liên quan~\cite{robertson2009}. BM25F chuẩn hóa tần suất của từng trường theo độ dài trường rồi mới áp dụng hàm
-bão hòa, nên một term xuất hiện ở nhiều trường không bị tính quá mức như khi cộng điểm BM25 của từng trường. Cấu trúc
-chỉ mục đảo, mã hóa khoảng cách (d-gap), mã Variable-byte và mã gamma được trình bày trong giáo trình của Manning và cộng
-sự~\cite{manning2008}; Scholer và cộng sự chỉ ra rằng mã theo byte giải mã nhanh hơn đáng kể so với mã theo bit với tỉ lệ
-nén chấp nhận được~\cite{scholer2002}. Hệ thống của nhóm dùng BM25F làm giai đoạn đầu và đo lại đánh đổi nén trên dữ
-liệu Lean.
+\paragraph{Sparse retrieval.} BM25 và mở rộng nhiều trường BM25F được Robertson và Zaragoza tổng kết trong khung xác
+suất về độ liên quan~\cite{robertson2009}. BM25F chuẩn hóa tần suất của từng trường theo độ dài trường rồi mới áp dụng
+hàm bão hòa, nên một term xuất hiện ở nhiều trường không bị tính quá mức như khi cộng điểm BM25 của từng trường. Cấu trúc
+chỉ mục đảo (inverted index), mã hóa khoảng cách (d-gap), mã Variable-byte và mã gamma được trình bày trong giáo trình của
+Manning và cộng sự~\cite{manning2008}; Scholer và cộng sự chỉ ra rằng mã theo byte giải mã nhanh hơn đáng kể so với mã
+theo bit với tỉ lệ nén chấp nhận được~\cite{scholer2002}. Hệ thống của nhóm dùng BM25F làm giai đoạn đầu và đo lại đánh
+đổi nén trên dữ liệu Lean.
 
 \paragraph{Chọn premise trong trợ lý chứng minh.} MePo, bộ lọc liên quan dùng trong Sledgehammer của Isabelle, chọn
 premise theo mức trùng ký hiệu với mục tiêu và mở rộng dần theo các ký hiệu mới~\cite{meng2009}. DeepMath dùng mô hình
 chuỗi học sâu để chọn premise cho thư viện Mizar~\cite{irving2016}. Magnushammer học biểu diễn bằng transformer theo
 phương pháp tương phản và vượt Sledgehammer trên Isabelle~\cite{mikula2024}. LeanDojo xây công cụ trích xuất dữ liệu từ
-Lean, công bố LeanDojo Benchmark với hai split \code{random} và \code{novel\_premises}, và đề xuất ReProver, một bộ truy
-hồi dày đặc chỉ tìm trong các premise truy cập được từ vị trí đang chứng minh~\cite{yang2023,leandojodocs}. Nhóm dùng
-lại benchmark và ý tưởng premise truy cập được, nhưng giữ toàn bộ hệ thống ở dạng thưa và không dùng mô hình neural;
-hướng dày đặc do Nhóm 4 của lớp khảo sát.
+Lean, công bố LeanDojo Benchmark với hai split \code{random} và \code{novel\_premises}, và đề xuất ReProver, một dense
+retriever chỉ tìm trong các accessible premise, tức premise dùng được tại vị trí đang chứng minh~\cite{yang2023,leandojodocs}.
+Nhóm dùng lại benchmark và ý tưởng accessible premise, nhưng giữ toàn bộ hệ thống ở dạng sparse retrieval và không dùng
+mô hình neural; hướng dense retrieval do Nhóm 4 của lớp khảo sát.
 
 \paragraph{Xây chỉ mục phân tán.} MapReduce~\cite{dean2004} và Spark với mô hình RDD~\cite{zaharia2012,sparkdocs} là
 hai mô hình tính toán phổ biến để xây chỉ mục đảo theo lô. Lin và Dyer mô tả các mẫu thiết kế cho bài toán này, trong
@@ -205,12 +219,13 @@ hai mô hình tính toán phổ biến để xây chỉ mục đảo theo lô. L
 xếp~\cite{lin2010}. Hệ thống của nhóm cài đặt các mẫu này trên Spark và đo tác động của chúng.
 
 \paragraph{Tín hiệu đồ thị và trộn xếp hạng.} PageRank~\cite{page1999} được dùng trên đồ thị theorem tới premise để ước
-lượng mức quan trọng của premise. Reciprocal Rank Fusion~\cite{cormack2009} là cách trộn hai danh sách xếp hạng không cần
-chuẩn hóa điểm, phù hợp để kết hợp hệ thống thưa của Nhóm 3 với hệ thống dày đặc của Nhóm 4.
+lượng mức quan trọng của premise. Reciprocal Rank Fusion~\cite{cormack2009} trộn hai danh sách xếp hạng mà không cần
+chuẩn hóa điểm, phù hợp để kết hợp hệ thống sparse retrieval của Nhóm 3 với hệ thống dense retrieval của Nhóm 4 thành
+hybrid retrieval.
 
-\paragraph{Khoảng trống.} Các hệ thống premise retrieval gần đây chủ yếu dùng biểu diễn dày đặc và báo cáo chất lượng
-trên một cấu hình phần cứng cố định. Ít công trình đo xem riêng chỉ mục thưa cộng các tín hiệu cấu trúc rẻ đạt tới mức
-nào, và chi phí xây chỉ mục cùng độ trễ thay đổi ra sao khi kho tăng. Báo cáo này tập trung vào khoảng trống đó.
+\paragraph{Khoảng trống.} Các hệ thống premise retrieval gần đây chủ yếu dùng dense retrieval và báo cáo chất lượng
+trên một cấu hình phần cứng cố định. Ít công trình đo riêng xem BM25F cộng các đặc trưng cấu trúc rẻ đạt tới mức nào, và
+chi phí xây chỉ mục cùng độ trễ thay đổi ra sao khi kho tăng. Báo cáo này tập trung vào khoảng trống đó.
 
 % ================================================================ 3
 \chapter{Dữ liệu}\label{sec:data}
@@ -228,28 +243,28 @@ mô tả từng cột nằm trong \code{docs/data\_dictionary.md}. Corpus gồm 
 core, \num{2883} của Batteries và phần nhỏ của các thư viện khác; theo loại có \num{109823} \code{theorem}, \num{36826}
 \code{def}, \num{16969} \code{lemma} và \num{10071} \code{instance}.
 
-\section{Truy vấn và premise đúng}
+\section{Truy vấn và gold premise}
 
-Một truy vấn là trường \code{state\_before} của một tactic có ít nhất một premise được chú thích; tập premise đúng là
+Một truy vấn là trường \code{state\_before} của một tactic có ít nhất một premise được chú thích; tập gold premise là
 các premise trong chú thích đó. Văn bản của tactic không được đưa vào truy vấn vì nó chứa sẵn tên premise cần tìm. Ví dụ,
 trong truy vấn \code{random:val:36:0}, mục tiêu là chứng minh tích của \code{a}, nghịch đảo của \code{b} và \code{b} bằng
 \code{a} trong một monoid; tactic \code{simp [mul\_assoc]} dùng premise \code{mul\_assoc}, còn hệ thống chỉ được thấy proof
 state. Truy vấn này là truy vấn đầu tiên trong mẫu kiểm tra ở Mục~\ref{sec:checkdata} và được dùng làm ví dụ xuyên suốt
 (Bảng~\ref{tab:example}). Ngoài proof state, hệ thống được dùng tên theorem đang chứng minh, tệp chứa nó và dòng bắt đầu
-của nó; bộ lọc truy cập được luôn loại chính theorem này ra.
+của nó; bộ lọc accessible premise luôn loại chính theorem này ra.
 
-Có \num{115736} lượt premise đúng không có trong corpus và bị loại. Hiện tượng này đến từ bản thân benchmark: các bổ đề sinh
+Có \num{115736} lượt gold premise không có trong corpus và bị loại. Hiện tượng này đến từ bản thân benchmark: các bổ đề sinh
 tự động bởi \code{@[to\_additive]} như \code{add\_comm}, các constructor như \code{Or.inl} và các trường của structure như
-\code{Iff.mp} không phải khai báo tường minh trong \code{corpus.jsonl}. Sau khi loại, \num{20544} truy vấn không còn premise
-đúng nào và cũng bị loại; mọi bản ghi bị loại được ghi vào bảng \code{dead\_letter} kèm lý do. Vì vậy recall báo cáo chỉ
+\code{Iff.mp} không phải khai báo tường minh trong \code{corpus.jsonl}. Sau khi loại, \num{20544} truy vấn không còn gold
+premise nào và cũng bị loại; mọi bản ghi bị loại được ghi vào bảng \code{dead\_letter} kèm lý do. Vì vậy recall báo cáo chỉ
 tính premise có trong corpus và cao hơn recall mà bộ chứng minh gặp thực tế.
 
 \section{Split và tập đánh giá}
 
 Nhóm giữ nguyên hai split của LeanDojo. Split \code{random} là split chính; split \code{novel\_premises} được thiết kế
-để khó hơn: mỗi chứng minh trong tập kiểm tra dùng ít nhất một premise chưa từng được dùng trong tập huấn luyện. Mọi tham
+để khó hơn: mỗi chứng minh trong tập test dùng ít nhất một premise chưa từng được dùng trong tập train. Mọi tham
 số chỉ được chọn trên validation. Bảng~\ref{tab:dataflow} theo dõi số lượng qua từng bước lọc. Mỗi split có \num{2000}
-theorem kiểm tra, nhưng chỉ 882 theorem của \code{random} và \num{1196} theorem của \code{novel\_premises} còn ít nhất một
+theorem trong tập test, nhưng chỉ 882 theorem của \code{random} và \num{1196} theorem của \code{novel\_premises} còn ít nhất một
 truy vấn, tức 44,1\% và 59,8\%. Nguyên nhân chính là khoảng một nửa số theorem được chứng minh trực tiếp bằng term nên
 không có tactic nào. Kết quả chất lượng vì vậy đại diện cho các chứng minh dạng tactic có chú thích premise, không phải
 cho mọi theorem. Con số \num{315014} của bảng \code{queries} là tổng lượt truy vấn của cả hai split; trong từng tập, số
@@ -258,26 +273,27 @@ proof state khác nhau ít hơn số truy vấn chưa tới 1\%.
 \input{tables/dataflow}
 
 \paragraph{Tính chất novel sau khi lọc.} Bảo đảm của split \code{novel\_premises} đặt ở cấp chứng minh, còn đánh giá
-diễn ra ở cấp tactic sau khi lọc nhãn. So với nhãn của toàn bộ tập huấn luyện cùng split, chỉ \num{2506} trên \num{9735}
-cặp (truy vấn, premise đúng) của tập kiểm tra, tức 25,7\%, là premise chưa thấy, gồm \num{1933} premise khác nhau; 103 trên
-\num{1196} theorem được chấm không còn premise đúng chưa thấy nào. Recall tổng thể của split này vì vậy chủ yếu là recall
-trên nhãn đã thấy; Mục~\ref{sec:robust} báo cáo riêng recall trên premise chưa thấy.
+diễn ra ở cấp tactic sau khi lọc nhãn. Gọi một gold premise là unseen premise nếu nó không xuất hiện trong nhãn của
+tập train cùng split (khác với premise vắng khỏi corpus), ngược lại là seen premise. Chỉ \num{2506} trên \num{9735} cặp
+(truy vấn, gold premise) của tập test, tức 25,7\%, là unseen premise, gồm \num{1933} premise khác nhau; 103 trên
+\num{1196} theorem được chấm không còn unseen premise nào. Recall tổng thể của split này vì vậy chủ yếu là recall trên
+seen premise; Mục~\ref{sec:robust} báo cáo riêng recall trên unseen premise.
 
-Tập huấn luyện được chia đôi cố định theo md5 của tên theorem: nửa A dùng để tính thống kê phụ thuộc như độ phổ biến và
-PageRank, nửa B dùng để huấn luyện reranker, để đặc trưng không chứa nhãn của chính truy vấn huấn luyện. Thống kê và mô
-hình cho \code{novel\_premises} được tính lại từ tập huấn luyện của split này, vì tập huấn luyện của \code{random} chứa các
-theorem thuộc tập kiểm tra của \code{novel\_premises}.
+Tập train được chia đôi cố định theo md5 của tên theorem: train A dùng để tính thống kê phụ thuộc như popularity và
+PageRank, train B dùng để huấn luyện reranker, để đặc trưng không chứa nhãn của chính truy vấn dùng để huấn luyện. Thống kê và mô
+hình cho \code{novel\_premises} được tính lại từ tập train của split này, vì tập train của \code{random} chứa các
+theorem thuộc tập test của \code{novel\_premises}.
 
-\paragraph{Tập con cho thí nghiệm quy mô.} Nhóm lấy mẫu 500 truy vấn kiểm tra \code{random} (seed 42) và tạo bốn chỉ mục
-lồng nhau 10K, 50K, 100K và 181K premise, đều chứa 870 premise đúng của mẫu, phần còn lại lấy ngẫu nhiên. Thí nghiệm xây
+\paragraph{Tập con cho thí nghiệm quy mô.} Nhóm lấy mẫu 500 truy vấn trong tập test \code{random} (seed 42) và tạo bốn chỉ mục
+lồng nhau 10K, 50K, 100K và 181K premise, đều chứa 870 gold premise của mẫu, phần còn lại lấy ngẫu nhiên. Thí nghiệm xây
 chỉ mục dùng thêm hai corpus nhân bản nội dung gấp 5 lần (\num{904785} bản ghi) và gấp 20 lần (\num{3619140} bản ghi), chỉ
 để đo thời gian, bộ nhớ và độ lệch.
 
 \section{Kiểm tra chất lượng dữ liệu}\label{sec:checkdata}
 
 Script \code{make\_check\_queries.py} lấy 20 truy vấn validation (seed 42, mỗi lĩnh vực nhiều nhất hai truy vấn) và kiểm
-tra tự động bốn điều kiện so với tactic gốc: premise đúng được đánh dấu trong tactic, truy cập được từ theorem, không phải
-chính theorem, và mọi premise bị loại đều có trong dead-letter. Cả 20 truy vấn đạt bốn điều kiện; 16 bản ghi trùng hoàn toàn
+tra tự động bốn điều kiện so với tactic gốc: gold premise được đánh dấu trong tactic, là accessible premise của theorem, không
+phải chính theorem, và mọi premise bị loại đều có trong dead-letter. Cả 20 truy vấn đạt bốn điều kiện; 16 bản ghi trùng hoàn toàn
 đã được loại. Bước đối chiếu thủ công từng truy vấn và ký xác nhận trong \code{docs/check\_queries.md} chưa được thực hiện.
 \canchot{Người kiểm tra đối chiếu 20 truy vấn và ký xác nhận.}
 
@@ -286,18 +302,19 @@ chính theorem, và mọi premise bị loại đều có trong dead-letter. Cả
 
 \section{Tổng quan}
 
-Hệ thống gồm hai đường xử lý (Hình~\ref{fig:arch}). Đường xây chỉ mục chạy theo lô: trích xuất dữ liệu, phân tích văn
-bản và xây chỉ mục đảo theo mô hình MapReduce. Đường phục vụ chạy trực tuyến: nhận proof state cùng ngữ cảnh, tách từ
-bằng đúng bộ tách từ và phiên bản đã dùng khi xây chỉ mục, tính BM25F để lấy 100 ứng viên rồi chấm lại bằng reranker cấu
-trúc. Ở V5, tập ứng viên được bổ sung từ lịch sử sử dụng trước khi chấm lại. Thống kê phụ thuộc tính từ nửa A của tập
-huấn luyện được nạp vào reranker.
+Hệ thống gồm hai đường xử lý (Hình~\ref{fig:arch}). Đường xây chỉ mục chạy theo lô: trích xuất dữ liệu, tokenize và
+xây chỉ mục đảo theo mô hình MapReduce. Đường phục vụ chạy trực tuyến: nhận proof state cùng ngữ cảnh, tokenize bằng đúng
+tokenizer và phiên bản đã dùng khi xây chỉ mục, dùng BM25F trên ba trường name, namespace và statement để lấy top 100
+accessible premise làm candidate, rồi reranker dùng hồi quy logistic để xếp hạng lại dựa trên các đặc trưng cấu trúc,
+popularity và PageRank (V4). V5 bổ sung candidate từ lịch sử sử dụng trong train A và thêm hai đặc trưng
+\code{file\_usage}, \code{dir\_usage}.
 
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
-  node distance=3.2mm and 9mm,
+  node distance=3.2mm and 7mm,
   khoi/.style={draw=chuthich,rounded corners=2pt,fill=white,align=center,font=\small,minimum width=5.0cm,minimum height=7mm,inner sep=2pt},
-  phu/.style={khoi,font=\footnotesize,minimum width=3.7cm,text width=3.5cm},
+  phu/.style={khoi,font=\small,minimum width=4.0cm,text width=3.8cm},
   dl/.style={khoi,fill=nhan!8},
   mui/.style={-{Stealth[length=2.2mm]},thick,draw=chuthich}]
   \node[dl] (raw) {LeanDojo Benchmark 4 v10\\(corpus.jsonl, train/val/test.json)};
@@ -308,12 +325,12 @@ huấn luyện được nạp vào reranker.
   \node[dl,below=of red] (idx) {Chỉ mục đảo: dictionary, postings.bin\\manifest có SHA-1 từng tệp};
   \node[dl,right=of raw] (q) {Proof state và ngữ cảnh\\(theorem, tệp, dòng bắt đầu)};
   \node[khoi,below=of q] (tok) {Tách từ Lean (cùng phiên bản)};
-  \node[khoi,below=of tok] (s1) {Giai đoạn 1: BM25F trên 3 trường\\lọc premise truy cập được, top 100};
-  \node[khoi,below=of s1] (mg) {Hợp nhất, loại trùng: 100 ứng viên\\thêm tối đa 250 ở V5 (trung bình 239)};
+  \node[khoi,below=of tok] (s1) {Giai đoạn 1: BM25F trên 3 trường\\lọc accessible premise, top 100};
+  \node[khoi,below=of s1] (mg) {Hợp nhất, loại trùng: 100 candidate;\\V5 thêm tối đa 250, tổng trung bình 239};
   \node[khoi,below=of mg] (s2) {Giai đoạn 2: hồi quy logistic\\13 đặc trưng (V4) hoặc 15 (V5)};
   \node[dl,below=of s2] (out) {Top-$k$ premise qua FastAPI hoặc CLI};
-  \node[phu,right=of mg] (ex) {Chỉ ở V5: premise dùng nhiều nhất ở cùng tệp (100), cùng thư mục (100) và toàn thư viện (50), qua bộ lọc truy cập được};
-  \node[phu,right=of out] (dep) {Thống kê từ train nửa A: độ phổ biến, PageRank (tĩnh); số lần dùng theo tệp, thư mục (chỉ theorem có trước)};
+  \node[phu,right=of mg] (ex) {Chỉ ở V5: premise dùng nhiều nhất ở cùng tệp (100), cùng thư mục (100), toàn thư viện (50)};
+  \node[phu,right=of out] (dep) {Train train A: phổ biến, PageRank (tĩnh); số lần dùng theo tệp, thư mục (chỉ theorem có trước)};
   \draw[mui] (raw) -- (ext); \draw[mui] (ext) -- (map); \draw[mui] (map) -- (shuf);
   \draw[mui] (shuf) -- (red); \draw[mui] (red) -- (idx);
   \draw[mui] (q) -- (tok); \draw[mui] (tok) -- (s1); \draw[mui] (s1) -- (mg); \draw[mui] (mg) -- (s2); \draw[mui] (s2) -- (out);
@@ -326,18 +343,19 @@ huấn luyện được nạp vào reranker.
     \node[fit=(q)(out)(ex)(dep),draw=chuthich!50,dashed,rounded corners=4pt,inner sep=4pt,label={[font=\small\bfseries]above:Đường phục vụ (trực tuyến)}] {};
   \end{scope}
 \end{tikzpicture}
-\caption[Kiến trúc hệ thống]{Kiến trúc hệ thống. Bản xây chỉ mục tuần tự và bản Spark cho cùng một chỉ mục. Số ứng viên
-trung bình 239 đo trên tập kiểm tra \code{random}.}\label{fig:arch}
+\caption[Kiến trúc hệ thống]{Kiến trúc hệ thống. Bản xây chỉ mục tuần tự và bản Spark cho cùng một chỉ mục. Candidate bổ
+sung của V5 cũng qua bộ lọc accessible premise; 239 là tổng số candidate trung bình của V5 trên tập test \code{random}, gồm
+cả 100 candidate của BM25F.}\label{fig:arch}
 \end{figure}
 
-\section{Bộ tách từ cho Lean}
+\section{Tokenizer cho Lean}
 
-Bộ tách từ mặc định của baseline chỉ lấy các chuỗi chữ và số rồi chuyển về chữ thường, nên làm mất ký hiệu toán học và
-tên ghép. Bộ tách từ Lean giữ tên đầy đủ có dấu chấm đồng thời tách thành các thành phần, ví dụ \code{Nat.add\_comm} sinh
+Tokenizer mặc định của baseline chỉ lấy các chuỗi chữ và số rồi chuyển về chữ thường, nên làm mất ký hiệu toán học và
+tên ghép. Tokenizer Lean giữ tên đầy đủ có dấu chấm đồng thời tách thành các thành phần, ví dụ \code{Nat.add\_comm} sinh
 ra \code{nat.add\_comm}, \code{nat}, \code{add\_comm}, \code{add} và \code{comm}; tách thêm theo camelCase (\code{natAbs}
 thành \code{nat} và \code{abs}); giữ các ký hiệu như $\forall$, $\to$, $\le$, $\neq$, $\mathbb{N}$, $\mathbb{R}$ làm token;
-và bỏ biến một chữ cái ASCII. Bộ tách từ không dùng chuẩn hóa NFKC vì NFKC biến $\mathbb{R}$ thành chữ R thường. Phiên bản
-bộ tách từ được ghi trong manifest của chỉ mục để đường phục vụ dùng đúng phiên bản.
+và bỏ biến một chữ cái ASCII. Tokenizer không dùng chuẩn hóa NFKC vì NFKC biến $\mathbb{R}$ thành chữ R thường. Phiên bản
+tokenizer được ghi trong manifest của chỉ mục để đường phục vụ dùng đúng phiên bản.
 
 \section{Xây chỉ mục theo mô hình MapReduce}\label{sec:mapreduce}
 
@@ -381,25 +399,25 @@ dài trung bình và $\mathrm{idf}(t) = \ln\big(1 + (N - \mathrm{df}(t) + 0{,}5)
 trong Lucene. Khi chỉ có một trường và $w = 1$, công thức trở về BM25. Hệ số $\mathrm{qtf}(t)$ là số lần term xuất hiện
 trong truy vấn hoặc bằng 1 (chế độ nhị phân, phù hợp với proof state nơi tên giả thiết lặp lại nhiều lần). Chi phí của một
 truy vấn phụ thuộc vào tổng độ dài các posting list được đọc, $\sum_{t \in q}\sum_f \mathrm{df}_f(t)$, cộng với thao tác gộp
-điểm. Cách làm này tránh chấm riêng từng tài liệu nhưng không độc lập với kích thước kho: posting list của các token phổ
+điểm. Cách làm này tránh tính điểm riêng cho từng tài liệu nhưng không độc lập với kích thước kho: posting list của các token phổ
 biến như \code{=} hay $\to$ dài ra tuyến tính theo số tài liệu $N$. Cài đặt hiện tại gộp điểm bằng \code{np.unique}, nên có
-thêm chi phí sắp xếp $O(M \log M)$ với $M$ là số posting được đọc, và bộ lọc truy cập được tạo mặt nạ trên toàn bộ $N$
+thêm chi phí sắp xếp $O(M \log M)$ với $M$ là số posting được đọc, và bộ lọc accessible premise tạo mặt nạ trên toàn bộ $N$
 premise.
 
-\section{Bộ lọc premise truy cập được}
+\section{Bộ lọc accessible premise}
 
-Một premise chỉ có thể được dùng nếu nó nằm trong tệp được import trực tiếp hoặc gián tiếp bởi tệp chứa theorem, hoặc
-nằm trong cùng tệp và đã khai báo xong trước theorem. Hệ thống tính bao đóng import trên \num{5674} tệp, lưu đệm theo tệp
+Một premise là accessible premise của theorem đang chứng minh nếu nó nằm trong tệp được import trực tiếp hoặc gián tiếp
+bởi tệp chứa theorem, hoặc nằm trong cùng tệp và đã khai báo xong trước theorem; chỉ những premise này mới dùng được tại
+vị trí chứng minh. Hệ thống tính bao đóng import trên \num{5674} tệp, lưu đệm theo tệp
 rồi tạo mặt nạ trên toàn bộ premise. Với premise cùng tệp, điều kiện là dòng \emph{kết thúc} của premise nhỏ hơn dòng bắt
-đầu của theorem (Mục~\ref{sec:bug} giải thích lý do). Bộ lọc được áp dụng ở giai đoạn 1, trước khi chọn 100 ứng viên.
+đầu của theorem (Mục~\ref{sec:bug} giải thích lý do). Bộ lọc được áp dụng ở giai đoạn 1, trước khi chọn 100 candidate.
 
 \section{Reranker cấu trúc}
 
-Giai đoạn 2 chấm lại 100 ứng viên bằng hồi quy logistic trên 13 đặc trưng ở Bảng~\ref{tab:features}. Đặc trưng chỉ dùng
-proof state, ngữ cảnh của truy vấn và thống kê tính trên nửa A của tập huấn luyện, không dùng nhãn của validation hay tập
-kiểm tra. Mô hình được huấn luyện trên \num{6000} truy vấn lấy ngẫu nhiên từ nửa B, gồm \num{600000} cặp (truy vấn, ứng
-viên) với \num{4492} cặp dương; ứng viên lúc huấn luyện được sinh bằng đúng giai đoạn 1 và bộ lọc như lúc chạy. Đặc trưng
-được chuẩn hóa theo tập huấn luyện; hệ số điều chuẩn $C = 1$. Đồ thị phụ thuộc có cạnh từ mỗi theorem của nửa A tới các
+Giai đoạn 2 rerank 100 candidate bằng hồi quy logistic trên 13 đặc trưng ở Bảng~\ref{tab:features}. Đặc trưng chỉ dùng
+proof state, ngữ cảnh của truy vấn và thống kê tính trên train A, không dùng nhãn của validation hay tập
+test. Mô hình được huấn luyện trên \num{6000} truy vấn lấy ngẫu nhiên từ train B, gồm \num{600000} cặp (truy vấn, candidate) với \num{4492} cặp dương; candidate lúc huấn luyện được sinh bằng đúng giai đoạn 1 và bộ lọc như lúc chạy. Đặc trưng
+được chuẩn hóa theo tập train; hệ số điều chuẩn $C = 1$. Đồ thị phụ thuộc có cạnh từ mỗi theorem của train A tới các
 premise nó dùng, gồm \num{129983} cạnh và \num{41703} premise; PageRank dùng hệ số damping 0,85 và hội tụ sau 11 vòng lặp.
 
 \begin{table}[htbp]
@@ -414,21 +432,20 @@ Namespace & \code{ns\_in\_query}, \code{ns\_thm} & tỉ lệ thành phần names
 Vị trí & \code{same\_file}, \code{dir\_overlap} & premise cùng tệp với theorem; tỉ lệ thư mục chung \\
 Ký hiệu & \code{sym\_jaccard} & hệ số Jaccard giữa tập ký hiệu toán của mục tiêu và của phát biểu \\
 Loại khai báo & \code{kind\_thm}, \code{kind\_def}, \code{kind\_inst}, \code{kind\_type} & theorem hoặc lemma; định nghĩa; instance; structure, class hoặc inductive \\
-Phụ thuộc & \code{popularity}, \code{pagerank} & logarit của số theorem nửa A dùng premise (cộng 1), đã chuẩn hóa; logarit PageRank đưa về khoảng từ 0 đến 1 \\
-Sử dụng (V5) & \code{file\_usage}, \code{dir\_usage} & logarit của số theorem nửa A có trước, cùng tệp hoặc cùng thư mục được import, dùng premise; chuẩn hóa theo giá trị lớn nhất \\
+Phụ thuộc & \code{popularity}, \code{pagerank} & logarit của số theorem train A dùng premise (cộng 1), đã chuẩn hóa; logarit PageRank đưa về khoảng từ 0 đến 1 \\
+Sử dụng (V5) & \code{file\_usage}, \code{dir\_usage} & logarit của số theorem train A có trước, cùng tệp hoặc cùng thư mục được import, dùng premise; chuẩn hóa theo giá trị lớn nhất \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\paragraph{V5: thêm ứng viên từ lịch sử sử dụng.} Phân tích lỗi của V4 trên tập kiểm tra \code{random}
-(Mục~\ref{sec:errors}) cho thấy phần lớn premise đúng bị bỏ lỡ không lọt vào 100 ứng viên của BM25F, và nhiều trong số đó
-là bổ đề tổng quát được dùng ở rất nhiều nơi. V5 bổ sung ứng viên từ ba nguồn không dựa vào từ khóa: các premise được dùng
-nhiều nhất bởi những theorem cùng tệp, bởi những theorem cùng thư mục, và các premise phổ biến nhất toàn thư viện; mọi ứng
-viên bổ sung đều qua bộ lọc truy cập được. Hai đặc trưng \code{file\_usage} và \code{dir\_usage} đưa số lần sử dụng vào
-reranker; số ứng viên của từng nguồn được chọn trên validation (Mục~\ref{sec:tuning}). Thống kê theo tệp chỉ đếm các
-theorem nửa A khai báo trước theorem đang chứng minh, thống kê theo thư mục chỉ đếm thêm theorem ở những tệp được import;
-ràng buộc này có unit test. Ngược lại, độ phổ biến và PageRank là prior tĩnh tính một lần trên toàn bộ nửa A. Như vậy hệ
-thống không dùng nhãn của validation hay tập kiểm tra và chỉ trả về premise truy cập được, nhưng không mô phỏng đầy đủ
+\paragraph{V5: thêm candidate từ lịch sử sử dụng.} Phân tích lỗi của V4 trên tập test \code{random}
+(Mục~\ref{sec:errors}) cho thấy phần lớn gold premise bị bỏ lỡ không lọt vào 100 candidate của BM25F, và nhiều trong số đó
+là bổ đề tổng quát được dùng ở rất nhiều nơi. V5 bổ sung candidate từ ba nguồn không dựa vào từ khóa: các premise được dùng
+nhiều nhất bởi những theorem cùng tệp, bởi những theorem cùng thư mục, và các premise phổ biến nhất toàn thư viện; mọi candidate bổ sung đều qua bộ lọc accessible premise. Hai đặc trưng \code{file\_usage} và \code{dir\_usage} đưa số lần sử dụng vào
+reranker; số candidate của từng nguồn được chọn trên validation (Mục~\ref{sec:tuning}). Thống kê theo tệp chỉ đếm các
+theorem train A khai báo trước theorem đang chứng minh, thống kê theo thư mục chỉ đếm thêm theorem ở những tệp được import;
+ràng buộc này có unit test. Ngược lại, popularity và PageRank là prior tĩnh tính một lần trên toàn bộ train A. Như vậy hệ
+thống không dùng nhãn của validation hay tập test và chỉ trả về accessible premise, nhưng không mô phỏng đầy đủ
 tình huống viết một định lý mới tại một thời điểm.
 
 \section{Dịch vụ truy vấn}
@@ -442,15 +459,12 @@ LRU cho \num{4096} posting list đã giải mã và chạy một truy vấn kh�
 
 \section{Môi trường và các biến thể}
 
-Mọi thí nghiệm chạy trên một máy 6 nhân, 12 luồng, 32 GB RAM (Bảng~\ref{tab:env}, Phụ lục~\ref{app:tables}). Phiên bản của
-mọi gói Python được khóa trong \code{requirements/main.lock.txt} và \code{requirements/spark.lock.txt}. Mỗi lần chạy ghi một
-bản ghi theo Phụ lục B của hướng dẫn gồm mã lần chạy, thời điểm, phiên bản mã và dữ liệu, cấu hình máy, phiên bản phần mềm,
-tham số, seed, kết quả và trạng thái (Mục~\ref{app:record}).
-
-Bảng~\ref{tab:variants} liệt kê tám biến thể của chuỗi cải tiến và bốn cấu hình đối chứng. B0 là baseline bắt buộc của
-đề: BM25 mặc định trên phát biểu với bộ tách từ thông thường, không dùng embedding và không dùng đồ thị phụ thuộc. B0t là B0
-đã tinh tham số với cùng ngân sách như V1, để so sánh công bằng. Mỗi cấu hình đối chứng chỉ khác biến thể gốc đúng một
-điểm và được huấn luyện lại trên cùng dữ liệu.
+Mọi thí nghiệm chạy trên một máy 6 nhân, 12 luồng, 32 GB RAM (Bảng~\ref{tab:env}, Phụ lục~\ref{app:tables}); phiên bản các
+gói Python được khóa trong \code{requirements/}. Mỗi lần chạy ghi một bản ghi theo Phụ lục B của hướng dẫn gồm mã lần chạy,
+thời điểm, phiên bản mã và dữ liệu, cấu hình máy, phần mềm, tham số, seed, kết quả và trạng thái (Mục~\ref{app:record}).
+Bảng~\ref{tab:variants} liệt kê tám biến thể của chuỗi cải tiến và bốn cấu hình đối chứng. B0 là baseline bắt buộc của đề;
+B0t là B0 đã tinh tham số với cùng ngân sách như V1. Mỗi cấu hình đối chứng chỉ khác biến thể gốc đúng một điểm và được
+huấn luyện lại trên cùng dữ liệu.
 
 \begin{table}[htbp]
 \centering
@@ -459,18 +473,18 @@ Bảng~\ref{tab:variants} liệt kê tám biến thể của chuỗi cải tiế
 \toprule
 Mã & Mô tả \\
 \midrule
-B0 & Baseline: BM25, $k_1 = 1{,}2$, $b = 0{,}75$, qtf đếm, trường phát biểu, bộ tách từ mặc định \\
+B0 & Baseline: BM25, $k_1 = 1{,}2$, $b = 0{,}75$, qtf đếm, trường statement, tokenizer mặc định \\
 B0t & B0 với $k_1 = 2{,}0$, $b = 1{,}0$, qtf nhị phân, chọn trên validation \\
-V1 & B0t với bộ tách từ Lean; $k_1 = 3{,}0$, $b = 1{,}0$, qtf nhị phân \\
-V2 & V1 với BM25F trên ba trường tên, namespace, phát biểu; trọng số 1,0; 0,5; 1,0 và $b_f = 1{,}0$ \\
-V2a & V2 với bộ lọc premise truy cập được \\
+V1 & B0t với tokenizer Lean; $k_1 = 3{,}0$, $b = 1{,}0$, qtf nhị phân \\
+V2 & V1 với BM25F trên ba trường name, namespace, statement; trọng số 1,0; 0,5; 1,0 và $b_f = 1{,}0$ \\
+V2a & V2 với bộ lọc accessible premise \\
 V3 & V2 với reranker 11 đặc trưng, không lọc, không dùng thống kê phụ thuộc \\
-V4 & V3 với hai đặc trưng phụ thuộc (độ phổ biến, PageRank) và bộ lọc truy cập được \\
-V5 & V4 thêm tối đa 250 ứng viên từ ba nguồn sử dụng (100 theo tệp, 100 theo thư mục, 50 phổ biến) và hai đặc trưng sử dụng \\
+V4 & V3 với hai đặc trưng phụ thuộc (popularity, PageRank) và bộ lọc accessible premise \\
+V5 & V4 thêm tối đa 250 candidate từ ba nguồn sử dụng (100 theo tệp, 100 theo thư mục, 50 phổ biến) và hai đặc trưng sử dụng \\
 \midrule
-V4-K240 & V4 với 240 ứng viên BM25F thay vì 100, xấp xỉ số ứng viên trung bình của V5; tách tác dụng của nguồn ứng viên khỏi tác dụng của số ứng viên \\
-V2-nons & V2 với trọng số namespace bằng 0, tức BM25F trên tên và phát biểu \\
-V4-poponly & V4 chỉ giữ độ phổ biến trong hai đặc trưng phụ thuộc \\
+V4-K240 & V4 lấy top 240 của BM25F thay vì 100, xấp xỉ số candidate trung bình của V5 trên \code{random} và holdout (V5 có 208 trên \code{novel\_premises}); vẫn dùng 13 đặc trưng của V4 \\
+V2-nons & V2 với trọng số namespace bằng 0, tức BM25F trên name và statement \\
+V4-poponly & V4 chỉ giữ popularity trong hai đặc trưng phụ thuộc \\
 V4-pronly & V4 chỉ giữ PageRank trong hai đặc trưng phụ thuộc \\
 \bottomrule
 \end{tabularx}
@@ -478,143 +492,143 @@ V4-pronly & V4 chỉ giữ PageRank trong hai đặc trưng phụ thuộc \\
 
 \section{Tinh tham số và huấn luyện}\label{sec:tuning}
 
-Tham số của giai đoạn 1 được chọn bằng tìm kiếm lưới trên validation của \code{random}. Lưới cơ bản cho B0t và V1 gồm 40
-điểm ($k_1$ từ 0,6 đến 2,0; $b$ từ 0,3 đến 0,9; hai chế độ qtf); vì điểm tốt nhất nằm ở biên lưới, lưới được mở rộng thêm 8
-điểm với $k_1 \in \{2;\ 3;\ 4;\ 6\}$ và $b \in \{0{,}9;\ 1{,}0\}$. Lưới BM25F của V2 gồm 20 tổ hợp trọng số trường và hệ số
-$b$. Điểm cao nhất của lưới này (Recall@10 bằng 0,1727) đặt trọng số namespace bằng 0; cấu hình được chọn thấp hơn 0,0005,
-với lý do có Recall@5 và Recall@50 cao hơn và dùng đủ ba trường. Quy tắc chọn này không được định trước nên không phải bằng
-chứng cho thấy trường namespace cần thiết; đối chứng V2-nons kiểm tra trực tiếp câu hỏi này (Mục~\ref{sec:ablation-rerank}).
-Với V5, nhóm thử 8 tổ hợp số ứng viên bổ sung trên validation, mỗi tổ hợp huấn luyện lại reranker (Bảng~\ref{tab:v5grid}
-ở Phụ lục~\ref{app:tables}), và chọn tổ hợp 100 theo tệp, 100 theo thư mục, 50 phổ biến có Recall@10 cao nhất. Tập kiểm
-tra chỉ được chạy với cấu hình đã chốt.
+Tham số của giai đoạn 1 được chọn bằng tìm kiếm lưới trên validation của \code{random}: 40 điểm cho B0t và V1, mở rộng thêm
+8 điểm vì điểm tốt nhất nằm ở biên lưới, và 20 tổ hợp trọng số trường cho V2. Điểm cao nhất của lưới BM25F (Recall@10 bằng
+0,1727) đặt trọng số namespace bằng 0; cấu hình được chọn thấp hơn 0,0005 vì có Recall@5 và Recall@50 cao hơn và dùng đủ ba
+trường. Quy tắc này không được định trước nên không là bằng chứng cho thấy namespace cần thiết; đối chứng V2-nons kiểm tra
+trực tiếp câu hỏi đó. Với V5, nhóm thử 8 tổ hợp số candidate bổ sung trên validation (Bảng~\ref{tab:v5grid},
+Phụ lục~\ref{app:tables}) và chọn tổ hợp 100, 100, 50 có Recall@10 cao nhất. Tham số của B0t đến V4 được chốt trước khi chạy
+tập test; số candidate của V5 được chọn trên validation, nhưng thiết kế của V5 đã chịu ảnh hưởng của tập test.
 
 \section{Quy trình phát triển và tập holdout}\label{sec:holdout}
 
-Tập kiểm tra không hoàn toàn đứng ngoài quá trình phát triển, và nhóm ghi lại hai lần tập này ảnh hưởng tới thiết kế.
-Lần thứ nhất là lỗi của bộ lọc truy cập được, phát hiện khi phân tích lỗi của V4 trên tập kiểm tra (Mục~\ref{sec:bug});
-đây là sửa lỗi tính đúng, không phải chọn tham số. Lần thứ hai là V5: ý tưởng thêm ứng viên từ lịch sử sử dụng xuất phát
-từ phân tích lỗi của V4 trên tập kiểm tra \code{random}, sau đó số ứng viên mới được chọn trên validation. Kết quả của V5
-trên tập kiểm tra vì vậy là kết quả sau quan sát.
+Tập test ảnh hưởng tới thiết kế hai lần. Lần thứ nhất là lỗi của bộ lọc accessible premise, phát hiện khi phân tích lỗi của
+V4 trên tập test (Mục~\ref{sec:bug}); đây là sửa lỗi tính đúng, không phải chọn tham số. Lần thứ hai là V5: ý tưởng thêm
+candidate từ lịch sử sử dụng đến từ phân tích lỗi của V4 trên tập test \code{random}. Kết quả của V5 trên tập test vì vậy
+có được sau khi đã xem lỗi trên chính tập đó, chứ không phải kết quả của một cấu hình chốt từ trước.
 
-Để có một phép đo chưa bị ảnh hưởng, sau khi chốt V5 nhóm tạo tập holdout bằng \path{scripts/make_holdout.py}: lấy theorem
-từ nửa B của tập huấn luyện \code{random}, loại mọi theorem có truy vấn nằm trong mẫu \num{6000} truy vấn dùng để huấn
-luyện reranker, rồi lấy ngẫu nhiên theorem (seed 42) cho đến đủ \num{2500} truy vấn, thuộc \num{1138} theorem. Holdout
-không trùng với nửa A, với mẫu huấn luyện reranker hay với validation. Cấu hình V4-K240 được thêm sau bản đánh giá phản
-biện, huấn luyện như V4 và đánh giá một lần trên mỗi tập.
+Sau khi chốt V5, nhóm tạo tập holdout bằng \path{scripts/make_holdout.py}: lấy theorem từ train B của
+\code{random}, loại mọi theorem có truy vấn trong mẫu \num{6000} truy vấn huấn luyện reranker, rồi lấy ngẫu nhiên (seed 42)
+\num{2500} truy vấn của \num{1138} theorem, không trùng theorem với train A, mẫu huấn luyện, validation hay tập test. Holdout
+là phần train B chưa dùng để huấn luyện reranker, giữ riêng để xác nhận nội bộ, cùng snapshot và phân phối, không phải
+benchmark bên ngoài. Vì các
+theorem có truy vấn trong mẫu huấn luyện bị loại, chứng minh nhiều bước dễ bị loại hơn: holdout có 2,20 truy vấn mỗi theorem
+so với 2,99 ở tập test \code{random}. Kết quả trên holdout vì vậy xác nhận trên dữ liệu chưa dùng để huấn luyện hay chọn
+cấu hình, không chứng minh khả năng tổng quát hóa sang phiên bản thư viện khác. Thứ tự thời gian của các lần chạy, lấy từ
+run record, nằm trong \code{docs/process\_log.md}: mỗi hệ thống được đánh giá trên holdout một lần và không cấu hình nào
+được chọn theo holdout. Từ nay holdout không còn là tập chưa xem cho các cải tiến tiếp theo.
 
 \section{Thiết kế thí nghiệm quy mô và tải}
 
 Nhóm dùng bốn kích thước chỉ mục cho chất lượng và độ trễ, sáu kích thước corpus từ 10K đến 3,6 triệu bản ghi cho thời
-gian xây chỉ mục trên hai nền tảng, và ba mức tải 1, 10 và 50 client đồng thời (yêu cầu tối thiểu của đề là ba kích thước
-và ba mức tải); Bảng~\ref{tab:design} ở Phụ lục~\ref{app:tables} liệt kê đủ các thí nghiệm. Thí nghiệm tải chính gồm 36
-cấu hình (3 biến thể, 4 kích thước chỉ mục, 3 mức tải), mỗi cấu hình đo 3 lần, tổng cộng 108 lần đo; mỗi lần đo gửi 50 yêu
-cầu khởi động rồi 400 yêu cầu được tính, nên có \num{43200} yêu cầu được đo. Client đa luồng giữ kết nối HTTP liên tục và
-đo độ trễ đầu cuối của từng yêu cầu.
+gian xây chỉ mục trên hai nền tảng, và ba mức tải 1, 10 và 50 client (Bảng~\ref{tab:design}, Phụ lục~\ref{app:tables}). Thí
+nghiệm tải chính gồm 36 cấu hình (3 biến thể, 4 kích thước chỉ mục, 3 mức tải), mỗi cấu hình đo 3 lần, mỗi lần 400 yêu cầu
+sau 50 yêu cầu khởi động, tổng cộng 108 lần đo và \num{43200} yêu cầu. Client đa luồng giữ kết nối HTTP liên tục và đo độ
+trễ đầu cuối của từng yêu cầu.
 
-\section{Chỉ số đánh giá và kiểm định}
+\section{Chỉ số đánh giá và kiểm định}\label{sec:metrics}
 
-Với truy vấn $q$, tập premise đúng $G_q$ và danh sách trả về $R_q$, Recall@$k$ bằng $|G_q \cap R_q^{(k)}| / |G_q|$ với
-$R_q^{(k)}$ là $k$ phần tử đầu. MRR là trung bình nghịch đảo hạng của premise đúng đầu tiên trong top 100; nDCG@10 dùng nhãn
-nhị phân. Chỉ số chính được lấy trung bình theo truy vấn, tức mỗi bước tactic có trọng số bằng nhau. Vì các truy vấn của
-cùng một theorem liên quan với nhau và có theorem chứa tới 53 truy vấn, nhóm báo thêm trung bình theo theorem như một kiểm
-tra độ bền. Recall trên premise chưa thấy chỉ tính các premise đúng không là nhãn của truy vấn huấn luyện nào cùng split,
-lấy trung bình trên các truy vấn có premise như vậy. Với tập ứng viên $C_q$, độ phủ là $|G_q \cap C_q|/|G_q|$, Oracle@$k$ là
-$\min(k, |G_q \cap C_q|)/|G_q|$, tức recall của một reranker hoàn hảo, và phần mất do xếp hạng là Oracle@10 trừ Recall@10.
-Chỉ số chi phí gồm P50, P95, P99 của độ trễ đầu cuối, QPS, thời gian xây chỉ mục, bộ nhớ đỉnh, dung lượng shuffle và kích
-thước chỉ mục.
+Với truy vấn $q$, tập gold premise $G_q$ và danh sách trả về $R_q$, Recall@$k$ bằng $|G_q \cap R_q^{(k)}| / |G_q|$ với
+$R_q^{(k)}$ là $k$ phần tử đầu; MRR là trung bình nghịch đảo hạng của gold premise đầu tiên trong top 100. Chỉ số chính là
+query-macro, tức trung bình theo truy vấn, mỗi truy vấn có trọng số bằng nhau. Vì có theorem chứa tới 53 truy vấn, nhóm báo
+thêm theorem-macro: lấy trung bình trong từng theorem rồi trung bình giữa các theorem, mỗi theorem có trọng số bằng nhau.
+Recall trên unseen premise chỉ tính các unseen premise và chỉ lấy trung bình trên các truy vấn có ít nhất một unseen premise.
+Với candidate pool $C_q$ trước khi rerank, candidate recall là $|G_q \cap C_q|/|G_q|$, Oracle@$k$ là
+$\min(k, |G_q \cap C_q|)/|G_q|$ (Recall@$k$ của một reranker hoàn hảo), candidate loss là $1 -$ candidate recall và ranking
+gap là Oracle@10 trừ Recall@10. Chỉ số chi phí gồm P50, P95 latency đầu cuối, QPS, thời gian xây chỉ mục, bộ nhớ đỉnh, dung
+lượng shuffle và kích thước chỉ mục.
 
-Hai hệ thống được so sánh bằng paired bootstrap theo cụm~\cite{efron1993}: lấy mẫu có hoàn lại \num{10000} lần trên tập
-theorem, mỗi theorem mang theo mọi truy vấn của nó, rồi tính chênh lệch theo đúng cách lấy trung bình của chỉ số. Khoảng
-tin cậy 95\% lấy theo phân vị. Giá trị $p$ một phía là tỉ lệ mẫu bootstrap có chênh lệch không dương, tức xác suất đuôi
-của phân phối bootstrap chứ không phải $p$ của một kiểm định dưới giả thuyết không; $p$ hai phía là hai lần đuôi nhỏ hơn.
-Với \num{10000} mẫu, giá trị bằng 0 được ghi là $< 0{,}0001$. Họ so sánh chính gồm 7 bước của chuỗi cải tiến trên Recall@10
-trung bình theo truy vấn, kiểm định một phía, hiệu chỉnh Holm trong từng split; ablation dùng $p$ hai phía, hiệu chỉnh Holm
-trên 9 phép so sánh của từng chỉ số; các phân tích còn lại báo khoảng tin cậy và $p$ chưa hiệu chỉnh. Họ so sánh và cách
-hiệu chỉnh được chốt sau bản đánh giá phản biện, trước khi chạy lại kiểm định. Kết quả chất lượng là tất định: hai lần chạy
-B0 trên tập kiểm tra cho tệp kết quả có cùng mã md5.
+Khoảng tin cậy 95\% của chênh lệch giữa hai hệ thống lấy từ paired bootstrap theo cụm~\cite{efron1993}: lấy mẫu có hoàn
+lại \num{10000} lần trên tập theorem, mỗi theorem mang theo mọi truy vấn của nó. Giá trị $p$ lấy từ kiểm định hoán vị ghép
+cặp theo cụm~\cite{good2005} với giả thuyết không là trong mỗi theorem, kết quả của hai hệ thống hoán đổi được cho nhau: mỗi
+phép hoán vị đổi nhãn hai hệ thống cho toàn bộ truy vấn của một theorem rồi tính lại đúng thống kê quan sát. $p$ hai phía là
+tỉ lệ phép hoán vị có trị tuyệt đối của chênh lệch không nhỏ hơn giá trị quan sát, tính cả trường hợp bằng nhau; với
+\num{10000} phép hoán vị ngẫu nhiên, $p = (1 + \text{số lần cực trị})/\num{10001}$~\cite{phipson2010}. Unit test kiểm tra
+rằng hai hệ thống giống nhau cho $p = 1$, đảo vai trò hai hệ thống không đổi $p$, và kết quả khớp phép duyệt hết hoán vị trên
+ví dụ nhỏ. Nhóm phép so sánh chính (family of hypotheses) là 7 bước của chuỗi cải tiến trên Recall@10, hiệu chỉnh
+Holm~\cite{holm1979} trong từng split;
+ablation hiệu chỉnh Holm trên 9 phép so sánh của từng chỉ số; các phân tích khác báo $p$ chưa hiệu chỉnh. Bản trước của báo
+cáo dùng tỉ lệ đuôi của phân phối bootstrap làm $p$; cách tính đó sai khi chênh lệch bằng 0 và không ứng với một giả thuyết
+không rõ ràng nên đã được thay. Kết quả chất lượng là tất định: hai lần chạy B0 cho tệp kết quả có cùng mã md5.
 
 % ================================================================ 6
 \chapter{Kết quả}\label{sec:results}
 
 \section{Chất lượng truy hồi}
 
-Bảng~\ref{tab:quality} trình bày chất lượng trên toàn bộ tập kiểm tra với \num{180957} premise ứng viên. V4 đạt
+Bảng~\ref{tab:quality} trình bày chất lượng trên toàn bộ tập test, tìm trong toàn bộ \num{180957} premise của corpus. V4 đạt
 Recall@10 bằng 0,243 trên \code{random}, gấp 2,4 lần B0, và MRR bằng 0,196, gấp 3 lần B0. Trên \code{novel\_premises},
 V4 đạt Recall@10 bằng 0,269 so với 0,127 của B0. V5 đạt 0,281 trên \code{random} và 0,280 trên \code{novel\_premises};
-Mục~\ref{sec:robust} phân tích mức tăng này kỹ hơn vì V5 được thiết kế sau khi xem tập kiểm tra.
+Mục~\ref{sec:robust} phân tích mức tăng này kỹ hơn vì V5 được thiết kế sau khi xem tập test.
 
 \input{tables/quality}
 
-Bảng~\ref{tab:signif} cho chênh lệch Recall@10 giữa các bước của chuỗi cải tiến. Trên \code{random}, cả 7 bước đều có
-ý nghĩa ở mức 0,05 sau hiệu chỉnh Holm; bước yếu nhất là bộ tách từ Lean sau khi đã tinh BM25, tăng 0,010 với $p$ Holm
-bằng 0,024 và cận dưới của khoảng tin cậy gần 0. Trên \code{novel\_premises}, bộ tách từ Lean và bước từ V4 sang V5 chỉ đạt
-$p$ Holm bằng 0,041 theo kiểm định một phía, và khoảng tin cậy hai phía 95\% của bước V4 sang V5 chứa 0.
+Bảng~\ref{tab:signif} cho chênh lệch Recall@10 giữa các bước của chuỗi cải tiến. Trên \code{random}, 6 trên 7 bước có ý
+nghĩa ở mức 0,05 sau hiệu chỉnh Holm ($p$ Holm 0,0007). Bước còn lại là tokenizer Lean sau khi đã tinh BM25: Recall@10 tăng
+0,010 với $p$ bằng 0,053, dù MRR của bước này tăng có ý nghĩa ($p$ Holm 0,0095). Trên \code{novel\_premises}, tokenizer Lean
+và bước từ V4 sang V5 đều có $p$ Holm bằng 0,094, nên không có ý nghĩa ở mức 0,05.
 
 \input{tables/signif}
 
 \paragraph{Trả lời RQ1.} BM25 mặc định chưa đủ cho dữ liệu Lean: Recall@10 chỉ đạt 0,100. Tinh $k_1$, $b$ và dùng qtf
-nhị phân thêm 0,023; bộ tách từ Lean thêm 0,010; BM25F ba trường thêm 0,013. Riêng trường namespace chưa có tác dụng xác
-định: bỏ nó khỏi BM25F (V2-nons) làm Recall@10 giảm 0,001 trên \code{random} với khoảng tin cậy chứa 0
-(Bảng~\ref{tab:controls}) và giảm 0,002 trên \code{novel\_premises} với $p$ chưa hiệu chỉnh bằng 0,027, nên phần tăng của
-BM25F chủ yếu đến từ trường tên. Thông tin phụ thuộc có tác dụng lớn nhất: bộ lọc theo quan hệ import thêm 0,036 khi áp
-dụng cho V2, và bỏ cặp đặc trưng độ phổ biến và PageRank làm Recall@10 giảm 0,018 ($p$ Holm bằng 0,003). Giữ riêng một
-trong hai đặc trưng cho kết quả không phân biệt được với V4, nên chỉ kết luận được tác dụng của cả cặp; bước từ V2a sang V4
-(tăng 0,060) thêm cùng lúc reranker và hai đặc trưng nên cũng không phải tác dụng riêng của PageRank. Câu trả lời cho RQ1 là
-BM25 cần tách từ theo cấu trúc tên của Lean, trường tên và đặc biệt là thông tin phụ thuộc; tác dụng riêng của namespace
-chưa được xác lập.
+nhị phân thêm 0,023. Tokenizer Lean thêm 0,010 nhưng không có ý nghĩa sau hiệu chỉnh trên cả hai split. BM25F ba trường
+thêm 0,013 và có ý nghĩa, chủ yếu nhờ trường name: bỏ riêng trường namespace (V2-nons) chỉ làm Recall@10 giảm 0,001 trên
+\code{random}, khoảng tin cậy chứa 0 (Bảng~\ref{tab:controls}), và giảm 0,002 trên \code{novel\_premises} ($p$ chưa hiệu
+chỉnh 0,030). Thông tin phụ thuộc có tác dụng lớn nhất. Bộ lọc accessible premise thêm 0,036 khi áp dụng cho V2. Bỏ cả
+popularity và PageRank làm Recall@10 giảm 0,018 ($p$ Holm 0,008), còn giữ riêng một trong hai cho kết quả không phân biệt
+được với V4, nên chỉ kết luận được tác dụng của cả cặp. Bước từ V2a sang V4 (tăng 0,060) thêm cùng lúc reranker và hai đặc
+trưng, nên đó không phải tác dụng riêng của PageRank. Câu trả lời cho RQ1: BM25 mặc định chưa đủ; trường name và đặc biệt
+là thông tin phụ thuộc có tác dụng đo được, còn với tokenizer Lean (trên Recall@10) và trường namespace thì chưa có đủ bằng
+chứng.
 
-\paragraph{Bối cảnh từ số liệu công bố.} Bảng~\ref{tab:leandojo} ở Phụ lục~\ref{app:tables} đặt số liệu của bài báo
-LeanDojo~\cite{yang2023} cạnh kết quả của nhóm: hai dòng BM25 lấy từ Bảng 1 của bài báo, đo trên benchmark cho Lean 3;
-dòng ReProver lấy từ Bảng B ở Phụ lục D, đo trên một snapshot LeanDojo Benchmark 4 cũ hơn bản v10. Vì khác benchmark và
-snapshot, các con số không so sánh trực tiếp được; bảng chỉ cho thấy kết quả của nhóm nằm trong cùng khoảng giá trị với các
-hệ thống thưa đã công bố, không dùng để xếp hạng hệ thống hay xác nhận tính đúng của pipeline. Tính đúng được kiểm tra bằng
-unit test, bằng đối chiếu với cài đặt tham chiếu và với Lucene trên cùng dữ liệu (Mục~\ref{sec:load}). Một so sánh có ý
-nghĩa với ReProver cần chạy checkpoint của nó trên cùng snapshot, tập truy vấn, nhãn và bộ lọc.
-
-\paragraph{So sánh với Nhóm 4.}\label{sec:group4} Nhóm 3 đã đề xuất đặc tả benchmark chung với Nhóm 4
-(\code{docs/benchmark\_spec.md}). Khi có tệp kết quả của Nhóm 4 theo cùng định dạng, hai hệ thống sẽ được so sánh bằng
-bootstrap theo cụm và trộn bằng Reciprocal Rank Fusion với hằng số 60~\cite{cormack2009}; script trộn đã sẵn sàng nhưng
-chưa chạy trên kết quả thật. Phần so sánh này chưa hoàn tất. \canchot{Bảng so sánh với Nhóm 4: chờ tệp kết quả và xác nhận
-đặc tả.}
+\paragraph{Bối cảnh và so sánh với nhóm khác.} Bảng~\ref{tab:leandojo} ở Phụ lục~\ref{app:tables} đặt số liệu của bài báo
+LeanDojo~\cite{yang2023} cạnh kết quả của nhóm: hai dòng BM25 lấy từ Bảng 1 (benchmark cho Lean 3), dòng ReProver từ Bảng B
+ở Phụ lục D (một snapshot LeanDojo Benchmark 4 cũ hơn v10). Vì khác benchmark và snapshot, các con số chỉ cho thấy kết quả của
+nhóm nằm trong cùng khoảng giá trị với các hệ thống sparse retrieval đã công bố; chúng không dùng để xếp hạng hệ thống hay
+xác nhận tính đúng của pipeline. Tính đúng được kiểm tra bằng unit test, đối chiếu với cài đặt tham chiếu và với Lucene
+(Mục~\ref{sec:load}). So sánh với Nhóm 4 trên benchmark chung (\code{docs/benchmark\_spec.md}) sẽ dùng cùng kiểm định và
+trộn kết quả bằng Reciprocal Rank Fusion với hằng số 60~\cite{cormack2009}. Script trộn đã sẵn sàng nhưng chưa chạy trên kết
+quả thật, nên phần này chưa hoàn tất.\label{sec:group4} \canchot{Bảng so sánh với Nhóm 4: chờ tệp kết quả và xác nhận đặc tả.}
 
 \section{Độ bền của kết quả V5}\label{sec:robust}
 
-Vì V5 được thiết kế từ phân tích lỗi trên tập kiểm tra \code{random} (Mục~\ref{sec:holdout}), nhóm kiểm tra mức tăng của
-nó theo ba cách: so với đối chứng V4-K240 có cùng ngân sách ứng viên, đổi cách lấy trung bình từ truy vấn sang theorem, và
-đánh giá trên tập holdout chưa dùng trong thiết kế (Bảng~\ref{tab:robust}).
+Vì V5 được thiết kế từ phân tích lỗi trên tập test \code{random}, nhóm kiểm tra mức tăng của nó theo ba cách: so với
+đối chứng V4-K240, so query-macro với theorem-macro, và đánh giá trên holdout (Bảng~\ref{tab:robust}). V4-K240 lấy top 240
+của BM25F, xấp xỉ số candidate của V5 trên \code{random} (239) và holdout (236) nhưng nhiều hơn V5 trên
+\code{novel\_premises} (208), và vẫn dùng 13 đặc trưng. Chênh lệch giữa V5 và V4-K240 vì vậy là tác dụng gộp của các nguồn
+candidate theo lịch sử sử dụng và hai đặc trưng \code{file\_usage}, \code{dir\_usage}; không tách riêng được từng phần.
 
 \input{tables/robust}
 
-Trên tập kiểm tra \code{random}, V5 hơn V4 0,038 và hơn V4-K240 0,027, với khoảng tin cậy không chứa 0 ở cả hai cách lấy
-trung bình. Trên holdout, V5 hơn V4 0,022 với khoảng tin cậy $[0{,}009;\ 0{,}035]$, nên lợi ích so với V4 được xác nhận trên
-dữ liệu mới. Tuy nhiên khoảng một nửa mức tăng này đến từ việc có nhiều ứng viên hơn: V4-K240 đã hơn V4 0,011, còn phần V5
-hơn V4-K240 là 0,011 với khoảng tin cậy $[-0{,}002;\ 0{,}024]$. Lợi ích riêng của các nguồn ứng viên theo lịch sử sử dụng,
-ngoài tác dụng của số ứng viên, chỉ rõ trên chính tập đã dùng để thiết kế.
+Trên tập test \code{random}, V5 hơn V4 0,038 và hơn V4-K240 0,027 ($p = 0{,}0002$) ở cả query-macro lẫn theorem-macro. Trên
+holdout, V5 hơn V4 0,022 (khoảng tin cậy $[0{,}009;\ 0{,}035]$, $p = 0{,}001$), nên lợi ích so với V4 lặp lại trên dữ liệu
+chưa dùng để huấn luyện hay chọn cấu hình. Theo một phân rã mô tả, V4-K240 hơn V4 0,011 và V5 hơn V4-K240 thêm 0,011
+(khoảng tin cậy $[-0{,}002;\ 0{,}024]$, $p = 0{,}098$). Đây không phải phép tách tác động nhân quả độc lập, vì candidate pool,
+đặc trưng và quá trình huấn luyện tương tác với nhau. Như vậy V5 tốt hơn V4-K240 trên tập test \code{random}, tập đã dùng để
+thiết kế V5, nhưng trên holdout chưa có đủ bằng chứng cho thấy V5 tốt hơn V4-K240.
 
-Trên \code{novel\_premises}, kết luận phụ thuộc cách lấy trung bình: theo truy vấn, V5 hơn V4 0,011 với khoảng tin cậy chứa
-0; theo theorem, V5 kém V4 0,014 với khoảng tin cậy $[-0{,}026;\ -0{,}002]$. Với 536 theorem chỉ có một truy vấn, Recall@10
-giảm từ 0,447 xuống 0,407, còn với 240 theorem có từ 5 truy vấn trở lên (chiếm \num{2525} trên \num{4141} truy vấn),
-Recall@10 tăng từ 0,198 lên 0,225; mức tăng theo truy vấn của V5 tập trung ở các chứng minh dài.
+Trên \code{novel\_premises}, kết luận phụ thuộc cách lấy trung bình. Theo query-macro, V5 hơn V4 0,011 ($p$ Holm 0,094);
+theo theorem-macro, V5 kém V4 0,014 (khoảng tin cậy $[-0{,}026;\ -0{,}002]$, $p = 0{,}027$, $p$ Holm 0,053). Với 536 theorem
+chỉ có một truy vấn, Recall@10 giảm từ 0,447 xuống 0,407, còn với 240 theorem có từ 5 truy vấn trở lên (\num{2525} trên
+\num{4141} truy vấn) Recall@10 tăng từ 0,198 lên 0,225. Mức tăng của V5 tập trung ở các chứng minh dài.
 
 \input{tables/unseen}
 
-Bảng~\ref{tab:unseen} tách premise đúng của \code{novel\_premises} thành chưa thấy và đã thấy trong tập huấn luyện. V5 tăng
-Recall@10 trên premise đã thấy từ 0,178 lên 0,231, nhưng giảm trên premise chưa thấy từ 0,444 xuống 0,359, tức giảm 0,085
-với khoảng tin cậy $[-0{,}100;\ -0{,}071]$. V4-K240 chỉ giảm 0,017 trên premise chưa thấy, nên phần lớn mức giảm đến từ các
-nguồn ứng viên và đặc trưng dựa trên lịch sử sử dụng: chúng đẩy các premise đã được dùng nhiều lên trên và chiếm chỗ của
-premise mới. Trên tập kiểm tra \code{random}, với 517 truy vấn có premise chưa thấy, Recall@10 trên premise chưa thấy cũng
-giảm từ 0,410 xuống 0,340. Vì vậy V5 không phải là cải tiến đồng đều so với V4: nó đổi recall trên premise mới lấy recall
-trên premise quen thuộc. Với mục tiêu tìm premise mới, V4 là cấu hình phù hợp hơn.
+Bảng~\ref{tab:unseen} tách gold premise của \code{novel\_premises} thành unseen premise và seen premise. V5 tăng Recall@10
+trên seen premise từ 0,178 lên 0,231 nhưng giảm trên unseen premise từ 0,444 xuống 0,359 (khoảng tin cậy
+$[-0{,}100;\ -0{,}071]$). V4-K240 chỉ giảm 0,017, nên phần lớn mức giảm đến từ các nguồn candidate và đặc trưng dựa trên lịch
+sử sử dụng: chúng đẩy premise đã được dùng nhiều lên trên và chiếm chỗ của premise mới. Trên tập test \code{random}, với
+517 truy vấn có unseen premise, Recall@10 trên unseen premise cũng giảm từ 0,410 xuống 0,340. V5 vì vậy đổi recall trên
+unseen premise lấy recall trên seen premise; với mục tiêu tìm premise mới, V4 phù hợp hơn.
 
 \section{Đánh đổi giữa chất lượng và độ trễ}
 
 Hình~\ref{fig:tradeoff} đặt chất lượng và độ trễ của B0, V2 và V4 trên cùng một biểu đồ, đo trong đợt kiểm tra tải chính
-(chỉ mục đầy đủ, 10 client đồng thời, 4 worker). P95 đầu cuối lần lượt là 60,2; 93,1 và 95,5 ms, QPS là 259, 166 và 130.
-Phần tăng lớn nhất nằm ở bước từ B0 sang V2, tức chuyển sang BM25F ba trường với bộ tách từ Lean, làm P95 tăng 32,9 ms.
-Bước từ V2 sang V4 chỉ thêm 2,4 ms nhưng nâng Recall@10 trên mẫu 500 truy vấn từ 0,143 lên 0,228. Phân rã thời gian trong
-một tiến trình với bộ đệm đã nóng (Bảng~\ref{tab:profile}, Phụ lục~\ref{app:tables}) cho kết quả cùng chiều: với V4, bước
-cộng điểm BM25F có trung vị 18,26 ms và chiếm 88\% tổng thời gian, còn bộ lọc mất 0,85 ms, tính 13 đặc trưng mất 0,54 ms
-và chấm lại 100 ứng viên mất 0,06 ms.
+(chỉ mục đầy đủ, 10 client, 4 worker). P95 latency đầu cuối lần lượt là 60,2; 93,1 và 95,5 ms, QPS là 259, 166 và 130.
+Bước từ B0 sang V2 (BM25F ba trường với tokenizer Lean) làm P95 tăng 32,9 ms; bước từ V2 sang V4 chỉ thêm 2,4 ms nhưng nâng
+Recall@10 trên mẫu 500 truy vấn từ 0,143 lên 0,228. Phân rã thời gian trong một tiến trình (Bảng~\ref{tab:profile},
+Phụ lục~\ref{app:tables}) cũng cho thấy điều này: với V4, bước cộng điểm BM25F có trung vị 18,26 ms và chiếm 88\% thời
+gian, còn bộ lọc, tính 13 đặc trưng và rerank lần lượt mất 0,85; 0,54 và 0,06 ms.
 
 \begin{figure}[htbp]
 \centering
@@ -630,27 +644,28 @@ và chấm lại 100 ứng viên mất 0,06 ms.
 ngang và vùng tô là khoảng giữa lần chạy nhanh nhất và chậm nhất trong 3 lần.}\label{fig:tradeoffload}
 \end{figure}
 
-V5 không có mặt trong đợt đo tải chính, nên nhóm đo riêng V4, V4-K240 và V5 trong cùng một phiên: một server 4 worker nạp
-cả ba cấu hình, thứ tự đo xoay vòng giữa 3 lần lặp (Bảng~\ref{tab:v5load}); các số này không ghép với số của đợt đo chính.
-Ở 10 client, P95 của V5 là 116,7 ms so với 103,2 ms của V4, cao hơn 13\%; khoảng giữa lần nhanh nhất và chậm nhất của hai
-hệ thống chồng nhau, và ba lần lặp chưa đủ để ước lượng khoảng tin cậy của chênh lệch, nên nhóm không kết luận V5 tương
-đương V4 ở mức tải này. Ở 50 client, khi máy đã bão hòa CPU, chi phí của V5 rõ hơn: P95 tăng từ 622,0 lên 726,7 ms và QPS
-giảm từ 132 xuống 116, vì phải tính đặc trưng cho khoảng 240 ứng viên; một phiên đo trước đó chỉ gồm V4 và V5 cho kết quả
-cùng chiều (QPS 131 so với 108). Trong \num{10800} yêu cầu có một yêu cầu V5 bị timeout sau 120 giây, nên lần đo đó có QPS
-3,3 và bảng báo trung vị.
-
+\FloatBarrier
+\Needspace{10\baselineskip}
 \input{tables/v5load}
 
-\paragraph{Trả lời RQ2 và câu hỏi trung tâm.} Kết hợp điểm thưa với tín hiệu cấu trúc làm tăng Recall@10 thêm 0,096 trên
-toàn bộ tập kiểm tra \code{random} (từ V2 lên V4) với chi phí 2,4 ms P95 ở 10 client trong đợt đo chính. Tín hiệu cấu trúc
-cải thiện recall thật sự, và chi phí của chúng nhỏ so với chi phí của chính giai đoạn BM25F. Mở rộng tập ứng viên như V5
+V5 không có mặt trong đợt đo tải chính, nên nhóm đo riêng V4, V4-K240 và V5 trong cùng một phiên, thứ tự đo xoay vòng giữa 3
+lần lặp (Bảng~\ref{tab:v5load}). Ở 10 client, P95 của V5 là 116,7 ms so với 103,2 ms của V4; khoảng biến thiên của hai hệ
+thống chồng nhau và ba lần lặp chưa đủ để ước lượng khoảng tin cậy, nên nhóm không kết luận V5 tương đương V4 ở mức tải này.
+Ở 50 client, khi máy đã bão hòa CPU, P95 tăng từ 622,0 lên 726,7 ms và QPS giảm từ 132 xuống 116, phù hợp với việc phải tính
+đặc trưng cho khoảng 240 candidate; một phiên đo trước đó cho kết quả cùng chiều (QPS 131 so với 108). Một yêu cầu V5 ở 10
+client bị timeout sau 120 giây, chưa rõ nguyên nhân: P95 của lần đo đó chỉ tính các yêu cầu thành công (138,7 ms), còn QPS
+tính cả thời gian chờ nên chỉ đạt 3,3. Độ tin cậy của V5 dưới tải vì vậy chưa được kiểm chứng đủ.
+
+\paragraph{Trả lời RQ2 và câu hỏi trung tâm.} Kết hợp BM25F với các đặc trưng cấu trúc làm tăng Recall@10 thêm 0,096 trên
+toàn bộ tập test \code{random} (từ V2 lên V4), với chi phí 2,4 ms P95 ở 10 client trong đợt đo chính. Các đặc trưng cấu trúc
+cải thiện recall thật sự, và chi phí của chúng nhỏ so với chi phí của chính giai đoạn BM25F. Mở rộng candidate pool như V5
 có chi phí rõ hơn khi tải cao và, như Mục~\ref{sec:robust} cho thấy, không cải thiện đồng đều. Nếu cần giảm độ trễ, điểm cần
 tối ưu là giai đoạn 1 chứ không phải reranker.
 
 \section{Ảnh hưởng của kích thước kho}
 
 Hình~\ref{fig:scale} cho thấy chất lượng và độ trễ khi chỉ mục tăng từ 10K lên 181K premise. Mọi mức đều chứa đủ 870
-premise đúng của mẫu, nên thiết kế này đo tác động của premise gây nhiễu, không mô phỏng thư viện lớn dần theo thời gian;
+gold premise của mẫu, nên thiết kế này đo tác động của premise gây nhiễu, không mô phỏng thư viện lớn dần theo thời gian;
 việc đổi corpus cũng đổi idf và độ dài trung bình của trường. Recall@10 giảm đều: B0 từ 0,226 xuống 0,101, V2 từ 0,343
 xuống 0,143 và V4 từ 0,454 xuống 0,228. P95 ở 10 client tăng từ 10,1 lên 60,2 ms với B0 và từ 27,6 lên 95,5 ms với V4, vì
 posting list của các token phổ biến dài ra; chỉ mục ba trường tăng gần tuyến tính từ 2,1 MB lên 26,3 MB.
@@ -669,6 +684,7 @@ posting list của các token phổ biến dài ra; chỉ mục ba trường tă
 vùng tô là khoảng giữa lần nhanh nhất và chậm nhất trong 3 lần).}\label{fig:scale}
 \end{figure}
 
+\FloatBarrier
 \section{Độ trễ dưới tải đồng thời}\label{sec:load}
 
 Hình~\ref{fig:clients} cho kết quả kiểm tra tải trên chỉ mục đầy đủ với 4 worker. Từ 1 lên 10 client, QPS tăng từ 3 đến
@@ -676,22 +692,21 @@ Hình~\ref{fig:clients} cho kết quả kiểm tra tải trên chỉ mục đầ
 và P95 lên 345,9 đến 566,8 ms vì các yêu cầu phải xếp hàng. Trong \num{43200} yêu cầu có 4 yêu cầu lỗi, đều phía client;
 khoảng biến thiên tương đối của P95 giữa các lần lặp có trung vị 15\% và lớn nhất 56\%.
 
-\paragraph{Thêm worker có giúp không?} Nhóm chạy lại kiểm tra tải trên chỉ mục đầy đủ với 4, 8 và 12 worker, thêm mức 100
-client (Bảng~\ref{tab:workers}, Phụ lục~\ref{app:tables}). Thông lượng gần như không đổi (B0 khoảng 230 đến 260 QPS, V4
-khoảng 140 đến 160 QPS), trong khi RAM của server tăng từ 3,4 lên 6,7 rồi 9,8 GB. Ngay với 4 worker, tổng CPU của các worker
-đã là 770 đến 950\%, tức 8 đến 9,5 trên 12 luồng logic, vì mỗi worker xử lý nhiều yêu cầu song song và phần tính toán numpy
-chạy ngoài GIL; tạo tải bằng bốn tiến trình client cũng không tăng QPS. Trên máy này, dịch vụ bị giới hạn bởi CPU: muốn
-tăng thông lượng phải giảm chi phí CPU của mỗi truy vấn hoặc thêm máy (chưa đo), còn thêm worker chỉ tốn bộ nhớ.
+\Needspace{5\baselineskip}
+\paragraph{Thêm worker có giúp không?} Với 4, 8 và 12 worker và thêm mức 100 client (Bảng~\ref{tab:workers},
+Phụ lục~\ref{app:tables}), thông lượng gần như không đổi (B0 khoảng 230 đến 260 QPS, V4 khoảng 140 đến 160 QPS) trong khi
+RAM của server tăng từ 3,4 lên 9,8 GB. Ngay với 4 worker, các worker đã dùng 8 đến 9,5 trên 12 luồng logic, và tạo tải bằng
+bốn tiến trình client cũng không tăng QPS. Trên máy này dịch vụ bị giới hạn bởi CPU: muốn tăng thông lượng phải giảm chi phí
+CPU mỗi truy vấn hoặc thêm máy (chưa đo), còn thêm worker chỉ tốn bộ nhớ.
 
-\paragraph{Đối chiếu với Lucene.} Với BM25 của Lucene 10.5 qua Anserini 2.3.0 trên cùng trường và cùng tập kiểm tra
-(Bảng~\ref{tab:lucene}), khi nhận đúng các token của B0 cùng $k_1$ và $b$, Lucene cho các chỉ số rất gần B0 (MRR 0,0657 so
+\Needspace{5\baselineskip}
+\paragraph{Đối chiếu với Lucene.} Với BM25 của Lucene 10.5 qua Anserini 2.3.0 trên cùng trường và cùng tập test
+(Bảng~\ref{tab:lucene}, Phụ lục~\ref{app:tables}), khi nhận đúng các token của B0 cùng $k_1$ và $b$, Lucene cho các chỉ số rất gần B0 (MRR 0,0657 so
 với 0,0654); top 10 trùng trung bình 98,9\% phần tử và trùng nguyên tập ở 89,6\% truy vấn, phần lệch còn lại phù hợp với
 việc Lucene nén độ dài tài liệu. Giữ nguyên $k_1$ và $b$, bộ phân tích tiếng Anh làm Recall@10 giảm từ 0,100 xuống 0,089 vì
 bỏ stopword và rút gọn từ làm hỏng tên Lean; tham số mặc định của Anserini làm giảm thêm xuống 0,076. Lucene mất 2,4 ms mỗi
-truy vấn so với 13,2 ms của B0 đo cùng quy tắc, tức nhanh hơn khoảng 5,5 lần; đây là trung bình một luồng với cấu hình B0,
+truy vấn so với 13,2 ms của B0 đo cùng quy tắc, tức nhanh hơn khoảng 5,5 lần; đây là trung bình khi chạy một thread với cấu hình B0,
 chưa phải bằng chứng về BM25F ba trường hay P95 của API sau khi tích hợp Lucene.
-
-\input{tables/lucene}
 
 \section{Xây chỉ mục theo lô}
 
@@ -726,13 +741,12 @@ ghi, nhanh hơn 3,84 lần trên Linux và 2,96 lần trên Windows. Các mức 
 nên chứng minh lợi ích của song song hóa cục bộ chứ chưa phải khả năng mở rộng trên cụm, và corpus nhân bản giữ nguyên số
 khóa nên thuận lợi cho engine Arrow.
 
-\paragraph{Số luồng, bộ nhớ và độ ổn định.} Ở 3,6 triệu bản ghi trên Linux, thời gian giảm từ 238,5 giây (local[2]) xuống
-95,6 giây (local[8]), còn RAM đỉnh tăng theo số worker (8,2 GB so với 5,0 GB của bản tuần tự). Ở 58 trên 64 cấu hình, chênh
-lệch giữa lần nhanh nhất và chậm nhất không quá 5\% trung vị. Vì bản tuần tự trên Windows chạy Python 3.13 còn trong
-container chạy Python 3.11, nhóm chỉ so sánh trong cùng một nền tảng.
+\paragraph{Số thread, bộ nhớ và độ ổn định.} Ở 3,6 triệu bản ghi trên Linux, thời gian giảm từ 238,5 giây (local[2]) xuống
+95,6 giây (local[8]) còn RAM đỉnh tăng từ mức của bản tuần tự (5,0 GB) lên 8,2 GB. Ở 58 trên 64 cấu hình, các lần lặp chênh
+nhau không quá 5\% trung vị. Hai nền tảng chạy Python khác phiên bản nên chỉ so sánh trong cùng một nền tảng.
 
 % ================================================================ 7
-\chapter{Ablation, phân tích lỗi và nguy cơ đối với kết luận}\label{sec:ablation}
+\chapter{Ablation, phân tích lỗi và hạn chế}\label{sec:ablation}
 
 \section{Ablation của reranker}\label{sec:ablation-rerank}
 
@@ -742,18 +756,20 @@ tác dụng nếu $p$ sau hiệu chỉnh Holm nhỏ hơn 0,05; ngược lại k�
 
 \input{tables/ablation}
 
-Bộ lọc truy cập được là thành phần có giá trị nhất; tiếp theo là điểm của giai đoạn 1 và cặp đặc trưng phụ thuộc. Sau
-hiệu chỉnh Holm, bỏ độ trùng ký hiệu ($-0{,}009$) và giảm xuống 50 ứng viên ($-0{,}009$) không còn có ý nghĩa với
-Recall@10 ($p$ Holm bằng 0,119), dù vẫn có ý nghĩa với MRR. Đặc trưng vị trí và loại khai báo không làm thay đổi Recall@10
-nhưng làm giảm MRR có ý nghĩa khi bị bỏ, nghĩa là chúng giúp đưa premise đúng lên đầu danh sách mà không đưa thêm premise
-đúng vào top 10. Đặc trưng namespace của reranker không có tác dụng đo được ở cả hai chỉ số. Tăng số ứng viên lên 200 làm
-Recall@10 tăng 0,010 ($p$ Holm bằng 0,036); V4 giữ 100 ứng viên vì giá trị này đã được chốt trước khi chạy tập kiểm tra.
+\input{tables/controls}
+
+Bộ lọc accessible premise là thành phần có giá trị nhất; tiếp theo là điểm của giai đoạn 1 và cặp đặc trưng phụ thuộc. Sau
+hiệu chỉnh Holm, bỏ độ trùng ký hiệu ($-0{,}009$) và giảm xuống 50 candidate ($-0{,}009$) không còn có ý nghĩa với
+Recall@10 ($p$ Holm bằng 0,132), dù vẫn có ý nghĩa với MRR. Đặc trưng vị trí và loại khai báo không làm thay đổi Recall@10
+nhưng làm giảm MRR có ý nghĩa khi bị bỏ, nghĩa là chúng giúp đưa gold premise lên đầu danh sách mà không đưa thêm gold
+premise vào top 10. Đặc trưng namespace của reranker không có tác dụng đo được ở cả hai chỉ số. Tăng số candidate lên 200 làm
+Recall@10 tăng 0,010 ($p$ Holm bằng 0,019); V4 giữ 100 candidate vì giá trị này đã được chốt trước khi chạy tập test.
 
 Bảng~\ref{tab:controls} tách thêm hai thành phần mà ablation trên chưa tách. Bỏ trường namespace khỏi BM25F, một can thiệp
-khác với bỏ đặc trưng namespace của reranker, không tạo khác biệt có ý nghĩa trên \code{random}. Giữ riêng độ phổ biến hoặc
+khác với bỏ đặc trưng namespace của reranker, không tạo khác biệt có ý nghĩa trên \code{random}. Giữ riêng popularity hoặc
 riêng PageRank cho Recall@10 trong khoảng 0,002 quanh V4 với khoảng tin cậy chứa 0.
 
-\input{tables/controls}
+\FloatBarrier
 
 \section{Ablation của đường xây chỉ mục}
 
@@ -775,100 +791,97 @@ mặc định, cả ba có trung vị độ trễ từ 12,9 đến 13,4 ms và c
 
 \section{Phân tích lỗi}\label{sec:errors}
 
-Trên tập kiểm tra \code{random}, V4 không đưa được \num{4369} trong \num{5483} cặp (truy vấn, premise đúng) vào top 10.
-Bảng~\ref{tab:errors} phân loại tự động các cặp này; một cặp có thể thuộc nhiều nhóm. Phân tích này được làm trên tập kiểm
-tra và đã dẫn tới thiết kế của V5 (Mục~\ref{sec:holdout}).
+Trên tập test \code{random}, V4 không đưa được \num{4369} trong \num{5483} cặp (truy vấn, gold premise) vào top 10.
+Bảng~\ref{tab:errors} phân loại tự động các cặp này; một cặp có thể thuộc nhiều nhóm. Phân tích này được làm trên tập test và đã dẫn tới thiết kế của V5 (Mục~\ref{sec:holdout}).
 
 \input{tables/errors}
 
-Phát hiện quan trọng nhất là 82,7\% cặp bị bỏ lỡ nằm ngoài 100 ứng viên của giai đoạn 1, nên reranker không thể cứu
+Phát hiện quan trọng nhất là 82,7\% cặp bị bỏ lỡ nằm ngoài 100 candidate của giai đoạn 1, nên reranker không thể cứu
 được. Các premise tổng quát như bổ đề về $\le$, $+$ hay $\in$ được dùng ở rất nhiều nơi nhưng ít trùng từ với một proof
-state cụ thể, và gần một phần tư premise bị bỏ lỡ không có từ nào chung với truy vấn. Đây là những trường hợp truy hồi dày
-đặc có khả năng bổ sung tốt. Theo lát cắt, V4 tốt hơn B0 ở mọi lĩnh vực có ít nhất 30 truy vấn; mức tăng Recall@10 lớn nhất
+state cụ thể, và gần một phần tư premise bị bỏ lỡ không có từ nào chung với truy vấn. Đây là những trường hợp dense
+retrieval có khả năng bổ sung tốt. Theo lát cắt, V4 tốt hơn B0 ở mọi lĩnh vực có ít nhất 30 truy vấn; mức tăng Recall@10 lớn nhất
 ở LinearAlgebra (0,201) và FieldTheory (0,163), nhỏ nhất ở Combinatorics (0,049) và NumberTheory (0,059). Truy vấn ngắn từ
 20 token trở xuống dễ nhất với Recall@10 bằng 0,378, truy vấn dài hơn 160 token khó nhất với 0,169, và truy vấn cần từ 5
 premise trở lên chỉ đạt 0,120.
 
-Bảng~\ref{tab:example} theo dõi ví dụ xuyên suốt qua từng biến thể. Premise đúng \code{mul\_assoc} không có từ nào chung
-với proof state ngoài các ký hiệu \code{*} và \code{=}, nên B0 đến V4 đều không đưa nó vào 100 ứng viên; các biến thể này
-trả về những bổ đề về \code{invOf} có tên gần với proof state. V5 đưa nó vào tập ứng viên qua nguồn theo tệp, vì một
-theorem nửa A khai báo trước trong cùng tệp đã dùng nó, và reranker xếp nó ở hạng 2; \code{mul\_assoc} cũng là premise
-được dùng nhiều thứ tư trong nửa A. Ví dụ này minh họa cơ chế, không phải bằng chứng định lượng; Mục~\ref{sec:robust}
-cho thấy cùng cơ chế đó làm giảm recall trên premise mới.
+Bảng~\ref{tab:example} theo dõi ví dụ xuyên suốt qua từng biến thể. Gold premise \code{mul\_assoc} không có từ nào chung
+với proof state ngoài các ký hiệu \code{*} và \code{=}, nên B0 đến V4 đều không đưa nó vào 100 candidate; các biến thể này
+trả về những bổ đề về \code{invOf} có tên gần với proof state. V5 đưa nó vào candidate pool qua nguồn theo tệp, vì một
+theorem train A khai báo trước trong cùng tệp đã dùng nó, và reranker xếp nó ở hạng 2; \code{mul\_assoc} cũng là premise
+được dùng nhiều thứ tư trong train A. Ví dụ này minh họa cơ chế, không phải bằng chứng định lượng; Mục~\ref{sec:robust}
+cho thấy cùng cơ chế đó làm giảm recall trên unseen premise.
 
 \input{tables/example}
 
-\paragraph{Ứng viên hay xếp hạng.} Bảng~\ref{tab:candidates} phân rã phần recall bị mất thành hai phần. Với V4, phần mất do
-tạo ứng viên (0,603 trên \code{random}) lớn gấp khoảng bốn lần phần mất do xếp hạng (0,154), đúng như phân tích lỗi ở trên.
-Với V5, độ phủ tăng lên 0,650 nhưng phần mất do xếp hạng tăng lên 0,369, xấp xỉ phần mất do tạo ứng viên (0,350): phần lớn
-premise đúng mới vào tập ứng viên vẫn bị reranker tuyến tính xếp ngoài top 10. Trong các premise đúng nằm trong tập ứng viên
+\paragraph{Tạo candidate hay xếp hạng.} Bảng~\ref{tab:candidates} tách phần recall bị mất thành candidate loss và
+ranking gap. Với V4, candidate loss (0,603 trên \code{random}) lớn gấp khoảng bốn lần ranking gap (0,154), đúng như phân
+tích lỗi ở trên. Với V5, candidate recall tăng lên 0,650 nhưng ranking gap tăng lên 0,369, xấp xỉ candidate loss (0,350):
+phần lớn gold premise mới vào candidate pool vẫn bị reranker tuyến tính xếp ngoài top 10. Trong các gold premise nằm trong candidate pool
 của V5 trên \code{random}, 55,6\% đến từ BM25F, 23,1\% từ nguồn theo tệp, 10,9\% từ nguồn theo thư mục và 10,3\% từ nguồn phổ
-biến. Như vậy reranker trở thành một hướng cải thiện quan trọng ngang với bước tạo ứng viên, nhưng bước tạo ứng viên vẫn bỏ
-lỡ khoảng 35\% premise đúng.
+biến. Như vậy reranker trở thành một hướng cải thiện quan trọng ngang với bước tạo candidate, nhưng bước tạo candidate vẫn bỏ
+lỡ khoảng 35\% gold premise.
 
 \input{tables/candidates}
 
 \paragraph{Gán nhãn thủ công.} Ngoài phân loại tự động, nhóm đã lấy mẫu phân tầng 30 trường hợp thất bại kèm proof state,
-premise đúng, hạng của nó và ba kết quả đầu của V4 (\code{results/figures/failure\_cases.md}). Kế hoạch là hai thành viên
+gold premise, hạng của nó và ba kết quả đầu của V4 (\code{results/figures/failure\_cases.md}). Kế hoạch là hai thành viên
 gán nhãn độc lập theo cùng bảng nhóm lỗi, rồi đối chiếu và báo tỉ lệ đồng thuận thô; việc gán nhãn này chưa được thực
 hiện. \canchot{Hai thành viên gán nhãn 30 trường hợp; điền tỉ lệ đồng thuận và các nhóm lỗi chính.}
 
 \section{Một lỗi được phát hiện nhờ phân tích lỗi}\label{sec:bug}
 
-Phiên bản đầu của bộ lọc truy cập được so dòng \emph{bắt đầu} của premise cùng tệp với dòng bắt đầu của theorem. Vì
+Phiên bản đầu của bộ lọc accessible premise so dòng \emph{bắt đầu} của premise cùng tệp với dòng bắt đầu của theorem. Vì
 vị trí của một khai báo trong dữ liệu tính cả docstring và thuộc tính đứng trước nó, chính theorem đang chứng minh có thể
 có dòng bắt đầu nhỏ hơn dòng bắt đầu được ghi cho truy vấn và lọt qua bộ lọc. Lỗi này xảy ra ở \num{1111} trên
-\num{2641} truy vấn của tập kiểm tra, tức 42\%. Nhóm phát hiện lỗi khi thấy chính theorem đang chứng minh xuất hiện trong
-danh sách ứng viên. Bộ lọc được sửa để so dòng kết thúc, có thêm test hồi quy kiểm tra rằng theorem không bao giờ truy cập
-được với chính nó và mọi premise đúng của tập kiểm tra đều truy cập được. V2a và V4 đã được huấn luyện và đánh giá lại;
+\num{2641} truy vấn của tập test, tức 42\%. Nhóm phát hiện lỗi khi thấy chính theorem đang chứng minh xuất hiện trong
+danh sách candidate. Bộ lọc được sửa để so dòng kết thúc, có thêm test hồi quy kiểm tra rằng theorem không bao giờ là
+accessible premise của chính nó và mọi gold premise của tập test đều là accessible premise. V2a và V4 đã được huấn luyện và đánh giá lại;
 mọi số liệu trong báo cáo là sau khi sửa.
 
-\section{Nguy cơ đối với tính đúng đắn của kết luận}
+\section{Hạn chế và threats to validity}
 
 \paragraph{Phạm vi của benchmark.} Benchmark chỉ tính premise có trong corpus, nên recall báo cáo cao hơn recall mà bộ
-chứng minh gặp thực tế; kết quả cũng chỉ đại diện cho 44,1\% theorem kiểm tra của \code{random} có truy vấn sau lọc. So
+chứng minh gặp thực tế; kết quả cũng chỉ đại diện cho 44,1\% theorem trong tập test \code{random} còn truy vấn sau lọc. So
 sánh giữa các biến thể vẫn công bằng vì dùng cùng định nghĩa và cùng tập truy vấn.
 
-\paragraph{Tập kiểm tra tham gia thiết kế.} V5 được thiết kế từ phân tích lỗi trên tập kiểm tra \code{random}. Holdout mới
-xác nhận V5 hơn V4, nhưng không xác nhận phần lợi ích vượt quá việc tăng số ứng viên. Các kết luận về V5 trên tập kiểm tra
-cần được đọc là kết quả sau quan sát.
+\paragraph{Tập test tham gia thiết kế.} V5 được thiết kế từ phân tích lỗi trên tập test \code{random}, nên kết quả của V5
+trên tập test có được sau khi đã xem lỗi trên chính tập đó. Holdout lấy từ phần train B chưa dùng để huấn luyện reranker,
+cùng snapshot và có ít truy vấn mỗi theorem hơn tập test, nên không chứng minh khả năng tổng quát hóa sang phiên bản thư
+viện khác. Tham số của giai đoạn 1 được chọn trên một lưới giới hạn; với V2, cấu hình được chọn thấp hơn điểm tốt nhất trên
+validation 0,0005 theo một quy tắc không định trước.
 
-\paragraph{Tương quan trong cùng chứng minh.} Các truy vấn của cùng một theorem không độc lập. Bootstrap theo cụm theorem
-cho khoảng tin cậy rộng hơn bootstrap theo truy vấn, và trung bình theo theorem đổi dấu chênh lệch giữa V4 và V5 trên
-\code{novel\_premises}. Kết luận về V5 vì vậy phụ thuộc đơn vị lấy trung bình.
+\paragraph{Tương quan và nhiều phép so sánh.} Các truy vấn của cùng một theorem không độc lập: bootstrap theo cụm cho khoảng
+tin cậy rộng hơn bootstrap theo truy vấn, và theorem-macro đổi dấu chênh lệch giữa V4 và V5 trên \code{novel\_premises}.
+Kiểm định hoán vị giả định các theorem hoán đổi được độc lập. Nhóm phép so sánh chính và ablation đã hiệu chỉnh Holm; các
+so sánh phụ thì chưa, nên một kết quả phụ có $p$ gần 0,05 chỉ là gợi ý. Ablation của V4, V4-poponly và V4-pronly chỉ chạy
+trên \code{random}; V2-nons có cả hai split, còn V4-K240 có cả hai split và holdout.
 
-\paragraph{Prior tĩnh.} Độ phổ biến và PageRank tính một lần trên nửa A, không theo vị trí của từng truy vấn. Điều này
-hợp lệ với benchmark tĩnh nhưng không mô phỏng việc viết một định lý mới tại một thời điểm.
+\paragraph{Prior tĩnh.} Popularity và PageRank tính một lần trên train A, không theo vị trí của từng truy vấn. Điều này hợp
+lệ với benchmark tĩnh nhưng không mô phỏng việc viết một định lý mới tại một thời điểm.
 
-\paragraph{Nhiều phép so sánh.} Họ so sánh chính và ablation đã hiệu chỉnh Holm; các so sánh phụ thì chưa, nên một kết quả
-phụ có $p$ gần 0,05 chỉ nên coi là gợi ý. Ablation và các cấu hình đối chứng chỉ chạy trên split \code{random}.
-
-\paragraph{Tinh tham số.} Lưới tham số có giới hạn và chỉ trên validation. Với V2, cấu hình được chọn thấp hơn điểm tốt
-nhất trên validation 0,0005 theo một quy tắc không định trước.
-
-\paragraph{Một máy, chế độ local, corpus nhân bản.} Mọi phép đo thời gian thực hiện trên một máy 6 nhân; thí nghiệm Linux
-chạy trong container trên cùng phần cứng, nên chưa phản ánh chi phí mạng và điều phối của một cụm. Corpus gấp 5 và gấp 20
-lần giữ nguyên phân phối term và số khóa, nên posting list dài và đều hơn dữ liệu thật; trên một corpus thật lớn cỡ đó,
-mức giảm bản ghi shuffle của engine Arrow sẽ nhỏ hơn. Chương trình tạo tải chạy cùng máy với server nên cũng chiếm một phần
-CPU.
+\paragraph{Một máy, chế độ local, corpus nhân bản.} Mọi phép đo thời gian thực hiện trên một máy 6 nhân, kể cả thí nghiệm
+Linux trong container, nên chưa phản ánh chi phí mạng và điều phối của một cụm; chương trình tạo tải cũng chạy cùng máy với
+server. Corpus gấp 5 và gấp 20 lần giữ nguyên phân phối term và số khóa, nên posting list dài và đều hơn dữ liệu thật; trên
+một corpus thật lớn cỡ đó, mức giảm bản ghi shuffle của engine Arrow sẽ nhỏ hơn.
 
 \paragraph{Truy vết phiên bản mã.} Các bản ghi lần chạy ghi phiên bản mã là \code{uncommitted} kèm mã băm của mã nguồn, vì
-kho mã chưa được commit tại thời điểm chạy. Mã băm cho phép đối chiếu nội dung nhưng chưa trỏ tới một revision lấy về được.
-Bảng của báo cáo đọc các lần chạy đã ghim trong \path{results/figures/report_manifest.json}; khi commit, các lần chạy cũ sẽ
-không được sửa hồi tố mà các lần chạy lại sẽ ghi mã commit đầy đủ.
+kho mã chưa được commit tại thời điểm chạy. Bảng và hình của báo cáo đọc các lần chạy đã ghim trong
+\path{results/figures/report_manifest.json} và \path{report_records.json}; khi commit, các lần chạy cũ sẽ không được sửa hồi
+tố mà các lần chạy lại sẽ ghi mã commit đầy đủ.
 
 % ================================================================ 8
 \chapter{Kết luận và hướng phát triển}\label{sec:conclusion}
 
-Với RQ1, BM25 mặc định chưa đủ cho dữ liệu Lean. Bộ tách từ Lean, trường tên và đặc biệt là thông tin phụ thuộc đều đóng
-góp có ý nghĩa; tác dụng riêng của trường namespace chưa được xác lập, còn độ phổ biến và PageRank chỉ kết luận được theo
-cặp. Với RQ2, kết hợp điểm thưa với tín hiệu cấu trúc (V4) đưa Recall@10 từ 0,100 lên 0,243 trên tập kiểm tra
-\code{random} và từ 0,127 lên 0,269 trên \code{novel\_premises}; trong đợt đo tải chính, P95 ở 10 client tăng từ 60,2 lên
-95,5 ms, phần lớn do giai đoạn BM25F, còn tín hiệu cấu trúc chỉ tốn khoảng 2 ms. Bổ sung ứng viên từ lịch sử sử dụng (V5)
-nâng Recall@10 trên \code{random} lên 0,281 và được xác nhận trên holdout (0,332 so với 0,310 của V4), nhưng khoảng một nửa
-mức tăng trên holdout đến từ việc có nhiều ứng viên hơn, và V5 làm giảm recall trên premise chưa thấy. V4 vì vậy là cấu
-hình nên dùng chung; V5 là một đánh đổi có lợi cho premise quen thuộc. Về phục vụ, dịch vụ bị giới hạn bởi CPU của máy;
-BM25 của Lucene cho kết quả rất gần B0 và nhanh hơn khoảng 5,5 lần trong một luồng. Về khía cạnh dữ liệu lớn, chỉ mục xây
+Với RQ1, BM25 mặc định chưa đủ cho dữ liệu Lean. Tinh tham số, trường name và đặc biệt là thông tin phụ thuộc có tác dụng
+đo được; với tokenizer Lean (trên Recall@10) và trường namespace thì chưa có đủ bằng chứng, còn popularity và PageRank chỉ
+kết luận được theo cặp. Với RQ2, kết hợp BM25F với các đặc trưng cấu trúc (V4) đưa Recall@10 từ 0,100 lên 0,243 trên tập
+test \code{random} và từ 0,127 lên 0,269 trên \code{novel\_premises}; trong đợt đo tải chính, P95 latency ở 10 client tăng từ
+60,2 lên 95,5 ms, phần lớn do giai đoạn BM25F, còn các đặc trưng cấu trúc chỉ tốn khoảng 2 ms. V4 là lựa chọn cân bằng giữa
+chất lượng và độ trễ. V5 bổ sung candidate từ lịch sử sử dụng, nâng Recall@10 trên \code{random} lên 0,281 và hơn V4 trên
+holdout (0,332 so với 0,310); tuy nhiên trên holdout chưa có đủ bằng chứng cho thấy V5 tốt hơn V4-K240, V5 làm giảm recall
+trên unseen premise của \code{novel\_premises}, và có chi phí rõ hơn khi tải cao. V5 vì vậy là một đánh đổi có lợi cho
+premise quen thuộc. Về phục vụ, dịch vụ bị giới hạn bởi CPU của máy; BM25 của Lucene cho kết quả rất gần B0 và nhanh hơn
+khoảng 5,5 lần khi chạy một thread. Về khía cạnh dữ liệu lớn, chỉ mục xây
 bằng Spark trùng từng byte với bản tuần tự. Engine RDD ban đầu không nhanh hơn bản tuần tự ở kích thước nào; sau khi viết
 lại với lô Arrow và gộp posting theo partition, Spark local[8] nhanh hơn bản tuần tự 1,53 lần trên corpus thật 181K (Linux,
 chỉ mục ba trường) và 3,84 lần trên corpus nhân bản 3,6 triệu bản ghi, đều trên một máy. Cách tổ chức job, đặc biệt là gộp
@@ -876,20 +889,23 @@ dữ liệu trước khi shuffle, quyết định lợi ích của xử lý song
 
 Sản phẩm bàn giao gồm đặc tả benchmark, pipeline trích xuất có kiểm tra chất lượng, chỉ mục đảo tái tạo được kèm manifest,
 dịch vụ truy vấn qua API và CLI, baseline BM25, reranker cấu trúc, các script đánh giá, ablation và phân tích lỗi, README
-và kịch bản demo. Các bảng số liệu của báo cáo được sinh bằng \code{scripts/make\_report\_tables.py} từ kết quả thô và các
-lần chạy đã ghim; nguồn của từng bảng ghi trong \code{report/latex/tables/SOURCES.md}. Các việc còn phải do thành viên thực
+và kịch bản demo. Các bảng và hình của báo cáo được sinh bằng script từ kết quả thô và các lần chạy đã ghim; nguồn của
+từng bảng, từng hình và mã SHA-256 của đầu vào ghi trong \code{tables/SOURCES.md} và \code{figures/SOURCES.md}. Các việc còn phải do thành viên thực
 hiện gồm đối chiếu thủ công 20 truy vấn kiểm tra, gán nhãn 30 trường hợp thất bại, chốt phân công và so sánh với Nhóm 4.
 
-Nhóm đề xuất năm hướng tiếp theo. Thứ nhất, trộn kết quả với hệ thống dày đặc của Nhóm 4 bằng Reciprocal Rank Fusion để
-tìm các premise không có từ chung với truy vấn và các premise mới. Thứ hai, thay reranker tuyến tính bằng một mô hình xếp
+Nhóm đề xuất năm hướng tiếp theo. Thứ nhất, trộn kết quả với hệ thống dense retrieval của Nhóm 4 bằng Reciprocal Rank Fusion
+thành hybrid retrieval, để tìm các premise không có từ chung với truy vấn và các unseen premise. Thứ hai, thay reranker tuyến tính bằng một mô hình xếp
 hạng phi tuyến, chọn trên validation và kiểm tra trên một holdout mới, vì Oracle@10 của V5 là 0,650 trong khi Recall@10 mới
-đạt 0,281; mô hình này cần giữ được recall trên premise chưa thấy. Thứ ba, thay giai đoạn 1 bằng Lucene hoặc cài đặt các
+đạt 0,281; mô hình này cần giữ được recall trên unseen premise. Thứ ba, thay giai đoạn 1 bằng Lucene hoặc cài đặt các
 kỹ thuật dừng sớm như MaxScore và WAND~\cite{broder2003}, rồi đo lại P95 của API. Thứ tư, chạy thí nghiệm xây chỉ mục trên
 cụm nhiều máy với corpus thật lớn hơn. Thứ năm, tích hợp với một bộ chứng minh Lean để đo ảnh hưởng của chất lượng truy hồi
 tới tỉ lệ chứng minh thành công.
 
 % ================================================================ Tài liệu tham khảo
+\begingroup\small
+\setlength{\itemsep}{1pt}
 \begin{thebibliography}{99}
+\setlength{\itemsep}{1pt}
 \phantomsection\addcontentsline{toc}{chapter}{Tài liệu tham khảo}
 \bibitem{demoura2021} L. de Moura, S. Ullrich. The Lean 4 Theorem Prover and Programming Language. \emph{Automated
 Deduction, CADE 28}, Lecture Notes in Computer Science 12699, Springer, 2021.
@@ -924,9 +940,15 @@ Individual Rank Learning Methods. \emph{Proceedings of the 32nd ACM SIGIR Confer
 \bibitem{zenodo2024} K. Yang. LeanDojo Benchmark 4, phiên bản v10. Zenodo, 2024. \url{https://zenodo.org/records/12740403}.
 \bibitem{mathlib4repo} mathlib4. \url{https://github.com/leanprover-community/mathlib4}. Truy cập tháng 10/2026.
 \bibitem{efron1993} B. Efron, R. J. Tibshirani. \emph{An Introduction to the Bootstrap}. Chapman \& Hall, 1993.
+\bibitem{good2005} P. Good. \emph{Permutation, Parametric, and Bootstrap Tests of Hypotheses}, ấn bản 3. Springer, 2005.
+\bibitem{phipson2010} B. Phipson, G. K. Smyth. Permutation P-values Should Never Be Zero: Calculating Exact P-values When
+Permutations Are Randomly Drawn. \emph{Statistical Applications in Genetics and Molecular Biology} 9(1), 2010.
+\bibitem{holm1979} S. Holm. A Simple Sequentially Rejective Multiple Test Procedure. \emph{Scandinavian Journal of
+Statistics} 6(2), 1979.
 \bibitem{broder2003} A. Z. Broder, D. Carmel, M. Herscovici, A. Soffer, J. Zien. Efficient Query Evaluation Using a
 Two-Level Retrieval Process. \emph{Proceedings of the 12th ACM CIKM}, 2003.
 \end{thebibliography}
+\endgroup
 
 % ================================================================ Phụ lục
 \appendix
@@ -937,10 +959,14 @@ Two-Level Retrieval Process. \emph{Proceedings of the 12th ACM CIKM}, 2003.
 Theo yêu cầu của học phần, nhóm khai báo việc dùng công cụ AI. Nhóm dùng Claude (Anthropic) qua công cụ Claude Code cho
 các việc sau: lập kế hoạch 10 tuần, viết mã nguồn của pipeline, unit test, các script thí nghiệm và vẽ biểu đồ, bản nháp
 tài liệu trong thư mục \code{docs}, và soạn bản báo cáo này. Mọi bảng số liệu trong báo cáo được sinh bằng script từ tệp
-kết quả, không chép tay từ đầu ra của AI.
+kết quả, không chép tay từ đầu ra của AI. Ba bản nhận xét phản biện báo cáo (\code{report/danh\_gia\_report.md}, \code{danh\_gia\_report\_lan\_2.md} và
+\code{danh\_gia\_report\_lan\_3.md}) được tạo với Codex (OpenAI); Codex đọc báo cáo, mã nguồn và kết quả rồi chỉ ra các điểm
+cần sửa, trong đó có lỗi tính $p$ hai phía của hàm bootstrap, các float đặt sai chỗ và cách dùng thuật ngữ. Các thay đổi
+theo nhận xét, gồm đối chứng V4-K240, tập holdout, kiểm định hoán vị, ghim nguồn của bảng và hình, và phần viết lại báo cáo,
+được thực hiện với Claude Code. \canchot{Nhóm xác nhận Codex chỉ được dùng cho ba bản phản biện này.}
 
-Các bước kiểm chứng tự động đã thực hiện gồm 53 unit test (trong đó có các ví dụ tính tay của giáo trình về mã VB, mã gamma
-và tần suất tài liệu, và ví dụ tính tay cho bootstrap theo cụm và hiệu chỉnh Holm), so sánh chỉ mục với một cài đặt tham
+Các bước kiểm chứng tự động đã thực hiện gồm 58 unit test (trong đó có các ví dụ tính tay của giáo trình về mã VB, mã gamma
+và tần suất tài liệu, ví dụ tính tay cho bootstrap theo cụm, kiểm định hoán vị theo cụm và hiệu chỉnh Holm), so sánh chỉ mục với một cài đặt tham
 chiếu đơn giản, so mã băm giữa bản xây chỉ mục tuần tự và bản Spark, kiểm tra tính tất định của kết quả và kiểm tra tự
 động 20 truy vấn mẫu. Những việc AI không quyết định thay nhóm gồm phân vai, nội dung thống nhất với Nhóm 4, đối chiếu thủ
 công 20 truy vấn mẫu, nhãn thủ công của các trường hợp thất bại và kết luận cuối cùng khi bảo vệ. Mỗi thành viên phải đọc,
@@ -963,7 +989,7 @@ Vai trò & Người chính & Dự phòng & Phần phụ trách \\
 Dữ liệu và trích xuất & Nguyễn Đức Hoàng & Nguyễn Ngọc Minh & tải dữ liệu, trích xuất, tập con, data card, data dictionary, 20 truy vấn kiểm tra \\
 Xây chỉ mục & Trần Duy Khánh & \canchot{người phụ trách phục vụ} & xây chỉ mục tuần tự và Spark, nén posting, thí nghiệm xây chỉ mục \\
 Baseline BM25 & Nguyễn Mạnh Cường & \canchot{người phụ trách đặc trưng} & bộ tách từ, BM25 và BM25F, tinh tham số, đối chiếu Lucene \\
-Đặc trưng cấu trúc & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũng} & Nguyễn Mạnh Cường & đặc trưng, bộ lọc truy cập được, thống kê phụ thuộc, reranker, V5 \\
+Đặc trưng cấu trúc & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũng} & Nguyễn Mạnh Cường & đặc trưng, bộ lọc accessible premise, thống kê phụ thuộc, reranker, V5 \\
 Phục vụ và hiệu năng & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũng} & Trần Duy Khánh & API, CLI, kiểm tra tải, profile độ trễ \\
 Đánh giá và phân tích lỗi & Nguyễn Ngọc Minh & Nguyễn Đức Hoàng & chỉ số, kiểm định, ablation, phân tích lỗi, holdout, so sánh với Nhóm 4, báo cáo \\
 \bottomrule
@@ -975,12 +1001,21 @@ Phục vụ và hiệu năng & \canchot{Vũ Trung Kiên hoặc Trần Đình Dũ
 \section{Lệnh tái lập}\label{app:repro}
 
 Các lệnh dưới đây chạy trong thư mục gốc của kho mã với môi trường cài theo \code{README.md} từ các tệp khóa phiên bản.
-Lệnh đầu tiên chỉ đánh giá lại các cấu hình đã chốt; tùy chọn \code{-{}-with-tuning} chạy lại cả quá trình chọn tham số
-(lưới BM25 cơ bản và mở rộng, lưới BM25F, lưới ứng viên của V5), \code{-{}-with-scale} chạy các thí nghiệm quy mô, tải và
-Lucene, \code{-{}-report} sinh bảng, hình và biên dịch báo cáo này.
+Có hai mục đích khác nhau. Để dựng lại đúng bản báo cáo đã phát hành, chạy \code{bash report/latex/build.sh}: lệnh này
+không chạy lại thí nghiệm, chỉ đọc các lần chạy đã ghim trong \path{results/figures/report_manifest.json} và
+\path{report_records.json}. Trước khi sinh lại bảng và hình, nó so SHA-256 của mọi tệp đầu vào với giá trị ghi trong
+\path{tables/SOURCES.md} và \path{figures/SOURCES.md}, và dừng nếu có tệp lệch; tùy chọn \code{-{}-compile-only} chỉ biên dịch
+từ bảng và hình đã có. Để tái tạo kết quả từ đầu hoặc cập nhật báo cáo bằng lần chạy mới, chạy \code{scripts/reproduce.sh};
+script này gọi \code{pin\_runs.py}, tức ghim lại các lần chạy mới nhất, rồi dựng báo cáo bằng \code{build.sh -{}-update},
+nên bảng có thể thay đổi. Tùy chọn \code{-{}-with-tuning} chạy lại cả quá trình chọn tham số, \code{-{}-with-scale} chạy các thí nghiệm quy mô,
+tải và Lucene, \code{-{}-report} sinh bảng, hình và biên dịch báo cáo.
 
 \begin{Verbatim}[fontsize=\footnotesize,frame=single,framesep=2mm,commandchars=\\\{\}]
-python -m pytest -q                                   \textrm{\# 53 unit test}
+\textrm{\# dựng lại đúng bản đã phát hành từ các lần chạy đã ghim}
+python -m pytest -q                                   \textrm{\# 58 unit test}
+bash report/latex/build.sh                 \textrm{\# hoặc --compile-only: chỉ biên dịch}
+
+\textrm{\# tái tạo từ đầu, ghim lại lần chạy mới nhất rồi dựng báo cáo}
 bash scripts/reproduce.sh [--with-tuning] [--with-scale] [--report]
 
 \textrm{\# một biến thể trên một tập, và truy vấn thử}
@@ -989,10 +1024,10 @@ python -m n3.eval.run_eval --config configs/v4_rerank_dep.yaml \textbackslash
 python -m n3.serving.cli --query-id random:val:36:0 --mode V5 -k 5
 uvicorn n3.serving.api:app --port 8000 --workers 4
 
-\textrm{\# phân tích của báo cáo (đọc các lần chạy đã ghim)}
-python scripts/pin_runs.py
+\textrm{\# cập nhật phân tích sau khi có lần chạy mới (thay đổi bản đã ghim)}
+python scripts/pin_runs.py && python scripts/ablation_significance.py
 python scripts/robustness.py && python scripts/candidate_analysis.py
-python scripts/make_report_tables.py && bash report/latex/build.sh
+bash report/latex/build.sh --update
 
 \textrm{\# xây chỉ mục trên Linux, cùng máy}
 docker build -t n3-spark-linux -f docker/spark-linux.Dockerfile docker
@@ -1000,8 +1035,9 @@ docker run --rm -v <repo>:/repo n3-spark-linux \textbackslash
     bash /repo/docker/run_build2_linux.sh --reps 3 --sizes 10k,full,x5,x20
 \end{Verbatim}
 
-Bảng nào được sinh từ tệp kết quả nào, và các \code{run\_id} đã ghim cho bản báo cáo này, được liệt kê trong
-\code{report/latex/tables/SOURCES.md}.
+Bảng nào được sinh từ tệp kết quả nào, các \code{run\_id} đã ghim và mã SHA-256 của mọi tệp đầu vào tại thời điểm sinh
+bảng được liệt kê trong \code{report/latex/tables/SOURCES.md}; thứ tự thời gian của các lần chạy nằm trong
+\code{docs/process\_log.md}.
 
 \section{Ví dụ một bản ghi lần chạy}\label{app:record}
 
@@ -1019,7 +1055,9 @@ chỉ số nằm trong \code{results/raw/eval}.
 
 \chapter{Bảng bổ sung}\label{app:tables}
 
-Các bảng dưới đây bổ sung cho phần thân và được nhắc tới trong các chương tương ứng.
+Các bảng dưới đây bổ sung cho phần thân và được nhắc tới trong các chương tương ứng, xếp theo ba nhóm.
+
+\section{Dữ liệu và môi trường}
 
 \begin{table}[htbp]
 \centering
@@ -1073,7 +1111,14 @@ Giới hạn thời gian & mỗi yêu cầu của client kiểm tra tải có ti
 \end{tabularx}
 \end{table}
 
+\FloatBarrier
+\section{Truy hồi, phục vụ và xây chỉ mục}
+
 \input{tables/leandojo}
+
+\input{tables/v5grid}
+
+\input{tables/lucene}
 
 \input{tables/profile}
 
@@ -1081,7 +1126,8 @@ Giới hạn thời gian & mỗi yêu cầu của client kiểm tra tải có ti
 
 \input{tables/engines}
 
-\input{tables/v5grid}
+\clearpage
+\section{Thiết kế thí nghiệm}
 
 \begin{table}[htbp]
 \centering
@@ -1106,7 +1152,7 @@ Ablation reranker & V4 đầy đủ và 9 biến thể, mỗi biến thể huấ
 Cách mã khi truy vấn & raw32, VB, gamma; mẫu 500 truy vấn; tắt bộ đệm 3 lần, bật bộ đệm 1 lần & 12 lần đo \\
 Profile độ trễ & B0, V2, V4; 500 truy vấn; lượt lạnh và lượt nóng & 1 \\
 Tinh chỉnh V5 & 8 tổ hợp nguồn ứng viên; validation \code{random}; huấn luyện lại mỗi tổ hợp & 8 \\
-BM25 của Lucene & Anserini 2.3.0, ba biến thể; B0 đo một luồng cùng quy tắc; kiểm tra \code{random} & 4 \\
+BM25 của Lucene & Anserini 2.3.0, ba biến thể; B0 đo một thread cùng quy tắc; kiểm tra \code{random} & 4 \\
 \bottomrule
 \end{tabularx}
 \end{table}

@@ -12,23 +12,25 @@ với một trạng thái chứng minh Lean, bằng chỉ mục đảo BM25/BM25
 ## Kết quả chính
 
 Toàn bộ tập kiểm tra, 180.957 premise ứng viên, trung bình theo truy vấn. Số liệu lấy từ các lần chạy đã ghim trong
-`results/figures/report_manifest.json`; kiểm định là bootstrap theo cụm theorem, hiệu chỉnh Holm
-(`results/figures/robustness.md`).
+`results/figures/report_manifest.json`. Khoảng tin cậy từ bootstrap theo cụm theorem; giá trị p hai phía từ kiểm định
+hoán vị ghép cặp theo cụm theorem, hiệu chỉnh Holm (`results/figures/robustness.md`).
 
-| Biến thể | random R@10 | random MRR | novel_premises R@10 | Holdout mới R@10 |
+| Biến thể | random R@10 | random MRR | novel_premises R@10 | Holdout R@10 |
 |---|---|---|---|---|
 | B0 (baseline bắt buộc) | 0,100 | 0,065 | 0,127 | 0,113 |
 | V2 (tokenizer Lean + BM25F) | 0,147 | 0,093 | 0,183 | 0,190 |
 | V4 (+ lọc import + reranker cấu trúc) | 0,243 | 0,196 | 0,269 | 0,310 |
-| V4-K240 (V4 với 240 ứng viên, đối chứng của V5) | 0,254 | 0,202 | 0,276 | 0,321 |
+| V4-K240 (V4 lấy top 240 của BM25F, đối chứng của V5) | 0,254 | 0,202 | 0,276 | 0,321 |
 | V5 (+ ứng viên từ lịch sử sử dụng) | 0,281 | 0,217 | 0,280 | 0,332 |
 
-- Trên `random`, cả 7 bước của chuỗi cải tiến có ý nghĩa sau hiệu chỉnh Holm. Riêng trường namespace của BM25F chưa có tác
-  dụng xác định (đối chứng V2-nons); độ phổ biến và PageRank chỉ kết luận được theo cặp.
-- V5 được thiết kế sau khi xem lỗi trên tập kiểm tra, nên được kiểm tra lại trên holdout 2.500 truy vấn chưa dùng: V5 hơn
-  V4 0,022 (KTC 95% [0,009; 0,035]), nhưng khoảng một nửa mức tăng đến từ việc có nhiều ứng viên hơn (V5 hơn V4-K240 0,011,
-  KTC chứa 0). Trên premise chưa thấy của `novel_premises`, V5 giảm Recall@10 từ 0,444 xuống 0,359. V4 là cấu hình nên dùng
-  chung; V5 là đánh đổi có lợi cho premise quen thuộc.
+- Trên `random`, 6 trên 7 bước của chuỗi cải tiến có ý nghĩa sau hiệu chỉnh Holm; bước bộ tách từ Lean (+0,010) có p = 0,053.
+  Riêng trường namespace của BM25F chưa có tác dụng xác định (đối chứng V2-nons); độ phổ biến và PageRank chỉ kết luận được
+  theo cặp.
+- V5 được thiết kế sau khi xem lỗi trên tập kiểm tra, nên được kiểm tra lại trên holdout 2.500 truy vấn (phần train nửa B
+  giữ riêng, xem `docs/process_log.md`): V5 hơn V4 0,022 (KTC 95% [0,009; 0,035]), nhưng phần V5 vượt đối chứng V4-K240
+  (0,011, KTC chứa 0) chưa được xác lập. V4-K240 chỉ xấp xỉ số ứng viên của V5 và không có hai đặc trưng sử dụng, nên chênh
+  lệch này là tác dụng gộp. Trên premise chưa thấy của `novel_premises`, V5 giảm Recall@10 từ 0,444 xuống 0,359. V4 là cấu
+  hình nên dùng chung; V5 là đánh đổi có lợi cho premise quen thuộc.
 - Độ trễ (API 4 worker, index đầy đủ, trung vị 3 lần): P95 ở 10 client của B0, V2, V4 là 60,2; 93,1; 95,5 ms trong đợt đo
   chính. Trong một phiên đo riêng, V4 và V5 có P95 103,2 và 116,7 ms ở 10 client; ở 50 client QPS giảm từ 132 xuống 116.
 - Index Spark trùng từng byte với bản tuần tự. Engine Spark tối ưu (lô Arrow, gộp posting theo partition) nhanh hơn bản
@@ -108,12 +110,14 @@ bash scripts/reproduce.sh                 # dữ liệu → huấn luyện → �
 bash scripts/reproduce.sh --with-tuning   # chạy lại cả quá trình chọn tham số (lưới BM25 cơ bản và mở rộng, BM25F, V5)
 bash scripts/reproduce.sh --with-scale    # thí nghiệm quy mô, tải và Lucene (~4 giờ)
 bash scripts/reproduce.sh --report        # sinh bảng, hình và biên dịch report/report.pdf
+bash report/latex/build.sh                # chỉ dựng lại đúng bản báo cáo đã phát hành (kiểm tra SHA-256 đầu vào trước)
 ```
 
 Mỗi lần chạy ghi một run record theo Phụ lục B (run_id, timestamp, git_commit, code_hash, data_version, machine,
 software, parameters, seed, metrics, status, log). Các lần chạy dùng cho báo cáo được ghim trong
-`results/figures/report_manifest.json` (`scripts/pin_runs.py`); bảng của báo cáo sinh từ các lần chạy đã ghim, không phụ
-thuộc lần chạy mới nhất. Mọi bảng và biểu đồ trong `results/figures/` sinh bằng script từ `results/raw/`.
+`results/figures/report_manifest.json` và `report_records.json` (`scripts/pin_runs.py`); bảng và hình của báo cáo sinh từ
+các lần chạy đã ghim, không phụ thuộc lần chạy mới nhất, và `report/latex/build.sh` dừng nếu một tệp đầu vào khác SHA-256
+đã ghi (xem `report/latex/README.md`). Mọi bảng và biểu đồ trong `results/figures/` sinh bằng script từ `results/raw/`.
 
 ## Cấu trúc thư mục
 
