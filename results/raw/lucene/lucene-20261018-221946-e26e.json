@@ -1,0 +1,52 @@
+{
+  "run_id": "lucene-20261018-221946-e26e",
+  "kind": "lucene",
+  "timestamp": "2026-10-18T15:19:46+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "0587623fac04",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "variant": "lucene-b0tokens",
+    "eval_set": "random_test_all",
+    "jar": "anserini-2.3.0-fatjar.jar",
+    "pretok": true,
+    "k1": 1.2,
+    "b": 0.75
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "variant": "lucene-b0tokens",
+    "R@1": 0.017835656287000474,
+    "R@10": 0.10032265107520694,
+    "R@50": 0.17600384576485137,
+    "MRR": 0.06567181796744731,
+    "nDCG@10": 0.06080359782186741,
+    "index_s": 2.3,
+    "index_mb": 6.7,
+    "search_wall_s": 10.2,
+    "ms_per_query_with_startup": 3.86,
+    "ms_per_query": 2.56,
+    "k1": 1.2,
+    "b": 0.75,
+    "n_queries": 2641
+  },
+  "status": "ok",
+  "log": "results/raw/lucene/lucene-b0tokens/search.log"
+}

@@ -1,0 +1,26 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Luồng lọc dữ liệu theo split]{Luồng lọc dữ liệu theo split và tập. Phần lớn theorem bị loại vì được chứng minh không qua tactic (chứng minh dạng term) nên không sinh truy vấn nào}\label{tab:dataflow}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+& \multicolumn{3}{c}{\code{random}} & \multicolumn{3}{c}{\code{novel\_premises}} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Bước & train & val & test & train & val & test \\
+\midrule
+Theorem gốc & 118.517 & 2.000 & 2.000 & 118.517 & 2.000 & 2.000 \\
+\quad có ít nhất một tactic & 59.557 & 995 & 992 & 59.050 & 1.245 & 1.249 \\
+\quad có tactic được chú thích premise & 53.787 & 892 & 898 & 53.154 & 1.207 & 1.216 \\
+\quad còn ít nhất một truy vấn & 52.663 & 880 & 882 & 52.047 & 1.182 & 1.196 \\
+\quad tỉ lệ so với theorem gốc & 44,4\% & 44,0\% & 44,1\% & 43,9\% & 59,1\% & 59,8\% \\
+\midrule
+Tactic & 250.814 & 4.260 & 4.506 & 246.714 & 6.240 & 6.626 \\
+\quad được chú thích premise & 162.262 & 2.681 & 2.836 & 159.234 & 4.165 & 4.380 \\
+\quad bị loại vì mọi premise đúng nằm ngoài corpus & 9.932 & 145 & 195 & 9.775 & 258 & 239 \\
+Truy vấn giữ lại & 152.330 & 2.536 & 2.641 & 149.459 & 3.907 & 4.141 \\
+\quad proof state khác nhau & 151.134 & 2.530 & 2.623 & 148.288 & 3.876 & 4.109 \\
+\midrule
+Lượt premise đúng nằm ngoài corpus & 55.971 & 867 & 1.030 & 54.047 & 1.886 & 1.935 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,13 @@
+# V2a = V2 + lọc stage 1 chỉ giữ premise truy cập được (import + khai báo trước trong cùng file). Chưa rerank.
+name: V2a
+index: {fields: [name, namespace, statement], tokenizer: lean, codec: vb}
+search:
+  k1: 3.0
+  b: {name: 1.0, namespace: 1.0, statement: 1.0}
+  weights: {name: 1.0, namespace: 0.5, statement: 1.0}
+  query_tf: binary
+rerank:
+  candidates: 100
+  accessible_filter: true
+  strategy: random
+  model: null

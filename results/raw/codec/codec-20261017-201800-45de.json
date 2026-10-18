@@ -1,0 +1,57 @@
+{
+  "run_id": "codec-20261017-201800-45de",
+  "kind": "codec",
+  "timestamp": "2026-10-17T13:18:00+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "313a93d4b69a",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "codec": "vb",
+    "index": "default__statement__vb__full",
+    "cache_terms": 0,
+    "eval_set": "scale_random_test_500"
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "postings_bytes": 4280417,
+    "decode_all_s": [
+      2.995583899999474,
+      2.916776600002777,
+      2.9068461999995634
+    ],
+    "postings_per_s": [
+      560044.4040309786,
+      575176.0350787245,
+      577140.9577845061
+    ],
+    "query_p50_ms": [
+      17.04480000080366,
+      16.836499999044463,
+      16.861800000697258
+    ],
+    "query_p95_ms": [
+      30.405029997564263,
+      29.72368500086304,
+      30.137085003298115
+    ]
+  },
+  "status": "ok",
+  "log": null
+}

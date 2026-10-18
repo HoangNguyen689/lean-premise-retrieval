@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "n3"
+version = "0.1.0"
+description = "Nhóm 3 INT4418: Lean premise retrieval (sparse/hybrid)"
+requires-python = ">=3.11"
+# Phiên bản chính xác đã dùng cho mọi số liệu nằm trong requirements/main.lock.txt và requirements/spark.lock.txt.
+dependencies = ["numpy>=2.4", "pandas>=3.0", "pyarrow>=26", "pyyaml>=6", "psutil>=7"]
+
+[project.optional-dependencies]
+main = ["scikit-learn>=1.9", "fastapi>=0.143", "uvicorn>=0.54", "matplotlib>=3.11", "python-docx", "pytest"]
+spark = ["pyspark==4.0.1"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

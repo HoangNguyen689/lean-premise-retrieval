@@ -1,0 +1,19 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Tinh chỉnh số ứng viên bổ sung của V5]{Tinh chỉnh số ứng viên bổ sung của V5 trên validation \code{random} (\num{2536} truy vấn). V4 trên cùng tập: Recall@10 = 0,273; Recall@50 = 0,398; MRR = 0,220}\label{tab:v5grid}
+\begin{tabular}{@{}rrrrrrrr@{}}
+\toprule
+Tệp & Thư mục & Phổ biến & Số ứng viên & Độ phủ & R@10 & R@50 & MRR \\
+\midrule
+0 & 0 & 0 & 100 & 0,420 & 0,279 & 0,398 & 0,225 \\
+50 & 0 & 0 & 121 & 0,509 & 0,288 & 0,462 & 0,226 \\
+0 & 50 & 0 & 139 & 0,525 & 0,288 & 0,467 & 0,228 \\
+0 & 0 & 50 & 150 & 0,517 & 0,292 & 0,455 & 0,228 \\
+50 & 50 & 0 & 154 & 0,555 & 0,288 & 0,487 & 0,228 \\
+50 & 50 & 50 & 204 & 0,615 & 0,299 & 0,501 & 0,229 \\
+\textbf{100} & \textbf{100} & \textbf{50} & \textbf{232} & \textbf{0,634} & \textbf{0,300} & \textbf{0,505} & \textbf{0,232} \\
+100 & 100 & 100 & 282 & 0,659 & 0,295 & 0,510 & 0,231 \\
+\bottomrule
+\end{tabular}
+\end{table}

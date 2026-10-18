@@ -1,0 +1,17 @@
+# Lưới BM25F cho V2 (statement giữ trọng số 1; k1, b_statement lấy từ kết quả tốt nhất của V1)
+k1: [3.0]
+query_tf: [binary]
+b:
+  - {name: 0.5, namespace: 0.5, statement: 1.0}
+  - {name: 1.0, namespace: 1.0, statement: 1.0}
+weights:
+  - {name: 0.0, namespace: 0.0, statement: 1.0}
+  - {name: 0.5, namespace: 0.0, statement: 1.0}
+  - {name: 1.0, namespace: 0.0, statement: 1.0}
+  - {name: 2.0, namespace: 0.0, statement: 1.0}
+  - {name: 0.5, namespace: 0.5, statement: 1.0}
+  - {name: 1.0, namespace: 0.5, statement: 1.0}
+  - {name: 2.0, namespace: 0.5, statement: 1.0}
+  - {name: 1.0, namespace: 1.0, statement: 1.0}
+  - {name: 2.0, namespace: 1.0, statement: 1.0}
+  - {name: 0.0, namespace: 1.0, statement: 1.0}

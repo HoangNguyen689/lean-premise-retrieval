@@ -1,0 +1,7 @@
+split,tập,theorem_gốc,theorem_có_tactic,theorem_có_tactic_có_premise,tactic,tactic_có_premise,nhãn_không_có_trong_corpus,truy_vấn_bị_loại,truy_vấn_giữ_lại,theorem_còn_truy_vấn,tỉ_lệ_theorem_giữ_lại,proof_state_khác_nhau
+random,train,118517,59557,53787,250814,162262,55971,9932,152330,52663,0.444,151134
+random,val,2000,995,892,4260,2681,867,145,2536,880,0.44,2530
+random,test,2000,992,898,4506,2836,1030,195,2641,882,0.441,2623
+novel_premises,train,118517,59050,53154,246714,159234,54047,9775,149459,52047,0.439,148288
+novel_premises,val,2000,1245,1207,6240,4165,1886,258,3907,1182,0.591,3876
+novel_premises,test,2000,1249,1216,6626,4380,1935,239,4141,1196,0.598,4109

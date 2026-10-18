@@ -1,0 +1,94 @@
+{
+  "run_id": "eval-V2a-20261017-194917-a6ad",
+  "kind": "eval",
+  "timestamp": "2026-10-17T12:50:42+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "313a93d4b69a",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "config": {
+      "name": "V2a",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      },
+      "rerank": {
+        "candidates": 100,
+        "accessible_filter": true,
+        "strategy": "random",
+        "model": null
+      }
+    },
+    "eval_set": "random_val_all",
+    "subset": "full",
+    "k": 100,
+    "tag": "quality-parallel-fixed"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.0641766498923439,
+    "R@5": 0.1562819212858645,
+    "R@10": 0.20915545706381203,
+    "R@50": 0.35004391436098387,
+    "MRR": 0.16888212640370892,
+    "nDCG@10": 0.14626049686709014,
+    "latency_ms_p50": 31.408249999913096,
+    "latency_ms_p95": 59.87737499981449,
+    "latency_ms_mean": 33.10814869874497,
+    "qps_sequential": 30.20404460240651,
+    "n_queries": 2536
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V2a-20261017-194917-a6ad.perquery.parquet",
+  "run_file": "results/runs/eval-V2a-20261017-194917-a6ad.tsv"
+}

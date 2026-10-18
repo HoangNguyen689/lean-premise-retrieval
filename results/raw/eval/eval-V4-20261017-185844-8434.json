@@ -1,0 +1,107 @@
+{
+  "run_id": "eval-V4-20261017-185844-8434",
+  "kind": "eval",
+  "timestamp": "2026-10-17T12:00:11+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "06b940d80fd9",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6"
+  },
+  "parameters": {
+    "config": {
+      "name": "V4",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      },
+      "rerank": {
+        "candidates": 100,
+        "accessible_filter": true,
+        "strategy": "random",
+        "features": [
+          "bm25_rel",
+          "bm25_rr",
+          "ns_in_query",
+          "ns_thm",
+          "same_file",
+          "dir_overlap",
+          "sym_jaccard",
+          "kind_thm",
+          "kind_def",
+          "kind_inst",
+          "kind_type",
+          "popularity",
+          "pagerank"
+        ],
+        "model": "results/models/v4.json"
+      }
+    },
+    "eval_set": "random_test_all",
+    "subset": "full",
+    "k": 100,
+    "tag": "quality-parallel"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.055704008221993825,
+    "R@5": 0.1753986941368615,
+    "R@10": 0.23802812053947986,
+    "R@50": 0.37284614110676806,
+    "MRR": 0.17448834902125937,
+    "nDCG@10": 0.15616954161019841,
+    "latency_ms_p50": 31.57629999986966,
+    "latency_ms_p95": 56.10580000029586,
+    "latency_ms_mean": 32.66881681181039,
+    "qps_sequential": 30.610230109052537,
+    "n_queries": 2641
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V4-20261017-185844-8434.perquery.parquet",
+  "run_file": "results/runs/eval-V4-20261017-185844-8434.tsv"
+}

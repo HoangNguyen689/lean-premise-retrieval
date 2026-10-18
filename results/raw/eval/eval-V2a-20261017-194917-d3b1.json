@@ -1,0 +1,94 @@
+{
+  "run_id": "eval-V2a-20261017-194917-d3b1",
+  "kind": "eval",
+  "timestamp": "2026-10-17T12:51:25+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "313a93d4b69a",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "config": {
+      "name": "V2a",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      },
+      "rerank": {
+        "candidates": 100,
+        "accessible_filter": true,
+        "strategy": "novel_premises",
+        "model": null
+      }
+    },
+    "eval_set": "novel_premises_test_all",
+    "subset": "full",
+    "k": 100,
+    "tag": "quality-parallel-fixed"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.062268103988099156,
+    "R@5": 0.1617174313193131,
+    "R@10": 0.22116873659169464,
+    "R@50": 0.38064688211396497,
+    "MRR": 0.17579936264287838,
+    "nDCG@10": 0.1518306018068623,
+    "latency_ms_p50": 28.25710000070103,
+    "latency_ms_p95": 55.83979999937583,
+    "latency_ms_mean": 30.6397490944409,
+    "qps_sequential": 32.63734297946435,
+    "n_queries": 4141
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V2a-20261017-194917-d3b1.perquery.parquet",
+  "run_file": "results/runs/eval-V2a-20261017-194917-d3b1.tsv"
+}

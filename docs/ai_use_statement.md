@@ -1,0 +1,21 @@
+# AI-use statement
+
+Theo yêu cầu của học phần INT4418, nhóm khai báo việc dùng công cụ AI trong dự án.
+
+| Công cụ | Dùng cho | Phần việc |
+|---|---|---|
+| Claude (Anthropic) qua Claude Code | Lập kế hoạch 10 tuần, viết khung mã nguồn, test, script thí nghiệm, bản nháp tài liệu | Toàn bộ repo phiên bản đầu (2026-10-17) |
+| Claude (Anthropic) qua Claude Code | Bổ sung sản phẩm tuần 1, 2, 5 (truy vấn kiểm tra, data dictionary, ablation plan, latency profile), hướng dẫn vai trò; soạn báo cáo LaTeX `report/latex/main.tex`; viết engine Spark Arrow (`src/n3/index/build_spark_arrow.py`), môi trường Docker Linux và thí nghiệm build2; V5 (ứng viên bổ sung), baseline Lucene, thí nghiệm số worker và kiểm tra CPU | 2026-10-18 |
+
+## Những gì nhóm phải tự kiểm chứng trước khi nộp
+- Mỗi thành viên đọc và giải thích được phần mã thuộc vai trò của mình (học phần yêu cầu: không nộp đoạn mã mình chưa hiểu).
+- Chạy lại toàn bộ pipeline theo README trên máy của nhóm và đối chiếu số liệu với `results/`.
+- Kiểm tra lại các con số trong báo cáo bằng script, không chép tay từ đầu ra của AI.
+- Đọc lại 30 failure case trong `results/figures/failure_cases.md`: phần phân loại tự động chỉ là gợi ý, nhóm phải gán nhãn lại thủ công.
+- Kiểm tra trích dẫn tài liệu tham khảo trong báo cáo bằng cách mở nguồn gốc.
+
+## Những gì AI không quyết định thay nhóm
+- Phân vai, người dự phòng, nội dung thống nhất với Nhóm 4.
+- Kết luận cuối cùng của báo cáo và câu trả lời khi bảo vệ.
+
+Cập nhật bảng trên mỗi khi dùng thêm AI cho việc khác (ví dụ viết báo cáo, làm slide).

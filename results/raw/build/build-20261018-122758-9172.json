@@ -1,0 +1,58 @@
+{
+  "run_id": "build-20261018-122758-9172",
+  "kind": "build",
+  "timestamp": "2026-10-18T12:27:58+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "bb7acd472fce",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Linux 5.15.153.1-microsoft-standard-WSL2 (#1 SMP Fri Mar 29 23:14:13 UTC 2024)",
+    "cpu": "",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 15.5,
+    "hostname_hash": "8c2fdc3b"
+  },
+  "software": {
+    "python": "3.11.17",
+    "numpy": "2.4.6",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1"
+  },
+  "parameters": {
+    "builder": "sequential",
+    "size": "x20",
+    "rep": 2,
+    "label": "linux-b0-seq",
+    "args": [],
+    "experiment": "build2",
+    "platform": "Linux"
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "wall_s": 70.65,
+    "peak_rss_mb": 3063.9,
+    "exit_code": 0,
+    "n_docs": 3619140,
+    "n_terms": 126002,
+    "n_postings": 33553200,
+    "max_df": 2196520,
+    "postings_bytes": 76288213,
+    "builder": "sequential",
+    "analyze_s": 40.073,
+    "write_s": 27.992,
+    "total_s": 68.4,
+    "index_bytes": 133840145,
+    "checksums": {
+      "dictionary.parquet": "d1d0f56fcc2d62e9a02f2ce6d6af696b8ad225ca",
+      "doc_lengths.parquet": "c160dc2a3a129e2b6091aef80b9220efc03c07ea",
+      "postings.bin": "16c825b49a4247c75b715c83354a9aefd3f4b823",
+      "terms_any.parquet": "06dae926e24790b25693da5ec86ea2d00cd4bcf5"
+    }
+  },
+  "status": "ok",
+  "log": "results/logs/scale/linux-b0-seq_x20_r2.log",
+  "spark_stages": null
+}

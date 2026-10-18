@@ -1,0 +1,5 @@
+# V1 = B0 + tokenizer Lean (tách tên, giữ ký hiệu toán, bỏ biến một chữ cái). Vẫn chỉ field statement.
+# k1, b, query_tf chọn trên random_val_all (results/raw/tuning/V1__grid_bm25*.csv).
+name: V1
+index: {fields: [statement], tokenizer: lean, codec: vb}
+search: {k1: 3.0, b: 1.0, query_tf: binary}

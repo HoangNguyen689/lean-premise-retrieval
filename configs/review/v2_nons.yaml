@@ -1,0 +1,20 @@
+# Ablation: V2 với trọng số trường namespace bằng 0 (chỉ name và statement).
+index:
+  codec: vb
+  fields:
+  - name
+  - namespace
+  - statement
+  tokenizer: lean
+name: V2-nons
+search:
+  b:
+    name: 1.0
+    namespace: 1.0
+    statement: 1.0
+  k1: 3.0
+  query_tf: binary
+  weights:
+    name: 1.0
+    namespace: 0.0
+    statement: 1.0

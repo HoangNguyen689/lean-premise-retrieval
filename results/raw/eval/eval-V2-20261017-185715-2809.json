@@ -1,0 +1,86 @@
+{
+  "run_id": "eval-V2-20261017-185715-2809",
+  "kind": "eval",
+  "timestamp": "2026-10-17T11:59:33+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "06b940d80fd9",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6"
+  },
+  "parameters": {
+    "config": {
+      "name": "V2",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      }
+    },
+    "eval_set": "novel_premises_test_all",
+    "subset": "full",
+    "k": 100,
+    "tag": "quality-parallel"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.029400592498274217,
+    "R@5": 0.1293028919559691,
+    "R@10": 0.18259675556619998,
+    "R@50": 0.3354905424840364,
+    "MRR": 0.12378807940616483,
+    "nDCG@10": 0.11200841253100012,
+    "latency_ms_p50": 31.631800000468502,
+    "latency_ms_p95": 58.86029999965103,
+    "latency_ms_mean": 33.07271497222173,
+    "qps_sequential": 30.23640486848192,
+    "n_queries": 4141
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V2-20261017-185715-2809.perquery.parquet",
+  "run_file": "results/runs/eval-V2-20261017-185715-2809.tsv"
+}

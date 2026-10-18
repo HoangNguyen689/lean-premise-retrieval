@@ -1,0 +1,45 @@
+# Sinh bởi scripts/tune_v5.py
+name: V5-f0-d50-p0
+index:
+  fields:
+  - name
+  - namespace
+  - statement
+  tokenizer: lean
+  codec: vb
+search:
+  k1: 3.0
+  b:
+    name: 1.0
+    namespace: 1.0
+    statement: 1.0
+  weights:
+    name: 1.0
+    namespace: 0.5
+    statement: 1.0
+  query_tf: binary
+rerank:
+  candidates: 100
+  accessible_filter: true
+  strategy: random
+  extra:
+    file: 0
+    dir: 50
+    popular: 0
+  features:
+  - bm25_rel
+  - bm25_rr
+  - ns_in_query
+  - ns_thm
+  - same_file
+  - dir_overlap
+  - sym_jaccard
+  - kind_thm
+  - kind_def
+  - kind_inst
+  - kind_type
+  - popularity
+  - pagerank
+  - file_usage
+  - dir_usage
+  model: results/models/v5_grid/V5-f0-d50-p0.json

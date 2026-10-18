@@ -1,0 +1,116 @@
+{
+  "run_id": "eval-V5-f100-d100-p100-20261018-220209-7322",
+  "kind": "eval",
+  "timestamp": "2026-10-18T15:03:07+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "386f00789935",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "config": {
+      "name": "V5-f100-d100-p100",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      },
+      "rerank": {
+        "candidates": 100,
+        "accessible_filter": true,
+        "strategy": "random",
+        "extra": {
+          "file": 100,
+          "dir": 100,
+          "popular": 100
+        },
+        "features": [
+          "bm25_rel",
+          "bm25_rr",
+          "ns_in_query",
+          "ns_thm",
+          "same_file",
+          "dir_overlap",
+          "sym_jaccard",
+          "kind_thm",
+          "kind_def",
+          "kind_inst",
+          "kind_type",
+          "popularity",
+          "pagerank",
+          "file_usage",
+          "dir_usage"
+        ],
+        "model": "results/models/v5_grid/V5-f100-d100-p100.json"
+      }
+    },
+    "eval_set": "random_val_all",
+    "subset": "full",
+    "k": 100,
+    "tag": "v5-tune"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.08410272360268577,
+    "R@5": 0.21587902065721165,
+    "R@10": 0.2954287062004049,
+    "R@50": 0.5103775568465001,
+    "MRR": 0.2308619771626016,
+    "nDCG@10": 0.20238304614041164,
+    "latency_ms_p50": 21.933499998340267,
+    "latency_ms_p95": 38.279949999378005,
+    "latency_ms_mean": 22.83493359615791,
+    "qps_sequential": 43.79255125875448,
+    "n_queries": 2536
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V5-f100-d100-p100-20261018-220209-7322.perquery.parquet",
+  "run_file": "results/runs/eval-V5-f100-d100-p100-20261018-220209-7322.tsv"
+}

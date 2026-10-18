@@ -1,0 +1,79 @@
+{
+  "run_id": "loadtest-20261018-213938-2c71",
+  "kind": "loadtest",
+  "timestamp": "2026-10-18T14:39:38+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "386f00789935",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "url": "http://127.0.0.1:8003",
+    "mode": "B0",
+    "eval_set": "scale_random_test_500",
+    "requests_per_level": 1200,
+    "k": 10,
+    "tag": null,
+    "server_workers": null,
+    "server": {
+      "status": "ok",
+      "subset": "full",
+      "modes": {
+        "B0": {
+          "index": "default__statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "default-v1",
+          "checksum_postings": "c416a8e0f91d"
+        },
+        "V2": {
+          "index": "lean__name+namespace+statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "lean-v1",
+          "checksum_postings": "48c65b44a508"
+        },
+        "V4": {
+          "index": "lean__name+namespace+statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "lean-v1",
+          "checksum_postings": "48c65b44a508"
+        }
+      },
+      "pid": 12752
+    }
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "levels": [
+      {
+        "clients": 12,
+        "requests_ok": 1200,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 17.464,
+        "qps": 68.71,
+        "e2e_ms_p50": 138.03349999943748,
+        "e2e_ms_p95": 358.7551399983567,
+        "e2e_ms_p99": 481.71051699933736,
+        "server_ms_p50": 125.6275,
+        "server_ms_p95": 349.16524999999996
+      }
+    ]
+  },
+  "status": "ok",
+  "log": null
+}

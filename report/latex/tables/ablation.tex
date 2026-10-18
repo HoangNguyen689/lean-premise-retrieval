@@ -1,0 +1,22 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\setlength{\tabcolsep}{4pt}
+\caption[Ablation của reranker]{Ablation trên tập kiểm tra \code{random} (\num{2641} truy vấn). V4 đầy đủ: Recall@10 = 0,243; MRR = 0,196. $\Delta$ là biến thể trừ V4; khoảng tin cậy và $p$ hai phía từ bootstrap theo cụm theorem, $p$ hiệu chỉnh Holm trên 9 phép so sánh của từng metric}\label{tab:ablation}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Thay đổi so với V4 & $\Delta$Recall@10 [KTC 95\%] & $p$ Holm & $\Delta$MRR [KTC 95\%] & $p$ Holm \\
+\midrule
+Tắt bộ lọc truy cập được & $-$0,051 \ [$-$0,061; $-$0,042] & $<$ 0,0001 & $-$0,066 \ [$-$0,076; $-$0,057] & $<$ 0,0001 \\
+Bỏ điểm và hạng BM25 & $-$0,036 \ [$-$0,047; $-$0,026] & $<$ 0,0001 & $-$0,046 \ [$-$0,059; $-$0,035] & $<$ 0,0001 \\
+Bỏ độ phổ biến và PageRank & $-$0,018 \ [$-$0,029; $-$0,007] & 0,0028 & $-$0,015 \ [$-$0,023; $-$0,008] & $<$ 0,0001 \\
+Bỏ độ trùng ký hiệu & $-$0,009 \ [$-$0,017; $-$0,001] & 0,1190 & $-$0,008 \ [$-$0,013; $-$0,004] & 0,0024 \\
+Bỏ loại khai báo & $-$0,001 \ [$-$0,007; 0,005] & 1,0000 & $-$0,008 \ [$-$0,014; $-$0,004] & 0,0010 \\
+Bỏ cùng tệp, cùng thư mục & $+$0,000 \ [$-$0,007; 0,008] & 1,0000 & $-$0,010 \ [$-$0,016; $-$0,004] & $<$ 0,0001 \\
+Bỏ namespace & $-$0,000 \ [$-$0,004; 0,003] & 1,0000 & $-$0,000 \ [$-$0,002; 0,002] & 0,8372 \\
+\midrule
+50 ứng viên thay vì 100 & $-$0,009 \ [$-$0,016; $-$0,001] & 0,1190 & $-$0,007 \ [$-$0,010; $-$0,003] & 0,0016 \\
+200 ứng viên thay vì 100 & $+$0,010 \ [0,003; 0,016] & 0,0360 & $+$0,006 \ [0,002; 0,010] & 0,0036 \\
+\bottomrule
+\end{tabular}
+\end{table}

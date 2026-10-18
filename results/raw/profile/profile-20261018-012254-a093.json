@@ -1,0 +1,51 @@
+{
+  "run_id": "profile-20261018-012254-a093",
+  "kind": "profile",
+  "timestamp": "2026-10-17T18:22:54+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "0af77973b7e2",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "configs": [
+      "b0_bm25_default",
+      "v2_bm25f_lean",
+      "v4_rerank_dep"
+    ],
+    "eval_set": "scale_random_test_500",
+    "k": 100
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "B0_lạnh_p50_total": 13.393999997788342,
+    "B0_nóng_p50_total": 13.143699998181546,
+    "V2_lạnh_p50_total": 20.64474999860977,
+    "V2_nóng_p50_total": 20.65914999911911,
+    "V4_lạnh_p50_total": 23.004999999102438,
+    "V4_nóng_p50_total": 20.894849996693665
+  },
+  "status": "ok",
+  "log": null,
+  "output": "results/raw/profile/latency_profile.parquet",
+  "checks": {
+    "B0": true,
+    "V2": true,
+    "V4": true
+  }
+}

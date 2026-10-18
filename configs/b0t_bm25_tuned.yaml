@@ -1,0 +1,4 @@
+# B0t = B0 nhưng k1, b, query_tf tinh trên val với cùng ngân sách lưới như V1 (baseline mạnh, công bằng).
+name: B0t
+index: {fields: [statement], tokenizer: default, codec: vb}
+search: {k1: 2.0, b: 1.0, query_tf: binary}

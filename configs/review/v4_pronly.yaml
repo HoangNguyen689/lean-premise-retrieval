@@ -1,0 +1,38 @@
+# Ablation: V4 bỏ popularity, giữ PageRank.
+index:
+  codec: vb
+  fields:
+  - name
+  - namespace
+  - statement
+  tokenizer: lean
+name: V4-pronly
+rerank:
+  accessible_filter: true
+  candidates: 100
+  features:
+  - bm25_rel
+  - bm25_rr
+  - ns_in_query
+  - ns_thm
+  - same_file
+  - dir_overlap
+  - sym_jaccard
+  - kind_thm
+  - kind_def
+  - kind_inst
+  - kind_type
+  - pagerank
+  model: results/models/review/v4_pronly.json
+  strategy: random
+search:
+  b:
+    name: 1.0
+    namespace: 1.0
+    statement: 1.0
+  k1: 3.0
+  query_tf: binary
+  weights:
+    name: 1.0
+    namespace: 0.5
+    statement: 1.0

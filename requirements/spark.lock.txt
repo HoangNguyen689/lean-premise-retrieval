@@ -1,0 +1,12 @@
+# Môi trường Spark (.venv-spark): Python 3.11.17 (uv), Java 21 trên Windows hoặc Java 17 trong docker/spark-linux.Dockerfile.
+# Cài: python -m pip install -r requirements/spark.lock.txt && python -m pip install -e .
+numpy==2.4.6
+pandas==3.0.6
+psutil==7.2.2
+py4j==0.10.9.9
+pyarrow==26.0.0
+pyspark==4.0.1
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
+six==1.17.0
+tzdata==2026.5
