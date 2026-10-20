@@ -959,22 +959,7 @@ Two-Level Retrieval Process. \emph{Proceedings of the 12th ACM CIKM}, 2003.
 
 \section{Khai báo sử dụng AI}\label{app:ai}
 
-Theo yêu cầu của học phần, nhóm khai báo việc dùng công cụ AI. Nhóm dùng Claude (Anthropic) qua công cụ Claude Code cho
-các việc sau: lập kế hoạch 10 tuần, viết mã nguồn của pipeline, unit test, các script thí nghiệm và vẽ biểu đồ, bản nháp
-tài liệu trong thư mục \code{docs}, và soạn bản báo cáo này. Mọi bảng số liệu trong báo cáo được sinh bằng script từ tệp
-kết quả, không chép tay từ đầu ra của AI. Codex (OpenAI) được dùng để hỗ trợ phản biện các bản thảo và góp ý biên tập: bốn bản nhận xét trong thư mục
-\code{report} (\code{danh\_gia\_report.md} và các bản \code{\_lan\_2} đến \code{\_lan\_4}) do Codex tạo sau khi đọc báo cáo,
-mã nguồn và kết quả; chúng chỉ ra các điểm cần sửa, trong đó có lỗi tính $p$ hai phía của hàm bootstrap, các float đặt sai
-chỗ và cách dùng thuật ngữ. Các thay đổi
-theo nhận xét, gồm đối chứng V4-K240, tập holdout, kiểm định hoán vị, ghim nguồn của bảng và hình, và phần viết lại báo cáo,
-được thực hiện với Claude Code. \canchot{Nhóm xác nhận phạm vi dùng Codex.}
-
-Các bước kiểm chứng tự động đã thực hiện gồm 58 unit test (trong đó có các ví dụ tính tay của giáo trình về mã VB, mã gamma
-và tần suất tài liệu, ví dụ tính tay cho bootstrap theo cụm, kiểm định hoán vị theo cụm và hiệu chỉnh Holm), so sánh chỉ mục với một cài đặt tham
-chiếu đơn giản, so mã băm giữa bản xây chỉ mục tuần tự và bản Spark, kiểm tra tính tất định của kết quả và kiểm tra tự
-động 20 truy vấn mẫu. Những việc AI không quyết định thay nhóm gồm phân vai, nội dung thống nhất với Nhóm 4, đối chiếu thủ
-công 20 truy vấn mẫu, nhãn thủ công của các trường hợp thất bại và kết luận cuối cùng khi bảo vệ. Mỗi thành viên phải đọc,
-chạy lại và giải thích được phần mã thuộc vai trò của mình theo hướng dẫn trong \code{docs/role\_guides.md}.
+\canchot{Nhóm viết lại phần khai báo sử dụng AI.}
 
 \section{Phân công và đóng góp}\label{app:contrib}
 

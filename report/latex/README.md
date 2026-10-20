@@ -51,7 +51,7 @@ Chữ đỏ trong ngoặc vuông (macro `\canchot`) đánh dấu nội dung nhó
 - Đối chiếu thủ công và ký xác nhận 20 truy vấn kiểm tra (Mục 3.4, `docs/check_queries.md`).
 - Bảng so sánh với Nhóm 4 (đoạn "Bối cảnh và so sánh với nhóm khác" cuối Mục 6.1).
 - Gán nhãn thủ công 30 trường hợp thất bại bởi hai thành viên và tỉ lệ đồng thuận (Mục 7.3).
-- Xác nhận phạm vi dùng Codex trong khai báo AI (Phụ lục A.1).
+- Viết lại phần khai báo sử dụng AI (Phụ lục A.1).
 
 Khi làm xong, sửa câu mô tả trạng thái tương ứng trong báo cáo (hiện ghi là "chưa được thực hiện") rồi mới xóa macro
 `\canchot`. Nhóm cũng cần mở từng tài liệu tham khảo để kiểm tra trích dẫn.

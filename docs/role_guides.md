@@ -225,7 +225,7 @@ python scripts/run_scale.py --part serve --reps 3         # thí nghiệm tải 
 ## 6. Evaluation/error analysis
 
 **Phụ trách:** `src/n3/eval/metrics.py`, `run_eval.py`; `scripts/summarize_quality.py`, `ablation.py`,
-`ablation_significance.py`, `error_analysis.py`, `make_figures.py`, `fuse_rrf.py`, `report_to_docx.py`;
+`ablation_significance.py`, `error_analysis.py`, `make_figures.py`, `make_report_tables.py`, `fuse_rrf.py`;
 tài liệu `docs/benchmark_spec.md`, `docs/ablation_plan.md`, `report/`.
 
 **Chạy lại**
@@ -235,7 +235,7 @@ python -m pytest -q tests/test_metrics.py
 python scripts/summarize_quality.py          # bảng chất lượng + paired bootstrap
 python scripts/ablation_significance.py      # KTC cho ablation
 python scripts/error_analysis.py             # lát cắt + 30 failure case
-python scripts/make_figures.py && python scripts/report_to_docx.py
+bash report/latex/build.sh                   # sinh bảng, hình và biên dịch report/report.pdf
 python scripts/fuse_rrf.py --runs results/runs/<run_V4>.tsv <run_nhom4>.tsv --eval random_test_all   # khi có run của Nhóm 4
 ```
 

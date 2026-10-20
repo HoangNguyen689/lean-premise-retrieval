@@ -134,7 +134,7 @@ các lần chạy đã ghim, không phụ thuộc lần chạy mới nhất, và
 | `docs/` | benchmark spec, 20 truy vấn kiểm tra, data card, data dictionary, ablation plan, hướng dẫn vai trò, system card, AI-use statement, license note |
 
 ## Tài liệu
-- `report/report.pdf`: báo cáo chính thức (nguồn LaTeX trong `report/latex/`, biên dịch bằng `bash report/latex/build.sh`); `report/report.md` và `report/report.docx` là bản nháp cũ
+- `report/report.pdf`: báo cáo chính thức (nguồn LaTeX trong `report/latex/`, biên dịch bằng `bash report/latex/build.sh`); `report/report.md` là bản nháp cũ
 - `docs/benchmark_spec.md`: benchmark đề xuất dùng chung với Nhóm 4 (các mục **[cần chốt]** chờ Nhóm 4 trả lời)
 - `docs/check_queries.md`: 20 truy vấn kiểm tra định nghĩa benchmark (tuần 1)
 - `docs/data_dictionary.md`: mô tả từng cột của mọi bảng (tuần 2)

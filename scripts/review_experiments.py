@@ -1,4 +1,4 @@
-"""Thí nghiệm bổ sung theo bản đánh giá báo cáo (report/danh_gia_report.md).
+"""Thí nghiệm bổ sung sau bản đánh giá báo cáo lần 1.
 
 1. Cùng ngân sách ứng viên: V4 với 240 ứng viên BM25F (V4-K240) so với V5 (khoảng 232 đến 239 ứng viên).
 2. Tách tín hiệu phụ thuộc: V4 chỉ giữ popularity, V4 chỉ giữ PageRank.
