@@ -109,19 +109,41 @@ Chụp màn hình kết quả `tv3_kiem_tra_tay.py`. Đây là bằng chứng b�
 
 ---
 
-## 5. Báo cáo phần baseline (khoảng nửa trang)
+## 5. Báo cáo phần baseline
 
-Lấy số từ `results\real\eval_summary.csv` (các dòng `bm25`) và `results\real\latency.csv`:
+> Số liệu lấy từ lần chạy `run_real_retrieval.py` ngày 20/10/2026 (đã lọc chính định lý truy vấn), LeanDojo Benchmark 4, mathlib4 commit `29dcec07`.
 
-> **Baseline BM25.** Statement Lean được tách từ bằng `tokenize` (tách tên theo `.`/`_`, giữ ký hiệu Lean). Chỉ mục đảo được xây trên trường `statement`. BM25 dùng tham số mặc định k1 = 1.5, b = 0.75 và IDF dạng ln(1 + (N − df + 0.5)/(df + 0.5)), không dùng embedding và không dùng dependency. Hệ lọc bỏ chính định lý truy vấn trước khi lấy top-k. Baseline chạy trên cùng dữ liệu, cùng split và cùng máy với các biến thể của nhóm.
+**5.1. Thiết lập.** Statement Lean được tách từ bằng hàm `tokenize`: tên định lý tách theo `.` và `_`, chuyển chữ thường, giữ ký hiệu Lean như `∀ ∈ → ℕ`. Inverted index được xây trên trường `statement`. BM25 dùng tham số mặc định k1 = 1.5, b = 0.75 và IDF = ln(1 + (N − df + 0.5)/(df + 0.5)), không dùng embedding và không dùng dependency. Hệ lọc bỏ chính định lý truy vấn trước khi lấy top-k. Baseline chạy trên cùng dữ liệu, cùng split và cùng máy với các biến thể còn lại của nhóm. Recall dùng nhãn 2 (premise được dùng trực tiếp trong chứng minh); MRR và nDCG dùng cả nhãn 1, theo cách tính hiện tại của `metrics.py`.
 
-| Scale | Recall@1 | Recall@5 | **Recall@10** | Recall@50 | MRR | P50 (ms) | **P95 (ms)** | Build index (s) |
-|---|---|---|---|---|---|---|---|---|
-| 10K | | | | | | | | |
-| 50K | | | | | | | | |
-| 181K | | | | | | | | |
+**5.2. Kết quả BM25 baseline**
 
-> **Nhận xét** (điền theo số): Recall@10 ở 181K đạt …, nghĩa là trung bình chỉ khoảng …% premise đúng nằm trong top-10. P95 tăng từ … ms (10K) lên … ms (181K) khi corpus tăng 18 lần. Lý do là các token như `theorem`, `:`, `(` xuất hiện ở hầu hết tài liệu, nên mỗi query vẫn phải duyệt gần hết kho. **Hạn chế:** tokenizer bỏ `+`, `=`; nhiều query không có từ chung với premise đúng nên BM25 không thể tìm ra. Đây là lý do nhóm thử thêm field và structural features (RQ1).
+| Scale | Corpus | Query | R@1 | R@5 | **R@10** | R@50 | MRR | nDCG@10 | Build (s) | P50 (ms) | **P95 (ms)** |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| S1 | 10.000 | 200 | 0.0249 | 0.1090 | **0.1473** | 0.2339 | 0.1293 | 0.0831 | 0.9 | 80.5 | **248.2** |
+| S2 | 50.000 | 500 | 0.0503 | 0.1221 | **0.1700** | 0.2445 | 0.1659 | 0.0875 | 4.2 | 441.6 | **1 180.5** |
+| S3 | 180.907 | 898 | 0.0585 | 0.1656 | **0.2248** | 0.3453 | 0.2694 | 0.1240 | 15.8 | 2 536.1 | **7 449.9** |
+
+**5.3. So sánh với các biến thể của nhóm ở S3 (181K)**
+
+| Hệ | R@10 | Chênh so với BM25 | MRR | P95 (ms) |
+|---|---|---|---|---|
+| **bm25 (baseline)** | **0.2248** | — | 0.2694 | 7 449.9 |
+| bm25_fielddrop (bỏ ký hiệu Lean) | 0.2154 | −0.0094 | 0.2644 | 9 012.2 |
+| bm25_field (thêm tên + namespace) | 0.2587 | +0.0339 (+15%) | 0.3028 | 7 923.7 |
+| hybrid (field + structural rerank) | 0.2590 | +0.0342 (+15%) | 0.3034 | 4 557.7 |
+
+**5.4. Nhận xét**
+
+1. **Chất lượng.** Ở toàn bộ kho (181K), BM25 đưa được trung bình **22,5%** premise đúng vào top-10 và **34,5%** vào top-50. Như vậy khoảng **2/3 premise đúng nằm ngoài top-50**. Recall@1 chỉ đạt 0,0585, tức hệ rất hiếm khi xếp premise đúng ở hạng 1. Truy hồi chỉ dựa trên từ khóa có giới hạn rõ ràng với dữ liệu Lean: nhiều premise được dùng trong chứng minh không có token nào chung với statement của query.
+2. **Recall tăng theo scale nhưng không thể kết luận "kho lớn thì tốt hơn".** Corpus S1/S2 là 10K/50K declaration đầu tiên theo thứ tự chữ cái, nên nhiều premise đúng nằm ngoài corpus nhỏ. Ở S1, 76 trong 114 query có trong qrels không có premise nhãn 2 nào trong corpus, nên Recall của chúng luôn bằng 0. Recall tăng chủ yếu do độ phủ của qrels tăng, không phải do BM25 làm việc tốt hơn.
+3. **Chi phí.** Khi corpus tăng **18 lần** (10K lên 181K), thời gian build index tăng **17,6 lần** (0,9 s lên 15,8 s), gần tuyến tính. Nhưng P50 tăng **31 lần** (80 ms lên 2 536 ms) và P95 tăng **30 lần** (248 ms lên 7 450 ms), tức latency tăng **nhanh hơn** kích thước kho. P95 khoảng 7,4 giây mỗi query là quá chậm cho một bộ chứng minh. Nguyên nhân: các token như `theorem`, `:`, `(` xuất hiện ở hầu hết declaration, nên dù có inverted index, mỗi query vẫn phải cộng điểm cho gần như toàn bộ kho bằng vòng lặp Python thuần.
+4. **Trả lời RQ1.** BM25 thuần **chưa đủ** ở quy mô lớn. Chỉ cần thêm tên định lý và namespace (bm25_field), Recall@10 đã tăng 15% tương đối và MRR tăng từ 0,2694 lên 0,3028. Bỏ ký hiệu Lean làm Recall@10 giảm 0,0094, nghĩa là ký hiệu có ích nhưng ở mức nhỏ. Structural reranking gần như không thêm gì so với bm25_field (0,2590 so với 0,2587).
+5. **Lưu ý về độ trễ.** Latency đo trong một lần chạy và biến động nhiều giữa các lần. Lần chạy trước của nhóm đo được P95 của BM25 ở S3 là 3 567 ms; lần này là 7 450 ms. Độ chênh latency giữa các hệ ở S3 (ví dụ hybrid 4 558 ms so với BM25 7 450 ms) vì vậy chưa đủ tin cậy. Theo yêu cầu của đề, cần chạy ít nhất 3 lần và báo median kèm min–max trước khi so sánh.
+
+**5.5. Hạn chế của baseline**
+- Tokenizer bỏ các ký hiệu `+ = < * ^`, không tách được chữ hoa giữa từ (ví dụ `foldlRecOn`) và làm mất chỉ số dưới (`eval₂` thành `eval`).
+- Qrels chỉ gồm các premise được dùng trong chứng minh gốc, nên mọi giá trị Recall là cận dưới.
+- Tham số k1/b giữ mặc định, không tinh chỉnh, đúng yêu cầu "BM25 mặc định" của đề.
 
 ---
 
