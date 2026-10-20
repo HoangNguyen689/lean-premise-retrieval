@@ -12,7 +12,7 @@ B0 được đo lại trong cùng script theo cùng quy tắc (một tiến trì
 lần đánh giá đã ghim có thể đo khi nhiều đánh giá chạy song song.
 Lucene lưu độ dài tài liệu dạng nén 1 byte nên điểm và thứ hạng có thể lệch nhẹ so với cài đặt chính xác.
 
-Cần Java 21 và tệp jar của Anserini (mặc định D:/bigdata/tools/anserini/anserini-2.3.0-fatjar.jar, đổi bằng --jar).
+Cần Java 21 và tệp jar của Anserini (mặc định tools/anserini/anserini-2.3.0-fatjar.jar trong kho, đổi bằng --jar).
 Dùng:  python scripts/lucene_baseline.py [--eval random_test_all] [--b0-only]
 Ra:    results/raw/lucene/*, results/figures/lucene.md, run record kind "lucene"
 """
@@ -83,7 +83,7 @@ def time_b0(queries, eval_name: str, warmup: int = 100) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--jar", default="D:/bigdata/tools/anserini/anserini-2.3.0-fatjar.jar")
+    ap.add_argument("--jar", default=str(ROOT / "tools" / "anserini" / "anserini-2.3.0-fatjar.jar"))
     ap.add_argument("--eval", default="random_test_all")
     ap.add_argument("--b0-only", action="store_true", help="chỉ đo lại B0, dùng kết quả Lucene đã ghi")
     args = ap.parse_args()

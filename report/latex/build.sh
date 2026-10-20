@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Dựng báo cáo: report/latex/main.tex -> report/report.pdf. Dùng Tectonic nếu có (biến TECTONIC hoặc trong PATH), không
-# thì dùng xelatex. Biến PYTHON chọn trình thông dịch (mặc định .venv của kho mã).
+# Dựng báo cáo: report/latex/main.tex -> report/report.pdf. Dùng Tectonic nếu có (biến TECTONIC, trong PATH hoặc
+# tools/tectonic/ của kho), không thì dùng xelatex. Biến PYTHON chọn trình thông dịch (mặc định .venv của kho mã).
 #
 #   bash build.sh                  kiểm tra đầu vào khớp bản đã phát hành (SHA-256 trong tables/ và figures/SOURCES.md),
 #                                  sinh lại bảng, ví dụ và hình rồi biên dịch; dừng nếu đầu vào lệch
@@ -25,6 +25,7 @@ if [ "$MODE" != "--compile-only" ]; then
 fi
 
 TECTONIC=${TECTONIC:-$(command -v tectonic || true)}
+[ -n "$TECTONIC" ] || for t in "$ROOT/tools/tectonic/tectonic.exe" "$ROOT/tools/tectonic/tectonic"; do [ -x "$t" ] && TECTONIC=$t && break; done
 if [ -n "$TECTONIC" ]; then
   "$TECTONIC" -X compile main.tex
 else
