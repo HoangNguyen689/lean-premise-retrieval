@@ -13,11 +13,17 @@ liệu ở đây không so trực tiếp với bảng trong báo cáo.
   trung bình. Run file ngoài thiếu truy vấn nào thì truy vấn đó nhận danh sách rỗng (metric bằng 0).
 - Mỗi metric báo trên hai lát: "all" (882 truy vấn chấm được) và "signature" (bỏ truy vấn mà statement còn chứa chứng
   minh, n3.shared.has_proof_body; chứng minh thường gọi thẳng tên premise đúng).
+- Trộn (--fuse "A+B"): Reciprocal Rank Fusion như scripts/fuse_rrf.py, điểm = Σ 1/(k + hạng) với k = 60, trọng số bằng
+  nhau, hòa điểm thì full_name nhỏ trước, giữ top-k. Hạng lấy từ danh sách đã qua quy tắc eligible. Gói chung chỉ có tập
+  test nên k và trọng số không được tinh chỉnh. Có run file ngoài mà không ghi --fuse thì mỗi run ngoài được trộn với V4
+  (cấu hình N3 nên dùng chung).
 - Kiểm định: hoán vị ghép cặp trên R@10 (mỗi truy vấn là một theorem nên cụm là truy vấn), hiệu chỉnh Holm trong mỗi
-  lát; khoảng tin cậy 95% của chênh lệch bằng paired bootstrap.
+  lát; khoảng tin cậy 95% của chênh lệch bằng paired bootstrap. Họ so sánh: các bước liên tiếp của N3, mỗi run ngoài với
+  từng biến thể N3, và mỗi hệ trộn với từng thành phần của nó.
 
 Dùng:  python scripts/eval_shared.py                                     # B0, V2, V4, V5
-       python scripts/eval_shared.py --external N4-dense=path/run_dense_full.csv   # chấm thêm run file khác
+       python scripts/eval_shared.py --external N4-dense=path/run_dense_full.csv   # chấm thêm run file khác, trộn với V4
+       python scripts/eval_shared.py --external N4-dense=... --fuse V4+N4-dense V5+N4-dense
 Run file ngoài: CSV hoặc TSV có cột query_id, premise_id (full_name); có cột rank thì xếp theo rank, không thì theo thứ
 tự dòng.
 Ra:    results/runs/shared/<hệ thống>.tsv, results/raw/shared/<run_id>.json và .perquery.parquet,
@@ -115,6 +121,18 @@ def read_external(path: Path, queries: list[dict], k: int) -> tuple[dict, dict]:
     return rankings, info
 
 
+def rrf(runs: list[dict], queries: list[dict], k: int, rrf_k: int = 60) -> dict:
+    """Reciprocal Rank Fusion của các danh sách đã qua quy tắc eligible (cùng công thức với fuse_rrf.fuse)."""
+    fused = {}
+    for q in queries:
+        scores: dict[str, float] = {}
+        for r in runs:
+            for rank, (name, _) in enumerate(r.get(q["id"], []), 1):
+                scores[name] = scores.get(name, 0.0) + 1.0 / (rrf_k + rank)
+        fused[q["id"]] = sorted(scores.items(), key=lambda x: (-x[1], x[0]))[:k]
+    return fused
+
+
 def per_query(system: str, rankings: dict, lat: dict | None, queries: list[dict]) -> pd.DataFrame:
     rows = []
     for q in queries:
@@ -150,7 +168,7 @@ def compare(pq_df: pd.DataFrame, pairs: list[tuple[str, str]]) -> list[dict]:
 
 
 def write_markdown(path: Path, run_id: str, report: dict, queries: list[dict], pq_df: pd.DataFrame,
-                   systems: list[str], comps: list[dict], external: dict) -> None:
+                   systems: list[str], comps: list[dict], external: dict, fused: dict, rrf_k: int) -> None:
     n_sig = int(pq_df[pq_df.system == systems[0]].signature.sum())
     n_scored = int((pq_df.system == systems[0]).sum())
     n_body = sum(has_proof_body(q["statement"]) for q in queries)
@@ -183,7 +201,11 @@ def write_markdown(path: Path, run_id: str, report: dict, queries: list[dict], p
             f"{i['missing_queries']} truy vấn thiếu, {i['unknown_queries']} truy vấn lạ bị bỏ" for name, i in external.items()]
     else:
         md += ["", "Chưa có run file của Nhóm 4. Khi nhận được: `python scripts/eval_shared.py --external "
-               "N4-dense=<run_dense>.csv`."]
+               "N4-dense=<run_dense>.csv` (tự trộn RRF với V4)."]
+    if fused:
+        md += ["", "## Trộn RRF", "", f"Điểm = Σ 1/({rrf_k} + hạng), trọng số bằng nhau, hòa điểm thì full_name nhỏ "
+               "trước; hạng lấy từ danh sách đã qua quy tắc eligible. Gói chung chỉ có tập test nên không tinh chỉnh k "
+               "hay trọng số.", ""] + [f"- {f}: {' + '.join(parts)}" for f, parts in fused.items()]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(md) + "\n", encoding="utf-8")
 
@@ -193,6 +215,9 @@ def main() -> None:
     ap.add_argument("--bundle", default="data/n4_shared", help="thư mục hoặc tệp zip của gói (scripts/export_n4_shared.py)")
     ap.add_argument("--configs", nargs="*", default=DEFAULT_CONFIGS)
     ap.add_argument("--external", nargs="*", default=[], metavar="TÊN=ĐƯỜNG_DẪN")
+    ap.add_argument("--fuse", nargs="*", default=None, metavar="A+B",
+                    help="hệ thống cần trộn RRF; mặc định mỗi run ngoài trộn với V4")
+    ap.add_argument("--rrf-k", type=int, default=60)
     ap.add_argument("--k", type=int, default=100)
     ap.add_argument("--limit", type=int, default=None, help="chỉ chạy n truy vấn đầu (chạy thử, không ghi kết quả)")
     args = ap.parse_args()
@@ -203,8 +228,18 @@ def main() -> None:
     full_name_of = names.sort_values("premise_id").full_name.to_numpy()
     ctxs = theorem_contexts()
 
-    frames, systems, cfgs, summary, run_files = [], [], [], {}, {}
+    frames, systems, cfgs, summary, run_files, ranked_by = [], [], [], {}, {}, {}
     run_dir = ROOT / "results" / "runs" / "shared"
+
+    def write_run(name: str, rankings: dict) -> None:
+        if args.limit:
+            return
+        run_dir.mkdir(parents=True, exist_ok=True)
+        lines = [f"{qid}\t{n}\t{r}\t{s:.6f}\t{name}" for qid, ranked in rankings.items() for r, (n, s) in enumerate(ranked, 1)]
+        run_file = run_dir / f"{name}.tsv"
+        run_file.write_text("query_id\tpremise_id\trank\tscore\tsystem\n" + "\n".join(lines) + "\n", encoding="utf-8")
+        run_files[name] = run_file.relative_to(ROOT).as_posix()
+
     for path in args.configs:
         cfg = load_config(ROOT / path)
         t0 = time.perf_counter()
@@ -212,20 +247,29 @@ def main() -> None:
         frames.append(per_query(cfg["name"], rankings, lat, queries))
         systems.append(cfg["name"])
         cfgs.append(cfg)
+        ranked_by[cfg["name"]] = rankings
         print(f"{cfg['name']}: R@10 {frames[-1]['R@10'].mean():.4f} ({time.perf_counter() - t0:.0f}s)", flush=True)
-        if not args.limit:
-            run_dir.mkdir(parents=True, exist_ok=True)
-            lines = [f"{qid}\t{n}\t{r}\t{s:.6f}\t{cfg['name']}" for qid, ranked in rankings.items()
-                     for r, (n, s) in enumerate(ranked, 1)]
-            run_file = run_dir / f"{cfg['name']}.tsv"
-            run_file.write_text("query_id\tpremise_id\trank\tscore\tsystem\n" + "\n".join(lines) + "\n", encoding="utf-8")
-            run_files[cfg["name"]] = run_file.relative_to(ROOT).as_posix()
+        write_run(cfg["name"], rankings)
     external = {}
     for spec in args.external:
         name, _, path = spec.partition("=")
         rankings, external[name] = read_external(Path(path), queries, args.k)
         frames.append(per_query(name, rankings, None, queries))
         systems.append(name)
+        ranked_by[name] = rankings
+    fuse_specs = args.fuse if args.fuse is not None else [f"V4+{e}" for e in external if "V4" in ranked_by]
+    fused = {}
+    for spec in fuse_specs:
+        parts = spec.split("+")
+        if len(parts) < 2 or any(p not in ranked_by for p in parts):
+            raise SystemExit(f"--fuse {spec}: cần ít nhất hai hệ thống trong {sorted(ranked_by)}")
+        name = f"RRF({spec})"
+        fused[name] = parts
+        rankings = rrf([ranked_by[p] for p in parts], queries, args.k, args.rrf_k)
+        frames.append(per_query(name, rankings, None, queries))
+        systems.append(name)
+        write_run(name, rankings)
+        print(f"{name}: R@10 {frames[-1]['R@10'].mean():.4f}", flush=True)
     pq_df = pd.concat(frames, ignore_index=True)
     for s in systems:
         d = pq_df[pq_df.system == s]
@@ -235,7 +279,8 @@ def main() -> None:
         if len(lat):
             summary[s].update(latency_ms_p50=float(np.percentile(lat, 50)), latency_ms_p95=float(np.percentile(lat, 95)))
     n3_names = [c["name"] for c in cfgs]
-    pairs = list(zip(n3_names, n3_names[1:])) + [(a, e) for e in external for a in n3_names]
+    pairs = list(zip(n3_names, n3_names[1:])) + [(a, e) for e in external for a in n3_names] + \
+        [(p, f) for f, parts in fused.items() for p in parts]
     comps = compare(pq_df, pairs)
     if args.limit:
         print(json.dumps({s: v["all"] for s, v in summary.items()}, indent=1))
@@ -247,12 +292,14 @@ def main() -> None:
     rec = runlog.write_record(
         "shared", parameters={"configs": cfgs, "k": args.k, "bundle": {
             "data_version": DATA_VERSION, "pool_id": report["pool_id"], "sha256": report["checksums_sha256"]},
-            "eligible_rule": report["eligible_rule"], "external": external}, metrics=summary, seed=42, run_id=run_id,
+            "eligible_rule": report["eligible_rule"], "external": external,
+            "fusion": {"systems": fused, "rrf_k": args.rrf_k, "weights": "equal", "depth": args.k}},
+        metrics=summary, seed=42, run_id=run_id,
         extra={"comparisons": comps, "per_query_file": f"results/raw/shared/{run_id}.perquery.parquet",
                "run_files": run_files, "n_queries": len(queries),
                "n_scored": int((pq_df.system == systems[0]).sum())})
     write_markdown(ROOT / "results" / "figures" / "shared_benchmark.md", run_id, report, queries, pq_df, systems,
-                   comps, external)
+                   comps, external, fused, args.rrf_k)
     print(f"{rec.relative_to(ROOT).as_posix()}\nresults/figures/shared_benchmark.md")
 
 
