@@ -73,7 +73,8 @@ cắt statement tại `:=` thì đó là phiên bản gói mới: nâng `data_ve
 python scripts/export_n4_shared.py --zip       # dựng lại gói từ data/raw → data/n4_shared/ (+ .zip); dừng nếu SHA-256 lệch
 python scripts/verify_n4_shared.py data/n4_shared.zip   # kiểm tra một gói nhận được (zip hoặc thư mục)
 python scripts/eval_shared.py                  # B0, V2, V4, V5 trên benchmark chung → results/figures/shared_benchmark.md
-python scripts/eval_shared.py --external N4-dense=<run_dense>.csv   # chấm thêm run file của Nhóm 4
+python scripts/eval_shared.py --external N4-dense=<run_dense>.csv   # chấm run file của Nhóm 4 và trộn RRF với V4
+python scripts/eval_shared.py --external N4-dense=<run_dense>.csv --fuse V4+N4-dense V5+N4-dense
 python -m pytest -q tests/test_shared_data.py
 ```
 
@@ -98,7 +99,8 @@ thống kê phụ thuộc lấy từ train của `random`, không chứa theorem
 ## 7. Bàn giao Nhóm 4
 
 Nhóm 4 nhận nguyên gói (hoặc tự dựng lại bằng `export_n4_shared.py` và đối chiếu SHA-256), rồi trả run file theo mục 3.
-Nhóm 3 chỉ chấm run file đó bằng `eval_shared.py`, không sửa kết quả của nhóm khác.
+Nhóm 3 chỉ chấm run file đó bằng `eval_shared.py`, không sửa kết quả của nhóm khác. Trộn RRF dùng điểm 1/(60 + hạng), trọng số bằng
+nhau, giống `scripts/fuse_rrf.py`; gói chỉ có tập test nên không tinh chỉnh hằng số hay trọng số.
 
 ## 8. Khác biệt với benchmark mức tactic của báo cáo
 

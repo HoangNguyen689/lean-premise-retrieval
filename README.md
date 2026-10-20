@@ -68,7 +68,8 @@ bằng `full_name`, 898 theorem của `random/test`, truy vấn là statement c�
 
 158 truy vấn của gói còn chứa phần chứng minh, và phần này thường gọi thẳng tên premise đúng; lát `signature` bỏ các truy
 vấn đó. Hai benchmark khác đơn vị truy vấn nên số liệu ở đây không so trực tiếp với bảng phía trên. Khi có run file của
-Nhóm 4: `python scripts/eval_shared.py --external N4-dense=<run_dense>.csv`.
+Nhóm 4: `python scripts/eval_shared.py --external N4-dense=<run_dense>.csv` (chấm cùng quy tắc, rồi trộn RRF với V4).
+Kết quả trên gói này nằm ở Bảng C.5 của báo cáo.
 
 ## Kiến trúc
 
