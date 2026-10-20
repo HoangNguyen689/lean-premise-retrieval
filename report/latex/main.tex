@@ -587,9 +587,10 @@ LeanDojo~\cite{yang2023} cạnh kết quả của nhóm: hai dòng BM25 lấy t�
 ở Phụ lục D (một snapshot LeanDojo Benchmark 4 cũ hơn v10). Vì khác benchmark và snapshot, các con số chỉ cho thấy kết quả của
 nhóm nằm trong cùng khoảng giá trị với các hệ thống sparse retrieval đã công bố; chúng không dùng để xếp hạng hệ thống hay
 xác nhận tính đúng của pipeline. Tính đúng được kiểm tra bằng unit test, đối chiếu với cài đặt tham chiếu và với Lucene
-(Mục~\ref{sec:load}). So sánh với Nhóm 4 trên benchmark chung (\code{docs/benchmark\_spec.md}) sẽ dùng cùng kiểm định và
-trộn kết quả bằng Reciprocal Rank Fusion với hằng số 60~\cite{cormack2009}. Script trộn đã sẵn sàng nhưng chưa chạy trên kết
-quả thật, nên phần này chưa hoàn tất.\label{sec:group4} \canchot{Bảng so sánh với Nhóm 4: chờ tệp kết quả và xác nhận đặc tả.}
+(Mục~\ref{sec:load}). So sánh với Nhóm 4 dùng gói \code{n4\_shared} ở mức theorem, khác benchmark của các bảng trên
+(Bảng~\ref{tab:shared}): V4 đạt Recall@10 0,418, và 0,347 khi bỏ 158 truy vấn còn chứa chứng minh. Khi có tệp kết quả của
+Nhóm 4, script đã có sẵn sẽ chấm theo cùng quy tắc rồi trộn với V4 bằng Reciprocal Rank Fusion với hằng
+số 60~\cite{cormack2009}.\label{sec:group4} \canchot{Chờ tệp kết quả của Nhóm 4.}
 
 \section{Độ bền của kết quả V5}\label{sec:robust}
 
@@ -890,7 +891,7 @@ lại với lô Arrow và gộp posting theo partition, Spark local[8] nhanh hơ
 chỉ mục ba trường) và 3,84 lần trên corpus nhân bản 3,6 triệu bản ghi, đều trên một máy. Cách tổ chức job, đặc biệt là gộp
 dữ liệu trước khi shuffle, quyết định lợi ích của xử lý song song.
 
-Sản phẩm bàn giao gồm đặc tả benchmark, pipeline trích xuất có kiểm tra chất lượng, chỉ mục đảo tái tạo được kèm manifest,
+Sản phẩm bàn giao gồm đặc tả benchmark, gói benchmark chung với Nhóm 4, pipeline trích xuất có kiểm tra chất lượng, chỉ mục đảo tái tạo được kèm manifest,
 dịch vụ truy vấn qua API và CLI, baseline BM25, reranker cấu trúc, các script đánh giá, ablation và phân tích lỗi, README
 và kịch bản demo. Các bảng và hình của báo cáo được sinh bằng script từ kết quả thô và các lần chạy đã ghim; nguồn của
 từng bảng, từng hình và mã SHA-256 của đầu vào ghi trong \code{tables/SOURCES.md} và \code{figures/SOURCES.md}. Các việc còn phải do thành viên thực
@@ -998,7 +999,7 @@ trình chọn tham số và các thí nghiệm quy mô, tải, Lucene.
 
 \begin{Verbatim}[fontsize=\footnotesize,frame=single,framesep=2mm,commandchars=\\\{\}]
 \textrm{\# dựng lại đúng bản đã phát hành từ các lần chạy đã ghim}
-python -m pytest -q                                   \textrm{\# 58 unit test}
+python -m pytest -q                                   \textrm{\# 68 unit test}
 bash report/latex/build.sh                 \textrm{\# hoặc --compile-only: chỉ biên dịch}
 
 \textrm{\# tái tạo từ đầu, ghim lại lần chạy mới nhất rồi dựng báo cáo}
@@ -1009,6 +1010,7 @@ python -m n3.eval.run_eval --config configs/v4_rerank_dep.yaml \textbackslash
     --eval random_test_all
 python -m n3.serving.cli --query-id random:val:36:0 --mode V5 -k 5
 uvicorn n3.serving.api:app --port 8000 --workers 4
+python scripts/eval_shared.py [--external N4-dense=<run>.csv]  \textrm{\# benchmark chung với Nhóm 4}
 
 \textrm{\# cập nhật phân tích sau khi có lần chạy mới (thay đổi bản đã ghim)}
 python scripts/pin_runs.py && python scripts/ablation_significance.py
@@ -1104,6 +1106,8 @@ Giới hạn thời gian & mỗi yêu cầu của client kiểm tra tải có ti
 \section{Truy hồi, phục vụ và xây chỉ mục}
 
 \input{tables/leandojo}
+
+\input{tables/shared}
 
 \input{tables/v5grid}
 

@@ -1,0 +1,18 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Kết quả trên benchmark chung với Nhóm 4]{Kết quả trên benchmark chung với Nhóm 4: gói \code{n4\_shared} gồm 180.907 premise định danh bằng \code{full\_name} và 898 theorem của \code{random/test}, mỗi truy vấn là statement của một theorem}\label{tab:shared}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+& \multicolumn{4}{c}{Toàn bộ (882 truy vấn)} & \multicolumn{2}{c}{Không chứa chứng minh (727)} \\
+\cmidrule(lr){2-5}\cmidrule(l){6-7}
+Hệ thống & R@1 & R@10 & R@50 & MRR & R@10 & MRR \\
+\midrule
+B0 & 0,069 & 0,215 & 0,323 & 0,256 & 0,190 & 0,221 \\
+V2 & 0,098 & 0,313 & 0,460 & 0,349 & 0,240 & 0,265 \\
+V4 & 0,138 & 0,418 & 0,561 & 0,484 & 0,347 & 0,412 \\
+V5 & 0,135 & 0,432 & 0,636 & 0,488 & 0,369 & 0,414 \\
+\bottomrule
+\end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: Mọi hệ thống loại chính theorem truy vấn trước khi cắt top-k; V4 và V5 lọc thêm accessible premise. 16 truy vấn không có premise đúng trong corpus không được chấm. Chênh lệch Recall@10 trên tập toàn bộ, B0 sang V2 $+$0,098 (p Holm 0,0003), V2 sang V4 $+$0,105 (p Holm 0,0003), V4 sang V5 $+$0,014 (p Holm 0,0812); trên tập không chứa chứng minh, B0 sang V2 $+$0,050 (p Holm 0,0003), V2 sang V4 $+$0,108 (p Holm 0,0003), V4 sang V5 $+$0,022 (p Holm 0,0172).\par}
+\end{table}

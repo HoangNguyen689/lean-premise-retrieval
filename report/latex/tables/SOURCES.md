@@ -13,6 +13,7 @@ Mọi bảng số liệu của báo cáo được sinh từ các tệp dưới �
 | `tables/candidates.tex` | results/figures/robustness/candidates.csv (scripts/candidate_analysis.py) |
 | `tables/v5grid.tex` | results/raw/tuning/V5__extra__random_val_all.csv (scripts/tune_v5.py); manifest V4|random_val_all |
 | `tables/leandojo.tex` | Yang và cộng sự (2023), arXiv:2306.15626, Bảng 1 và Bảng B; manifest cho các dòng của nhóm |
+| `tables/shared.tex` | results/raw/shared/shared-20261020-112058-e591.json (đã ghim trong report_records.json); src/n3/shared.py |
 | `tables/lucene.tex` | results/raw/lucene/*.json (scripts/lucene_baseline.py); manifest B0|random_test_all |
 | `tables/v5load.tex` | results/raw/loadtest/*.json, tag v5cmp2-r* (run_scale.py --part serve_v5_k240) |
 | `tables/workers.tex` | results/raw/loadtest/*.json tag workers-*; results/raw/serve-memory/*.json (run_scale.py --part serve2) |
@@ -73,7 +74,7 @@ Mọi bảng số liệu của báo cáo được sinh từ các tệp dưới �
 |---|---|
 | `results/figures/ablation_significance.csv` | `84938f2a32d12d8d842d8032ef120f06f959c4fe86a3841f2245964756549043` |
 | `results/figures/report_manifest.json` | `608d4e7a8de99826f58132d778b661bf1d3b9d0b84910849b886c4b58df686af` |
-| `results/figures/report_records.json` | `3f7c476a52ee4d91e457b9e42990a72330420e023eb6b15fc19a7207701529dc` |
+| `results/figures/report_records.json` | `8c3b4fb58f53870134636bd6a79f4dc2c4699fc25c8891f7a0353fc9b2f4fe48` |
 | `results/figures/robustness/candidates.csv` | `0b1a31325ccf9a36a258b49fba7d55100b7235a3ebbee65b4eec75267b542d66` |
 | `results/figures/robustness/data_flow.csv` | `e84adbc96ca71d84a6eaafb8d8f80f0cafcc313eb4100aef5d6cbff374d21049` |
 | `results/figures/robustness/macro.csv` | `83b80a04f64e1ebd5e8f8f1d904b5185f8802f6236966014147aa90bbe213c56` |
@@ -469,4 +470,5 @@ Mọi bảng số liệu của báo cáo được sinh từ các tệp dưới �
 | `results/raw/serve-memory/serve-memory-20261018-212707-7d1c.json` | `97be1f2b6626a77ae2a13b9453c411397f8842a2009957b3b32a7aec3da14156` |
 | `results/raw/serve-memory/serve-memory-20261018-213014-3c91.json` | `711f752acc442504b3bc00e1a1ec0bf1fc33b8faafd70b6ca7da527f39d71b43` |
 | `results/raw/serve-memory/serve-memory-20261018-213319-2034.json` | `10269fc470dc393ab9f4dd72967716626db10d07712e3220ef586ae106529413` |
+| `results/raw/shared/shared-20261020-112058-e591.json` | `cb6f956526266b599bded1c56c545444ab31465dda4eeccf24093261cd39a021` |
 | `results/raw/tuning/V5__extra__random_val_all.csv` | `371067979f87cb2aab618be9ceaa9a5f6d23b493c3e6337c096ae33bd3e2e112` |

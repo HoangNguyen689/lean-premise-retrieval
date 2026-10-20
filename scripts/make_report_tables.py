@@ -19,6 +19,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from n3.runlog import file_sha256  # noqa: E402
+from n3.shared import EXPECTED_COUNTS  # noqa: E402
 
 FIG = ROOT / "results" / "figures"
 RAW = ROOT / "results" / "raw"
@@ -301,6 +302,30 @@ def t_leandojo():
           short="Bối cảnh: số liệu công bố của LeanDojo", env="tabularx")
 
 
+def t_shared():
+    """Benchmark chung N3/N4 (gói n4_shared): lần chạy scripts/eval_shared.py đã ghim, mới nhất nếu có nhiều lần."""
+    rec = max(load_records("shared"), key=lambda r: r["timestamp"])
+    m, sl = rec["metrics"], {"all": "toàn bộ", "signature": "không chứa chứng minh"}
+    n_all, n_sig = (next(iter(m.values()))[s]["n"] for s in sl)
+    body = [f"& \\multicolumn{{4}}{{c}}{{Toàn bộ ({n(n_all)} truy vấn)}} & "
+            f"\\multicolumn{{2}}{{c}}{{Không chứa chứng minh ({n(n_sig)})}} \\\\",
+            "\\cmidrule(lr){2-5}\\cmidrule(l){6-7}", "Hệ thống & R@1 & R@10 & R@50 & MRR & R@10 & MRR \\\\", "\\midrule"]
+    body += [f"{s} & " + " & ".join(f(v["all"][k]) for k in ("R@1", "R@10", "R@50", "MRR")) + " & "
+             + " & ".join(f(v["signature"][k]) for k in ("R@10", "MRR")) + " \\\\" for s, v in m.items()]
+    steps = "; ".join(f"trên tập {sl[s]}, " + ", ".join(
+        f"{c['a']} sang {c['b']} {sg(c['delta_R@10'])} (p Holm {p(c['p_holm'])})"
+        for c in rec["comparisons"] if c["slice"] == s) for s in sl)
+    write("shared", f"Kết quả trên benchmark chung với Nhóm 4: gói \\code{{n4\\_shared}} gồm "
+          f"{n(EXPECTED_COUNTS['corpus.jsonl'])} premise định danh bằng \\code{{full\\_name}} và "
+          f"{n(EXPECTED_COUNTS['queries.jsonl'])} theorem của \\code{{random/test}}, mỗi truy vấn là statement của một "
+          "theorem", "tab:shared", body, "@{}l" + "r" * 6 + "@{}",
+          f"results/raw/shared/{rec['run_id']}.json (đã ghim trong report_records.json); src/n3/shared.py",
+          short="Kết quả trên benchmark chung với Nhóm 4",
+          note="Mọi hệ thống loại chính theorem truy vấn trước khi cắt top-k; V4 và V5 lọc thêm accessible premise. "
+               f"{n(rec['n_queries'] - rec['n_scored'])} truy vấn không có premise đúng trong corpus không được chấm. "
+               f"Chênh lệch Recall@10 {steps}.")
+
+
 def t_lucene():
     recs = {}
     for r in load_records("lucene"):
@@ -514,7 +539,7 @@ def t_ablation():
 
 
 def main() -> None:
-    for fn in (t_dataflow, t_quality, t_signif, t_robust, t_unseen, t_controls, t_candidates, t_v5grid, t_leandojo, t_lucene, t_v5load,
+    for fn in (t_dataflow, t_quality, t_signif, t_robust, t_unseen, t_controls, t_candidates, t_v5grid, t_leandojo, t_shared, t_lucene, t_v5load,
                t_workers, t_build, t_engines, t_profile, t_errors, t_ablation):
         fn()
     lines = ["# Nguồn của từng bảng (sinh bởi scripts/make_report_tables.py)", "",

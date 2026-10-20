@@ -35,11 +35,11 @@ def main() -> None:
     out.write_text(json.dumps(dict(sorted(latest.items())), ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{len(latest)} lần chạy được ghim vào {out.relative_to(ROOT)}")
 
-    # Các bảng tải, xây chỉ mục, Lucene và ablation tổng hợp nhiều run record: ghim danh sách run_id hiện có, để một lần
+    # Các bảng tải, xây chỉ mục, Lucene, benchmark chung N3/N4 và ablation tổng hợp nhiều run record: ghim danh sách run_id hiện có, để một lần
     # chạy phát sinh sau đó không lọt vào bảng của bản báo cáo.
     raw = ROOT / "results" / "raw"
     records = {kind: sorted(f.stem for f in (raw / kind).glob("*.json"))
-               for kind in ("loadtest", "build", "lucene", "serve-memory", "serve-cpu", "codec")}
+               for kind in ("loadtest", "build", "lucene", "serve-memory", "serve-cpu", "codec", "shared")}
     # lần chạy chất lượng theo kích thước chỉ mục, dùng cho Hình chất lượng và độ trễ theo kích thước
     records["eval-scale"] = sorted(f.stem for f in (raw / "eval").glob("*.json")
                                    if json.loads(f.read_text(encoding="utf-8"))["parameters"].get("tag") == "scale-quality")

@@ -2,7 +2,7 @@
 
 | Tệp | SHA-256 |
 |---|---|
-| `results/figures/report_records.json` | `3f7c476a52ee4d91e457b9e42990a72330420e023eb6b15fc19a7207701529dc` |
+| `results/figures/report_records.json` | `8c3b4fb58f53870134636bd6a79f4dc2c4699fc25c8891f7a0353fc9b2f4fe48` |
 | `results/raw/build/build-20261017-191227-bdc6.json` | `2fcc515312445ed51c58d566ad6b34312bdafd3c4904554f9164e4932003ee2b` |
 | `results/raw/build/build-20261017-191244-3a75.json` | `a5e2263bbcf0d5f5f9f610f9fa18f93450490e7fdea276d99a1f8f32ee5768a8` |
 | `results/raw/build/build-20261017-191310-e96d.json` | `073a8a5e053aba4419a6f1197e8b7ab0048e4fb4da85dc312e77de14bf613001` |
