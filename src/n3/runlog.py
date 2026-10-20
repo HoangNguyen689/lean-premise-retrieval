@@ -36,6 +36,16 @@ def code_hash() -> str:
     return h.hexdigest()[:12]
 
 
+def file_sha256(path: str | Path) -> str:
+    """SHA-256 dùng để ghim đầu vào của báo cáo. Tệp văn bản được băm ở dạng xuống dòng LF vì Git lưu LF và đổi xuống dòng
+    khi checkout theo core.autocrlf; tệp nhị phân (có byte NUL trong 8000 byte đầu, cùng cách Git nhận biết) băm nguyên
+    byte. Nhờ vậy giá trị như nhau trên Windows, Linux và với mọi cấu hình Git."""
+    data = Path(path).read_bytes()
+    if b"\0" not in data[:8000]:
+        data = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
 def machine_info() -> dict:
     return {
         "os": f"{platform.system()} {platform.release()} ({platform.version()})",

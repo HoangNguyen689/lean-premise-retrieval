@@ -5,6 +5,10 @@ make_figures.py --report ghi lại lúc sinh bản phát hành), tính lại SHA
 report/latex/build.sh gọi script này trước khi sinh lại bảng và hình; nếu có lệch, build dừng thay vì âm thầm tạo bảng
 khác bản đã phát hành. Muốn chủ ý cập nhật báo cáo bằng dữ liệu mới thì dùng build.sh --update.
 
+SHA-256 được ghi trên tệp lúc sinh: tệp ghi trên Windows có xuống dòng CRLF, tệp ghi trong Docker Linux có LF, còn Git
+lưu LF và đổi xuống dòng khi checkout theo core.autocrlf. Vì vậy một tệp được coi là khớp nếu chính nó, hoặc cùng nội
+dung đổi hết sang LF hay CRLF, có SHA-256 đã ghi. Tệp nhị phân (Parquet, PNG) Git không đổi nên vẫn khớp ở dạng gốc.
+
 Dùng:  python scripts/verify_report_inputs.py
 Thoát: 0 nếu mọi tệp khớp, 1 nếu có tệp thiếu hoặc lệch.
 """
@@ -18,6 +22,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFESTS = [ROOT / "report" / "latex" / "tables" / "SOURCES.md", ROOT / "report" / "latex" / "figures" / "SOURCES.md"]
 ROW = re.compile(r"^\| `([^`]+)` \| `([0-9a-f]{64})` \|$")
+
+
+def digests(data: bytes) -> set[str]:
+    """SHA-256 của tệp ở dạng gốc, dạng xuống dòng LF và dạng CRLF."""
+    lf = data.replace(b"\r\n", b"\n")
+    return {hashlib.sha256(form).hexdigest() for form in (data, lf, lf.replace(b"\n", b"\r\n"))}
 
 
 def main() -> int:
@@ -34,7 +44,7 @@ def main() -> int:
             checked += 1
             if not path.exists():
                 bad.append(f"thiếu {r.group(1)}")
-            elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            elif expected not in digests(path.read_bytes()):
                 bad.append(f"lệch  {r.group(1)}")
     for b in bad:
         print(b)

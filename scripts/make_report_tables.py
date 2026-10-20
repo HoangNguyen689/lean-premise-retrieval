@@ -8,8 +8,8 @@ Dùng:  python scripts/make_report_tables.py
 """
 from __future__ import annotations
 
-import hashlib
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -17,6 +17,9 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from n3.runlog import file_sha256  # noqa: E402
+
 FIG = ROOT / "results" / "figures"
 RAW = ROOT / "results" / "raw"
 OUT = ROOT / "report" / "latex" / "tables"
@@ -523,7 +526,7 @@ def main() -> None:
               "|---|---|"] + [f"| {k} | `{v['run_id']}` |" for k, v in man.items()]
     lines += ["", "## Tệp đầu vào và SHA-256 tại thời điểm sinh bảng", "", "| Tệp | SHA-256 |", "|---|---|"]
     for x in sorted(INPUTS):
-        lines.append(f"| `{x.relative_to(ROOT).as_posix()}` | `{hashlib.sha256(x.read_bytes()).hexdigest()}` |")
+        lines.append(f"| `{x.relative_to(ROOT).as_posix()}` | `{file_sha256(x)}` |")
     (OUT / "SOURCES.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(SOURCES)} bảng trong {OUT.relative_to(ROOT)}")
 

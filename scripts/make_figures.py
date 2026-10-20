@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -22,6 +23,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
 RAW = ROOT / "results" / "raw"
 FIG = ROOT / "results" / "figures"
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
@@ -517,10 +519,10 @@ def main() -> None:
         (FIG / "scale_tables.md").write_text("\n".join(md) + "\n", encoding="utf-8")
         print("\n".join(md))
     else:   # nguồn của từng hình kèm SHA-256, đối chiếu bằng scripts/verify_report_inputs.py
-        import hashlib
+        from n3.runlog import file_sha256
         lines = ["# Tệp đầu vào của các hình (sinh bởi scripts/make_figures.py --report)", "",
                  "| Tệp | SHA-256 |", "|---|---|"]
-        lines += [f"| `{x.relative_to(ROOT).as_posix()}` | `{hashlib.sha256(x.read_bytes()).hexdigest()}` |"
+        lines += [f"| `{x.relative_to(ROOT).as_posix()}` | `{file_sha256(x)}` |"
                   for x in sorted(INPUTS)]
         (FIG / "SOURCES.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
