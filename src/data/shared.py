@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import re
 import zipfile
 from collections import Counter
 from pathlib import Path
@@ -49,6 +51,7 @@ def _keys(rec: dict, expected: set[str], label: str, lineno: int) -> None:
 
 
 def theorem_id(query_id: str) -> str:
+    # Query ID convention from original N3 exporter is 'Q' + theorem full_name.
     return query_id[1:] if query_id.startswith('Q') else query_id
 
 

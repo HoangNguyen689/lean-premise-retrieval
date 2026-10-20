@@ -1,4 +1,4 @@
-# Hoàng — Data/extraction: N3 ↔ N4 frozen benchmark
+# Data/extraction: N3 ↔ N4 frozen benchmark
 
 ## Scope
 The source of truth is the **attached** `n4_shared.zip`, not an independently rebuilt split. Existing group code for indexing, BM25, hybrid and serving is untouched. The original group ZIP is the baseline. This module validates the shared data instead of rewriting it.
