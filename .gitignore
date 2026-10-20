@@ -16,3 +16,8 @@ results/raw/lucene/*/
 # bản biên dịch trung gian; bản nộp là report/report.pdf
 report/latex/main.pdf
 *.egg-info/
+# Công cụ ngoài đặt cục bộ (Anserini, Tectonic), không đưa vào Git
+tools/
+# Gói benchmark chung N3/N4 tái tạo bằng scripts/export_n4_shared.py; báo cáo kiểm tra của scripts/verify_n4_shared.py
+*.zip
+results/data_quality/

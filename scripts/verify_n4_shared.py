@@ -7,12 +7,13 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
-from data.shared import ContractError,verify_archive,verify_directory
+from n3.shared import ContractError,verify_archive,verify_directory
 
 
 def main() -> int:
     p=argparse.ArgumentParser()
-    p.add_argument('input',help='Path to n4_shared.zip or directory with corpus.jsonl and queries.jsonl')
+    p.add_argument('input',nargs='?',default=str(ROOT/'data'/'n4_shared'),
+                   help='Path to n4_shared.zip or directory with corpus.jsonl and queries.jsonl (default: data/n4_shared)')
     p.add_argument('--report',default='results/data_quality/shared_validation.json')
     args=p.parse_args()
     try:

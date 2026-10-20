@@ -1,4 +1,8 @@
-"""Pinned N3/N4 LeanDojo Benchmark 4 corpus/query validator (Hoàng)."""
+"""Frozen N3/N4 shared benchmark: pinned LeanDojo Benchmark 4 corpus/query contract (Data/extraction, Hoàng).
+
+The validator checks an untouched copy of the bundle given to Nhóm 4 (n4_shared.zip). build_records and write_bundle
+rebuild the same bytes from the raw LeanDojo release, so the bundle is reproducible without the zip.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -9,6 +13,8 @@ import zipfile
 from collections import Counter
 from pathlib import Path
 from typing import BinaryIO, Iterator
+
+from n3.extract.leandojo import _strip_attributes, statement_of
 
 DATA_VERSION = 'leandojo-benchmark-4@29dcec07+split-v1.0'
 SOURCE_COMMIT = '29dcec074de168ac2bf835a77ef68bbe069194c5'
@@ -169,3 +175,68 @@ def verify_archive(path: Path, *, strict_counts: bool = True) -> dict:
                 if f'{digest}  {name}' not in raw:
                     raise ContractError(f'checksums.txt mismatch for {name}')
         return dict(report,checksums_sha256=actual,source=str(path))
+
+
+def _traced_premises(theorem: dict) -> set[str]:
+    """full_name of every premise annotated in any traced tactic of the theorem."""
+    names: set[str] = set()
+    for tactic in theorem.get('traced_tactics') or []:
+        annotated = tactic.get('annotated_tactic') or []
+        if isinstance(annotated, list) and len(annotated) >= 2 and isinstance(annotated[1], list):
+            names.update(p['full_name'] for p in annotated[1] if p.get('full_name'))
+    return names
+
+
+def build_records(leandojo_dir: Path) -> tuple[list[dict], list[dict]]:
+    """Rebuild the frozen corpus and query records from the raw LeanDojo Benchmark 4 release.
+
+    Same rules as the original exporter (scripts/build_real_corpus.py and export_n4_shared.py at b1fbb35):
+    corpus = every premise of corpus.jsonl, deduplicated by full_name (first occurrence wins), sorted by id;
+    queries = random/test theorems with at least one annotated premise, statement = the theorem's corpus code,
+    relevant_ids = annotated premises present in the corpus (may be empty), sorted by id.
+    """
+    root = Path(leandojo_dir)
+    code: dict[str, str] = {}
+    with (root / 'corpus.jsonl').open(encoding='utf-8') as f:
+        for line in f:
+            for p in json.loads(line)['premises']:
+                code.setdefault(p['full_name'], p.get('code', ''))
+    corpus = [{'id': n, 'name': n, 'statement': code[n], 'namespace': n.rsplit('.', 1)[0] if '.' in n else '',
+               'source_commit': SOURCE_COMMIT} for n in sorted(code)]
+    queries = []
+    for thm in json.loads((root / 'random' / 'test.json').read_text(encoding='utf-8')):
+        used = _traced_premises(thm)
+        if not used:
+            continue
+        name = thm['full_name']
+        queries.append({'id': 'Q' + name, 'statement': code.get(name, name),
+                        'relevant_ids': sorted(p for p in used if p in code), 'split': 'test', 'pool_id': POOL_ID})
+    queries.sort(key=lambda q: q['id'])
+    return corpus, queries
+
+
+def write_bundle(out_dir: Path, corpus: list[dict], queries: list[dict]) -> dict[str, str]:
+    """Write corpus.jsonl, queries.jsonl and checksums.txt; return the SHA-256 of the two JSONL files.
+
+    The frozen bytes have CRLF line endings because the original export ran on Windows in text mode, so the line
+    ending is fixed here to give the same SHA-256 on every OS.
+    """
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    digests = {}
+    for name, rows in (('corpus.jsonl', corpus), ('queries.jsonl', queries)):
+        with (out / name).open('w', encoding='utf-8', newline='\r\n') as f:
+            for r in rows:
+                f.write(json.dumps(r, ensure_ascii=False) + '\n')
+        with (out / name).open('rb') as f:
+            digests[name] = checksum(f)
+    lines = [f'# N3/N4 shared benchmark {DATA_VERSION}', f'# pool_id: {POOL_ID}',
+             *(f'{d}  {n}' for n, d in digests.items())]
+    (out / 'checksums.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+    return digests
+
+
+def has_proof_body(statement: str) -> bool:
+    """True if a query statement carries the declaration body after ':=' (LeanDojo `code` keeps the proof of some
+    theorems). Such a proof usually names the gold premises, so these queries leak their labels."""
+    return len(statement_of(statement)) < len(_strip_attributes(statement).rstrip())
