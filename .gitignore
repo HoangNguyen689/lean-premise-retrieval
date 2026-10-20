@@ -1,0 +1,14 @@
+# No large datasets in Git (INT4418)
+data_raw/
+results/n4_shared/
+results/real/*.parquet
+results/real/corpus_*.csv
+results/real/queries_*.csv
+results/real/qrels_*.csv
+results/real/run_*.csv
+results/data_quality/
+*.zip
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
