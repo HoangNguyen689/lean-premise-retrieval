@@ -1,4 +1,4 @@
-# Môi trường chính (.venv): Python 3.13.0, Windows 11. Cài: python -m pip install -r requirements/main.lock.txt && python -m pip install -e .
+# Main environment (.venv): Python 3.13.0, Windows 11. Install: python -m pip install -r requirements/main.lock.txt && python -m pip install -e .
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
