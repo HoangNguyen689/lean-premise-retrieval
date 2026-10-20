@@ -1,0 +1,26 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Thời gian xây chỉ mục bằng engine Arrow]{Thời gian xây chỉ mục (giây, trung vị của 3 lần, gồm cả thời gian khởi động Spark). Tăng tốc là thời gian tuần tự chia cho thời gian Spark local[8] trên cùng nền tảng; hai mức cuối là corpus nhân bản 5 và 20 lần}\label{tab:build}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Nền tảng và chỉ mục & Cách xây & 10K & 181K & 905K & 3,6 triệu \\
+\midrule
+\multirow{3}{*}{Windows, ba trường} & Tuần tự & 2,3 & 23,1 & 77,7 & 284,7 \\
+ & Spark local[8] & 22,6 & 29,2 & 44,6 & 96,3 \\
+ & Tăng tốc & 0,10 & 0,79 & \textbf{1,74} & \textbf{2,96} \\
+\midrule
+\multirow{3}{*}{Linux, ba trường} & Tuần tự & 2,5 & 28,7 & 101,1 & 366,8 \\
+ & Spark local[8] & 10,9 & 18,7 & 37,3 & 95,6 \\
+ & Tăng tốc & 0,23 & \textbf{1,53} & \textbf{2,71} & \textbf{3,84} \\
+\midrule
+\multirow{3}{*}{Windows, B0} & Tuần tự & 1,2 & 5,9 & 17,0 & 58,9 \\
+ & Spark local[8] & 22,4 & 23,3 & 27,2 & 37,0 \\
+ & Tăng tốc & 0,05 & 0,25 & 0,63 & \textbf{1,59} \\
+\midrule
+\multirow{3}{*}{Linux, B0} & Tuần tự & 1,0 & 6,7 & 20,4 & 71,5 \\
+ & Spark local[8] & 10,4 & 12,3 & 17,4 & 30,9 \\
+ & Tăng tốc & 0,10 & 0,55 & \textbf{1,17} & \textbf{2,31} \\
+\bottomrule
+\end{tabular}
+\end{table}

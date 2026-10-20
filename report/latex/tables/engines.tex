@@ -1,0 +1,17 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[So sánh hai engine Spark]{So sánh hai engine Spark, chỉ mục B0, Spark local[4] (trung vị của 3 lần; engine RDD ở 3,6 triệu bản ghi chạy 1 lần trên mỗi nền tảng; engine RDD ở 905K chỉ đo trên Windows)}\label{tab:engines}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+& & \multicolumn{2}{c}{Thời gian (s)} & \multicolumn{2}{c}{RAM đỉnh (GB)} \\
+\cmidrule(lr){3-4}\cmidrule(l){5-6}
+Kích thước & Engine & Windows & Linux & Windows & Linux \\
+\midrule
+905K & RDD & 41,0 &  & 3,8 &  \\
+905K & Arrow & 23,5 & 19,2 & 1,5 & 2,8 \\
+3,6 triệu & RDD & 106,7 & 109,7 & 11,4 & 12,2 \\
+3,6 triệu & Arrow & 35,7 & 35,7 & 2,0 & 3,9 \\
+\bottomrule
+\end{tabular}
+\end{table}

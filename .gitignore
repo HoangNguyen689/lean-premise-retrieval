@@ -1,14 +1,18 @@
-# No large datasets in Git (INT4418)
-data_raw/
-results/n4_shared/
-results/real/*.parquet
-results/real/corpus_*.csv
-results/real/queries_*.csv
-results/real/qrels_*.csv
-results/real/run_*.csv
-results/data_quality/
-*.zip
-__pycache__/
-*.py[cod]
-.pytest_cache/
 .venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# Dữ liệu lớn: chỉ giữ manifest, script và data_sample
+data/
+!data/README.md
+indexes/
+results/runs/
+spark-warehouse/
+*.log
+.venv-spark/
+tmp/
+# chỉ mục và tệp run của Lucene tái tạo được bằng scripts/lucene_baseline.py; giữ run record JSON
+results/raw/lucene/*/
+# bản biên dịch trung gian; bản nộp là report/report.pdf
+report/latex/main.pdf
+*.egg-info/

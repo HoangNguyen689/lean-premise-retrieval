@@ -1,0 +1,39 @@
+# Đối chứng cùng ngân sách ứng viên: V4 với 240 ứng viên BM25F (V5 có trung bình khoảng 232 đến 239 ứng viên).
+index:
+  codec: vb
+  fields:
+  - name
+  - namespace
+  - statement
+  tokenizer: lean
+name: V4-K240
+rerank:
+  accessible_filter: true
+  candidates: 240
+  features:
+  - bm25_rel
+  - bm25_rr
+  - ns_in_query
+  - ns_thm
+  - same_file
+  - dir_overlap
+  - sym_jaccard
+  - kind_thm
+  - kind_def
+  - kind_inst
+  - kind_type
+  - popularity
+  - pagerank
+  model: results/models/review/v4k240.json
+  strategy: random
+search:
+  b:
+    name: 1.0
+    namespace: 1.0
+    statement: 1.0
+  k1: 3.0
+  query_tf: binary
+  weights:
+    name: 1.0
+    namespace: 0.5
+    statement: 1.0

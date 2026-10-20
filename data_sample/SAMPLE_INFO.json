@@ -1,0 +1,8 @@
+{
+  "source": "LeanDojo Benchmark 4 v10 (Zenodo 12740403), mathlib4 commit 29dcec07",
+  "n_premises": 1000,
+  "n_queries": 200,
+  "n_qrels": 379,
+  "seed": 42,
+  "note": "premise_id giống bản đầy đủ; chỉ để chạy thử, không dùng để báo cáo kết quả"
+}

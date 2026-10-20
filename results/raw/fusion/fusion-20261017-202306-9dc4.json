@@ -1,0 +1,46 @@
+{
+  "run_id": "fusion-20261017-202306-9dc4",
+  "kind": "fusion",
+  "timestamp": "2026-10-17T13:23:06+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "0af77973b7e2",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "runs": [
+      "results/runs/eval-V4-20261017-194917-88cd.tsv",
+      "results/runs/eval-B0-20261017-185614-87d3.tsv"
+    ],
+    "eval_set": "random_test_all",
+    "k": 60,
+    "weights": null,
+    "name": "smoke-V4+B0"
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.0629536357243665,
+    "R@5": 0.14298342334597539,
+    "R@10": 0.1916542611118529,
+    "R@50": 0.3481241662286023,
+    "MRR": 0.1620657371183516,
+    "nDCG@10": 0.13591859901857772
+  },
+  "status": "ok",
+  "log": null
+}

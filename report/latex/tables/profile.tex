@@ -1,0 +1,20 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Thời gian theo bước của một truy vấn]{Thời gian theo bước của một truy vấn (ms, trung vị và P95 trong ngoặc), một tiến trình, chỉ mục đầy đủ, 500 truy vấn, bộ đệm đã nóng}\label{tab:profile}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Bước & B0 & V2 & V4 \\
+\midrule
+Tokenize & 0,03 (0,08) & 0,18 (0,56) & 0,17 (0,53) \\
+Cộng điểm BM25/BM25F & 12,41 (23,54) & 19,71 (36,10) & 18,26 (32,24) \\
+Tính mặt nạ accessible premise &  &  & 0,85 (1,24) \\
+Lọc và chọn top 100 & 0,67 (1,09) & 0,76 (1,14) & 0,87 (1,42) \\
+Tính 13 đặc trưng &  &  & 0,54 (0,96) \\
+Rerank và sắp xếp &  &  & 0,06 (0,10) \\
+\midrule
+Tổng & 13,14 (24,72) & 20,66 (37,59) & 20,89 (35,69) \\
+Tỉ lệ thời gian của BM25 & 95\% & 96\% & 88\% \\
+\bottomrule
+\end{tabular}
+\end{table}

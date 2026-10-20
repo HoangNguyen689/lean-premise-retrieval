@@ -1,0 +1,40 @@
+{
+  "run_id": "lucene-20261018-231842-b00c",
+  "kind": "lucene",
+  "timestamp": "2026-10-18T16:18:42+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "50e9470e64ad",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "variant": "b0-inprocess",
+    "eval_set": "random_test_all",
+    "config": "B0"
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "variant": "b0-inprocess",
+    "ms_per_query": 13.22,
+    "ms_per_query_all": 13.27,
+    "ms_p50": 12.98,
+    "n_queries": 2641
+  },
+  "status": "ok",
+  "log": null
+}

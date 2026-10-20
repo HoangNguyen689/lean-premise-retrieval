@@ -1,0 +1,108 @@
+{
+  "run_id": "eval-V4-poponly-20261018-225806-d905",
+  "kind": "eval",
+  "timestamp": "2026-10-18T15:59:09+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "50e9470e64ad",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "config": {
+      "index": {
+        "codec": "vb",
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean"
+      },
+      "name": "V4-poponly",
+      "rerank": {
+        "accessible_filter": true,
+        "candidates": 100,
+        "features": [
+          "bm25_rel",
+          "bm25_rr",
+          "ns_in_query",
+          "ns_thm",
+          "same_file",
+          "dir_overlap",
+          "sym_jaccard",
+          "kind_thm",
+          "kind_def",
+          "kind_inst",
+          "kind_type",
+          "popularity"
+        ],
+        "model": "results/models/review/v4_poponly.json",
+        "strategy": "random"
+      },
+      "search": {
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "k1": 3.0,
+        "query_tf": "binary",
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        }
+      }
+    },
+    "eval_set": "random_test_all",
+    "subset": "full",
+    "k": 100,
+    "tag": "review"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.07198301509168605,
+    "R@5": 0.1840001110211258,
+    "R@10": 0.2441505909841767,
+    "R@50": 0.3727708629834021,
+    "MRR": 0.19562600718498882,
+    "nDCG@10": 0.16960291489316234,
+    "latency_ms_p50": 23.29249999820604,
+    "latency_ms_p95": 39.322500000707805,
+    "latency_ms_mean": 24.075693752398855,
+    "qps_sequential": 41.53566706256853,
+    "n_queries": 2641
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V4-poponly-20261018-225806-d905.perquery.parquet",
+  "run_file": "results/runs/eval-V4-poponly-20261018-225806-d905.tsv"
+}

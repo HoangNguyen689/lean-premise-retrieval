@@ -1,0 +1,10 @@
+name: B0-vb
+index:
+  fields:
+  - statement
+  tokenizer: default
+  codec: vb
+search:
+  k1: 1.2
+  b: 0.75
+  query_tf: count

@@ -1,0 +1,22 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Bối cảnh: số liệu công bố của LeanDojo]{Số liệu công bố trong bài báo LeanDojo đặt cạnh kết quả của nhóm, chỉ để làm bối cảnh: các dòng của bài báo đo trên benchmark và snapshot khác nên không so sánh trực tiếp được}\label{tab:leandojo}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xrrrrrr@{}}
+\toprule
+& \multicolumn{3}{c}{\code{random}} & \multicolumn{3}{c}{\code{novel\_premises}} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Hệ thống & R@1 & R@10 & MRR & R@1 & R@10 & MRR \\
+\midrule
+BM25, toàn bộ premise (LeanDojo, Bảng 1, Lean 3) & 0,019 & 0,119 & 0,08 & 0,021 & 0,124 & 0,08 \\
+B0 của nhóm & 0,018 & 0,100 & 0,065 & 0,024 & 0,127 & 0,090 \\
+\midrule
+BM25, accessible premise (LeanDojo, Bảng 1, Lean 3) & 0,067 & 0,172 & 0,15 & 0,059 & 0,155 & 0,14 \\
+V2a của nhóm & 0,053 & 0,183 & 0,148 & 0,062 & 0,221 & 0,176 \\
+V4 của nhóm & 0,072 & 0,243 & 0,196 & 0,072 & 0,269 & 0,211 \\
+V5 của nhóm & 0,073 & 0,281 & 0,217 & 0,069 & 0,280 & 0,215 \\
+\midrule
+ReProver (LeanDojo, Bảng B, Lean 4, snapshot cũ hơn v10) & 0,128 & 0,347 & 0,29 & 0,098 & 0,321 & 0,24 \\
+\bottomrule
+\end{tabularx}
+\end{table}

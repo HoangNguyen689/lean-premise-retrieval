@@ -1,0 +1,21 @@
+# V5 = V4 + ứng viên bổ sung từ cấu trúc thư viện + hai đặc trưng sử dụng theo file và thư mục.
+# Lý do: error analysis của V4 cho thấy 82,7% premise đúng bị bỏ lỡ nằm ngoài top-100 của BM25F, trong đó nhiều premise
+# là bổ đề tổng quát rất phổ biến. Số ứng viên của từng nguồn chọn trên random_val_all bằng scripts/tune_v5.py.
+name: V5
+index:
+  fields: [name, namespace, statement]
+  tokenizer: lean
+  codec: vb
+search:
+  k1: 3.0
+  b: {name: 1.0, namespace: 1.0, statement: 1.0}
+  weights: {name: 1.0, namespace: 0.5, statement: 1.0}
+  query_tf: binary
+rerank:
+  candidates: 100
+  accessible_filter: true
+  strategy: random
+  extra: {file: 100, dir: 100, popular: 50}
+  features: [bm25_rel, bm25_rr, ns_in_query, ns_thm, same_file, dir_overlap, sym_jaccard,
+    kind_thm, kind_def, kind_inst, kind_type, popularity, pagerank, file_usage, dir_usage]
+  model: results/models/v5.json

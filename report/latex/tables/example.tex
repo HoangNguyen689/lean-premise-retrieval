@@ -1,0 +1,16 @@
+% Sinh bởi scripts/running_example.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Ví dụ xuyên suốt]{Ví dụ xuyên suốt: truy vấn validation \code{random:val:36:0}, gold premise \code{mul\_assoc}. Hạng lấy từ kết quả top 100 của từng biến thể; ba kết quả đầu theo thứ tự hạng}\label{tab:example}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{4.2cm}r>{\raggedright\arraybackslash}X@{}}
+\toprule
+Biến thể & Thay đổi & Hạng & Ba kết quả đầu \\
+\midrule
+B0 & BM25, tokenizer mặc định & ngoài top 100 & \code{Invertible.congr}; \code{invOf\_add\_invOf}; \code{invOf\_sub\_invOf} \\
+V2 & BM25F ba trường, tokenizer Lean & ngoài top 100 & \code{Invertible.congr}; \code{invOf\_add\_invOf}; \code{invOf\_sub\_invOf} \\
+V2a & V2 và bộ lọc accessible premise & ngoài top 100 & \code{Invertible}; \code{invOf\_mul\_self\_assoc}; \code{invOf\_mul\_self\_assoc'} \\
+V4 & V2a và reranker 13 đặc trưng & ngoài top 100 & \code{invOf\_mul\_self\_assoc}; \code{mul\_invOf\_self}; \code{invOf\_mul\_self} \\
+V5 & V4 và candidate từ lịch sử sử dụng & 2 & \code{invOf\_mul\_self}; \code{mul\_assoc}; \code{one\_mul} \\
+\bottomrule
+\end{tabularx}
+\end{table}

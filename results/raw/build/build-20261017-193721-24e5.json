@@ -1,0 +1,51 @@
+{
+  "run_id": "build-20261017-193721-24e5",
+  "kind": "build",
+  "timestamp": "2026-10-17T12:37:21+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "313a93d4b69a",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "builder": "sequential",
+    "size": "50k",
+    "rep": 3,
+    "label": "seq",
+    "args": []
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "wall_s": 2.52,
+    "peak_rss_mb": 233.4,
+    "exit_code": 0,
+    "n_docs": 50000,
+    "n_terms": 48326,
+    "n_postings": 461956,
+    "max_df": 30345,
+    "postings_bytes": 1247821,
+    "builder": "sequential",
+    "analyze_s": 0.545,
+    "write_s": 1.116,
+    "total_s": 1.748,
+    "index_bytes": 3725736
+  },
+  "status": "ok",
+  "log": "results/logs/scale/seq_50k_r3.log",
+  "spark_stages": null
+}

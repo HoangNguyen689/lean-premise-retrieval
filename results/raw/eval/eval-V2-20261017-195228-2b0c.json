@@ -1,0 +1,88 @@
+{
+  "run_id": "eval-V2-20261017-195228-2b0c",
+  "kind": "eval",
+  "timestamp": "2026-10-17T12:52:34+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "313a93d4b69a",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "config": {
+      "name": "V2",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      }
+    },
+    "eval_set": "scale_random_test_500",
+    "subset": "100k",
+    "k": 100,
+    "tag": "scale-quality"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.03478658008658009,
+    "R@5": 0.13301688311688312,
+    "R@10": 0.18201926406926408,
+    "R@50": 0.29814155844155843,
+    "MRR": 0.13129551536954293,
+    "nDCG@10": 0.11622143952724039,
+    "latency_ms_p50": 11.394150001251546,
+    "latency_ms_p95": 20.39577499926963,
+    "latency_ms_mean": 11.688490399963484,
+    "qps_sequential": 85.55424745039137,
+    "n_queries": 500
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__100k",
+    "n_docs": 100000,
+    "n_postings": 2384385,
+    "postings_bytes": 6721642,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 6.614,
+      "write_s": 6.097,
+      "total_s": 13.297
+    },
+    "built_this_run_s": 13.49
+  },
+  "per_query_file": "results/raw/eval/eval-V2-20261017-195228-2b0c.perquery.parquet",
+  "run_file": "results/runs/eval-V2-20261017-195228-2b0c.tsv"
+}

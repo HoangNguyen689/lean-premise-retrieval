@@ -1,0 +1,92 @@
+{
+  "run_id": "eval-V2a-20261017-185007-5c92",
+  "kind": "eval",
+  "timestamp": "2026-10-17T11:51:00+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "6db0d497913f",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6"
+  },
+  "parameters": {
+    "config": {
+      "name": "V2a",
+      "index": {
+        "fields": [
+          "name",
+          "namespace",
+          "statement"
+        ],
+        "tokenizer": "lean",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 3.0,
+        "b": {
+          "name": 1.0,
+          "namespace": 1.0,
+          "statement": 1.0
+        },
+        "weights": {
+          "name": 1.0,
+          "namespace": 0.5,
+          "statement": 1.0
+        },
+        "query_tf": "binary"
+      },
+      "rerank": {
+        "candidates": 100,
+        "accessible_filter": true,
+        "strategy": "random",
+        "model": null
+      }
+    },
+    "eval_set": "random_val_all",
+    "subset": "full",
+    "k": 100,
+    "tag": null
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.054610591607831355,
+    "R@5": 0.15191480772119575,
+    "R@10": 0.20643463687453759,
+    "R@50": 0.3494688617847483,
+    "MRR": 0.157267962491522,
+    "nDCG@10": 0.1391485730296319,
+    "latency_ms_p50": 19.757050000407617,
+    "latency_ms_p95": 37.18252499947994,
+    "latency_ms_mean": 20.78206589115609,
+    "qps_sequential": 48.1184115783963,
+    "n_queries": 2536
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/lean__name+namespace+statement__vb__full",
+    "n_docs": 180957,
+    "n_postings": 4323308,
+    "postings_bytes": 11923305,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 11.97,
+      "write_s": 10.026,
+      "total_s": 22.976
+    },
+    "built_this_run_s": 0.0
+  },
+  "per_query_file": "results/raw/eval/eval-V2a-20261017-185007-5c92.perquery.parquet",
+  "run_file": "results/runs/eval-V2a-20261017-185007-5c92.tsv"
+}

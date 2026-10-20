@@ -1,0 +1,23 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[V4, V4-K240 và V5 dưới tải cùng phiên]{V4, V4-K240 và V5 dưới tải trong cùng một phiên đo}\label{tab:v5load}
+\begin{tabular}{@{}lrlll@{}}
+\toprule
+Biến thể & Client & P95 (ms) [nhỏ nhất; lớn nhất] & QPS [nhỏ nhất; lớn nhất] & Yêu cầu lỗi \\
+\midrule
+V4 & 1 & 40,5 [40,4; 43,4] & 40,2 [37,5; 40,4] & 0 / 1.200 \\
+ & 10 & 103,2 [99,1; 118,8] & 150,1 [116,6; 157,8] & 0 / 1.200 \\
+ & 50 & 622,0 [611,5; 654,0] & 132,4 [126,2; 137,5] & 0 / 1.200 \\
+\midrule
+V4-K240 & 1 & 44,1 [43,7; 45,3] & 35,4 [34,9; 36,5] & 0 / 1.200 \\
+ & 10 & 124,6 [98,5; 147,5] & 121,8 [103,0; 142,8] & 0 / 1.200 \\
+ & 50 & 650,6 [607,6; 654,3] & 129,5 [123,7; 131,6] & 0 / 1.200 \\
+\midrule
+V5 & 1 & 44,7 [40,5; 47,1] & 35,4 [34,8; 39,4] & 0 / 1.200 \\
+ & 10 & 116,7 [113,1; 138,7] & 127,6 [3,3; 134,4] & 1 / 1.200 \\
+ & 50 & 726,7 [685,2; 727,4] & 116,0 [107,6; 118,3] & 0 / 1.200 \\
+\bottomrule
+\end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: một server 4 worker nạp cả ba cấu hình, thứ tự đo xoay vòng giữa 3 lần lặp, mỗi lần 400 yêu cầu ở mỗi mức client. P95 tính trên các yêu cầu thành công; QPS tính trên toàn bộ thời gian chạy, kể cả thời gian chờ yêu cầu bị timeout. Mỗi ô là trung vị [nhỏ nhất; lớn nhất] của 3 lần.\par}
+\end{table}

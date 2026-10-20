@@ -1,0 +1,9 @@
+# V2 = V1 + BM25F theo trường: name (full_name), namespace, statement.
+# Tham số chọn trên random_val_all (results/raw/tuning/V2__grid_bm25f__random_val_all.csv).
+name: V2
+index: {fields: [name, namespace, statement], tokenizer: lean, codec: vb}
+search:
+  k1: 3.0
+  b: {name: 1.0, namespace: 1.0, statement: 1.0}
+  weights: {name: 1.0, namespace: 0.5, statement: 1.0}
+  query_tf: binary

@@ -1,0 +1,4 @@
+# Mở rộng lưới vì điểm tốt nhất của grid_bm25 nằm ở biên (k1=2.0, b=0.9)
+k1: [2.0, 3.0, 4.0, 6.0]
+b: [0.9, 1.0]
+query_tf: [binary]

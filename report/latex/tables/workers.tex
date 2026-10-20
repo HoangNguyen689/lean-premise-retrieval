@@ -1,0 +1,20 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\caption[Mở rộng dịch vụ theo số worker]{Kiểm tra tải trên chỉ mục đầy đủ theo số worker (P95 tính bằng ms và QPS, trung vị của 3 lần; RAM là tổng của mọi tiến trình server)}\label{tab:workers}
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+& & & \multicolumn{2}{c}{10 client} & \multicolumn{2}{c}{50 client} & \multicolumn{2}{c}{100 client} \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(l){8-9}
+Biến thể & Worker & RAM (GB) & P95 & QPS & P95 & QPS & P95 & QPS \\
+\midrule
+B0 & 4 & 3,4 & 62 & 250 & 334 & 242 & 572 & 240 \\
+B0 & 8 & 6,7 & 58 & 229 & 365 & 253 & 865 & 235 \\
+B0 & 12 & 9,8 & 57 & 260 & 376 & 260 & 748 & 260 \\
+\midrule
+V4 & 4 & 3,4 & 105 & 136 & 541 & 143 & 1.077 & 142 \\
+V4 & 8 & 6,7 & 92 & 159 & 532 & 162 & 997 & 161 \\
+V4 & 12 & 9,8 & 103 & 146 & 584 & 162 & 1.185 & 148 \\
+\bottomrule
+\end{tabular}
+\end{table}

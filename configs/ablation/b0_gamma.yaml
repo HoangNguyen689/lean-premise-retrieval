@@ -1,0 +1,10 @@
+name: B0-gamma
+index:
+  fields:
+  - statement
+  tokenizer: default
+  codec: gamma
+search:
+  k1: 1.2
+  b: 0.75
+  query_tf: count

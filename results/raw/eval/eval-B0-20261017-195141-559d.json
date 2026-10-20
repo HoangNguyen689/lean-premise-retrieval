@@ -1,0 +1,77 @@
+{
+  "run_id": "eval-B0-20261017-195141-559d",
+  "kind": "eval",
+  "timestamp": "2026-10-17T12:51:43+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "313a93d4b69a",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "config": {
+      "name": "B0",
+      "index": {
+        "fields": [
+          "statement"
+        ],
+        "tokenizer": "default",
+        "codec": "vb"
+      },
+      "search": {
+        "k1": 1.2,
+        "b": 0.75,
+        "query_tf": "count"
+      }
+    },
+    "eval_set": "scale_random_test_500",
+    "subset": "50k",
+    "k": 100,
+    "tag": "scale-quality"
+  },
+  "seed": 42,
+  "timeout_s": null,
+  "metrics": {
+    "R@1": 0.05541904761904762,
+    "R@5": 0.11627619047619048,
+    "R@10": 0.1618961038961039,
+    "R@50": 0.23301363636363634,
+    "MRR": 0.13525860753171048,
+    "nDCG@10": 0.11621410655890421,
+    "latency_ms_p50": 3.0730500002391636,
+    "latency_ms_p95": 5.940339999870047,
+    "latency_ms_mean": 3.217117599961057,
+    "qps_sequential": 310.83725382376605,
+    "n_queries": 500
+  },
+  "status": "ok",
+  "log": null,
+  "index": {
+    "path": "indexes/default__statement__vb__50k",
+    "n_docs": 50000,
+    "n_postings": 461956,
+    "postings_bytes": 1247821,
+    "build": {
+      "builder": "sequential",
+      "analyze_s": 0.562,
+      "write_s": 1.102,
+      "total_s": 1.744
+    },
+    "built_this_run_s": 1.84
+  },
+  "per_query_file": "results/raw/eval/eval-B0-20261017-195141-559d.perquery.parquet",
+  "run_file": "results/runs/eval-B0-20261017-195141-559d.tsv"
+}

@@ -1,0 +1,64 @@
+{
+  "run_id": "build-20261018-184754-f1fc",
+  "kind": "build",
+  "timestamp": "2026-10-18T11:47:54+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "bb7acd472fce",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "builder": "sequential",
+    "size": "x20",
+    "rep": 3,
+    "label": "win-lean-seq",
+    "args": [
+      "--fields",
+      "name,namespace,statement",
+      "--tokenizer",
+      "lean"
+    ],
+    "experiment": "build2",
+    "platform": "Windows"
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "wall_s": 282.13,
+    "peak_rss_mb": 4807.5,
+    "exit_code": 0,
+    "n_docs": 3619140,
+    "n_terms": 324435,
+    "n_postings": 86466160,
+    "max_df": 2199200,
+    "postings_bytes": 202907809,
+    "builder": "sequential",
+    "analyze_s": 222.521,
+    "write_s": 54.815,
+    "total_s": 278.561,
+    "index_bytes": 270486602,
+    "checksums": {
+      "dictionary.parquet": "d61ab9ecec4f03f90865782f79933879834cb1c2",
+      "doc_lengths.parquet": "28a44a9d76dd66aa8f9fc28f192bc900c418ae4a",
+      "postings.bin": "2b1e0426f3e76e6da20df259801b4052ab1fc142",
+      "terms_any.parquet": "ea2e486b3f67d66a3f60a29e1d42f287a9edc064"
+    }
+  },
+  "status": "ok",
+  "log": "results/logs/scale/win-lean-seq_x20_r3.log",
+  "spark_stages": null
+}

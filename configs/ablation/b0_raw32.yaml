@@ -1,0 +1,10 @@
+name: B0-raw32
+index:
+  fields:
+  - statement
+  tokenizer: default
+  codec: raw32
+search:
+  k1: 1.2
+  b: 0.75
+  query_tf: count

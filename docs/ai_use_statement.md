@@ -1,24 +1,21 @@
-# AI-USE STATEMENT — Nhóm 3, Lean Premise Retrieval
+# AI-use statement
 
-> Bắt buộc theo hướng dẫn môn (mục 2, yêu cầu chung): "Việc sử dụng AI phải được khai báo;
-> mọi code và kết luận do AI hỗ trợ vẫn phải được nhóm kiểm chứng."
+Theo yêu cầu của học phần INT4418, nhóm khai báo việc dùng công cụ AI trong dự án.
 
-## Nguyên tắc nhóm
+| Công cụ | Dùng cho | Phần việc |
+|---|---|---|
+| Claude (Anthropic) qua Claude Code | Lập kế hoạch 10 tuần, viết khung mã nguồn, test, script thí nghiệm, bản nháp tài liệu | Toàn bộ repo phiên bản đầu (2026-10-17) |
+| Claude (Anthropic) qua Claude Code | Bổ sung sản phẩm tuần 1, 2, 5 (truy vấn kiểm tra, data dictionary, ablation plan, latency profile), hướng dẫn vai trò; soạn báo cáo LaTeX `report/latex/main.tex`; viết engine Spark Arrow (`src/n3/index/build_spark_arrow.py`), môi trường Docker Linux và thí nghiệm build2; V5 (ứng viên bổ sung), baseline Lucene, thí nghiệm số worker và kiểm tra CPU | 2026-10-18 |
 
-1. Mọi lần dùng AI hỗ trợ sinh code/văn bản/phân tích **phải được ghi vào bảng dưới**.
-2. Người ghi là người chạy prompt; người đó **kiểm chứng** kết quả trước khi đưa vào repo.
-3. Code do AI sinh chỉ được merge sau khi (a) unit test pass, (b) một thành viên khác đọc và hiểu.
-4. Kết luận trong báo cáo không được dựa chỉ vào output AI — phải đối chiếu raw results.
+## Những gì nhóm phải tự kiểm chứng trước khi nộp
+- Mỗi thành viên đọc và giải thích được phần mã thuộc vai trò của mình (học phần yêu cầu: không nộp đoạn mã mình chưa hiểu).
+- Chạy lại toàn bộ pipeline theo README trên máy của nhóm và đối chiếu số liệu với `results/`.
+- Kiểm tra lại các con số trong báo cáo bằng script, không chép tay từ đầu ra của AI.
+- Đọc lại 30 failure case trong `results/figures/failure_cases.md`: phần phân loại tự động chỉ là gợi ý, nhóm phải gán nhãn lại thủ công.
+- Kiểm tra trích dẫn tài liệu tham khảo trong báo cáo bằng cách mở nguồn gốc.
 
-## Bảng khai báo
+## Những gì AI không quyết định thay nhóm
+- Phân vai, người dự phòng, nội dung thống nhất với Nhóm 4.
+- Kết luận cuối cùng của báo cáo và câu trả lời khi bảo vệ.
 
-| Ngày | Thành viên | Công cụ | Mục đích | Phạm vi | Đã kiểm chứng bằng |
-|---|---|---|---|---|---|
-| 2026-10-01 | TV6 (Evaluation) | Claude (VCode agent) | Soạn khung pipeline evaluation: contract.py, run_logger.py, make_mock_end_to_end.py, run_all_evaluations.py, run_ablation.py, run_failure_analysis.py, run_comparison_n4.py, make_figures.py, data_contract_v1.md, phan_vai_tam.md, report_draft.md, bản khai báo này | Toàn bộ code/docs trong commit này | `python tests/test_metrics.py` 15/15 PASS; chạy 4 script end-to-end trên mock, đối chiếu eval_summary.csv tính lại từ run file bằng tay cho 1 query (Q001) |
-| 2026-10-15 | TV6 (Evaluation) | Claude (VCode agent) | Chọn benchmark + tải LeanDojo Benchmark 4 từ Zenodo; build_real_corpus.py (corpus 180.907 + qrels từ trace); src/retrieval/systems.py (tokenizer Lean, BM25 thuần Python, 4 hệ); run_real_retrieval.py, run_load_test.py, search_cli.py, make_real_figures.py; report_draft.md v1.0 số thật; contract chuyển ACTIVE; contributions.md | Toàn bộ pipeline dữ liệu thật | 15/15 unit tests; 12 cấu hình chạy đủ 3 scale với số Recall hợp lý (tăng theo scale, fielddrop < full ở 181K khớp giả thuyết); latency đo trực tiếp 898 query; contract validator PASS cho corpus S1; CLI demo trả kết quả đúng namespace |
-| | | | | | |
-
-## Kết luận AI không được dùng cho
-
-- Số liệu trong bảng kết quả chính (chỉ từ raw results + script).
-- Nhận định "đúng/đặc" về Lean/mathlib chưa kiểm chứng bằng Lean toolchain.
+Cập nhật bảng trên mỗi khi dùng thêm AI cho việc khác (ví dụ viết báo cáo, làm slide).

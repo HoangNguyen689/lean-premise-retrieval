@@ -1,0 +1,99 @@
+{
+  "run_id": "loadtest-20261018-221556-7d3c",
+  "kind": "loadtest",
+  "timestamp": "2026-10-18T15:15:56+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "0587623fac04",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "url": "http://127.0.0.1:8004",
+    "mode": "V4",
+    "eval_set": "scale_random_test_500",
+    "requests_per_level": 400,
+    "k": 10,
+    "tag": "v5cmp-r1",
+    "server_workers": 4,
+    "server": {
+      "status": "ok",
+      "subset": "full",
+      "modes": {
+        "V4": {
+          "index": "lean__name+namespace+statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "lean-v1",
+          "checksum_postings": "48c65b44a508"
+        },
+        "V5": {
+          "index": "lean__name+namespace+statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "lean-v1",
+          "checksum_postings": "48c65b44a508"
+        }
+      },
+      "pid": 11652
+    }
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "levels": [
+      {
+        "clients": 1,
+        "requests_ok": 400,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 10.381,
+        "qps": 38.53,
+        "e2e_ms_p50": 25.23509999991802,
+        "e2e_ms_p95": 41.313609998906024,
+        "e2e_ms_p99": 49.46720200205163,
+        "server_ms_p50": 23.532,
+        "server_ms_p95": 39.48455
+      },
+      {
+        "clients": 10,
+        "requests_ok": 400,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 2.754,
+        "qps": 145.25,
+        "e2e_ms_p50": 59.28289999974368,
+        "e2e_ms_p95": 104.7587299983206,
+        "e2e_ms_p99": 147.70808799948983,
+        "server_ms_p50": 55.855999999999995,
+        "server_ms_p95": 101.42084999999999
+      },
+      {
+        "clients": 50,
+        "requests_ok": 400,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 3.061,
+        "qps": 130.67,
+        "e2e_ms_p50": 250.4608500021277,
+        "e2e_ms_p95": 645.7359350008117,
+        "e2e_ms_p99": 810.7571290004848,
+        "server_ms_p50": 231.7065,
+        "server_ms_p95": 629.4931999999995
+      }
+    ]
+  },
+  "status": "ok",
+  "log": null
+}

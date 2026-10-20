@@ -1,0 +1,120 @@
+{
+  "run_id": "loadtest-20261018-213548-86f5",
+  "kind": "loadtest",
+  "timestamp": "2026-10-18T14:35:48+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "386f00789935",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "url": "http://127.0.0.1:8002",
+    "mode": "V2",
+    "eval_set": "scale_random_test_500",
+    "requests_per_level": 400,
+    "k": 10,
+    "tag": "workers-12-r3",
+    "server_workers": 12,
+    "server": {
+      "status": "ok",
+      "subset": "full",
+      "modes": {
+        "B0": {
+          "index": "default__statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "default-v1",
+          "checksum_postings": "c416a8e0f91d"
+        },
+        "V2": {
+          "index": "lean__name+namespace+statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "lean-v1",
+          "checksum_postings": "48c65b44a508"
+        },
+        "V4": {
+          "index": "lean__name+namespace+statement__vb__full",
+          "n_docs": 180957,
+          "tokenizer_version": "lean-v1",
+          "checksum_postings": "48c65b44a508"
+        }
+      },
+      "pid": 22612
+    }
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "levels": [
+      {
+        "clients": 1,
+        "requests_ok": 400,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 8.77,
+        "qps": 45.61,
+        "e2e_ms_p50": 21.036950000052457,
+        "e2e_ms_p95": 36.106109998945605,
+        "e2e_ms_p99": 44.74947100065036,
+        "server_ms_p50": 19.1935,
+        "server_ms_p95": 34.269299999999994
+      },
+      {
+        "clients": 10,
+        "requests_ok": 400,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 2.278,
+        "qps": 175.63,
+        "e2e_ms_p50": 47.10709999926621,
+        "e2e_ms_p95": 87.05681499977798,
+        "e2e_ms_p99": 102.85760099981412,
+        "server_ms_p50": 43.153,
+        "server_ms_p95": 82.70104999999998
+      },
+      {
+        "clients": 50,
+        "requests_ok": 398,
+        "errors": 2,
+        "error_types": {
+          "TimeoutError": 2
+        },
+        "wall_s": 120.216,
+        "qps": 3.31,
+        "e2e_ms_p50": 160.83629999957338,
+        "e2e_ms_p95": 509.67238000175695,
+        "e2e_ms_p99": 728.2863629999314,
+        "server_ms_p50": 137.697,
+        "server_ms_p95": 439.9163499999997
+      },
+      {
+        "clients": 100,
+        "requests_ok": 400,
+        "errors": 0,
+        "error_types": {},
+        "wall_s": 2.612,
+        "qps": 153.16,
+        "e2e_ms_p50": 280.80115000011574,
+        "e2e_ms_p95": 1120.6344549980693,
+        "e2e_ms_p99": 1631.5852980004267,
+        "server_ms_p50": 188.4885,
+        "server_ms_p95": 564.1854999999997
+      }
+    ]
+  },
+  "status": "ok",
+  "log": null
+}

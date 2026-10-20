@@ -1,0 +1,12 @@
+# B0: baseline bắt buộc theo đề bài.
+# BM25 mặc định (k1=1.2, b=0.75 như Lucene) trên statement, tokenizer tách từ thường.
+# Không embedding, không dependency graph, không field weighting.
+name: B0
+index:
+  fields: [statement]
+  tokenizer: default
+  codec: vb
+search:
+  k1: 1.2
+  b: 0.75
+  query_tf: count

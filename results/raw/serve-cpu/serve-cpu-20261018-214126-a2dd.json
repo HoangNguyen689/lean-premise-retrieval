@@ -1,0 +1,81 @@
+{
+  "run_id": "serve-cpu-20261018-214126-a2dd",
+  "kind": "serve-cpu",
+  "timestamp": "2026-10-18T14:41:26+00:00",
+  "git_commit": "uncommitted",
+  "code_hash": "386f00789935",
+  "data_version": "leandojo_benchmark_4@v10#md5:25e1ee60",
+  "machine": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "Intel64 Family 6 Model 151 Stepping 5, GenuineIntel",
+    "logical_cores": 12,
+    "physical_cores": 6,
+    "ram_gb": 31.9,
+    "hostname_hash": "da39b5ef"
+  },
+  "software": {
+    "python": "3.13.0",
+    "numpy": "2.5.4",
+    "pyarrow": "26.0.0",
+    "pandas": "3.0.6",
+    "pyspark": "4.0.1",
+    "fastapi": "0.143.3"
+  },
+  "parameters": {
+    "workers": 8,
+    "mode": "B0",
+    "subset": "full"
+  },
+  "seed": null,
+  "timeout_s": null,
+  "metrics": {
+    "workers": 8,
+    "logical_cpus": 12,
+    "physical_cpus": 6,
+    "1x48": {
+      "qps": 242.5,
+      "p95_ms": [
+        378.2
+      ],
+      "worker_cpu_pct": {
+        "per_worker": [
+          0.0,
+          91.9,
+          163.5,
+          71.6,
+          64.8,
+          123.1,
+          68.1,
+          37.4,
+          202.2
+        ],
+        "total": 822.6
+      }
+    },
+    "4x12": {
+      "qps": 268.8,
+      "p95_ms": [
+        368.5,
+        365.7,
+        387.1,
+        429.2
+      ],
+      "worker_cpu_pct": {
+        "per_worker": [
+          0.3,
+          199.0,
+          79.4,
+          105.1,
+          123.1,
+          100.2,
+          121.4,
+          122.1,
+          104.4
+        ],
+        "total": 955.0
+      }
+    }
+  },
+  "status": "ok",
+  "log": null
+}

@@ -1,0 +1,24 @@
+% Sinh bởi scripts/make_report_tables.py, không sửa tay.
+\begin{table}[htbp]
+\centering
+\setlength{\tabcolsep}{5pt}
+\caption[Phân rã giới hạn: candidate và xếp hạng]{Candidate recall, Oracle@10 và ranking gap, query-macro}\label{tab:candidates}
+\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+Tập & Hệ thống & Candidate & Candidate recall & Oracle@10 & R@10 & Ranking gap & R@50 \\
+\midrule
+\code{random} & V4 & 100 & 0,397 & 0,397 & 0,243 & 0,154 & 0,373 \\
+ & V4-K240 & 240 & 0,485 & 0,485 & 0,254 & 0,232 & 0,419 \\
+ & V5 & 239 & 0,650 & 0,650 & 0,281 & 0,369 & 0,508 \\
+\midrule
+\code{novel\_premises} & V4 & 100 & 0,452 & 0,452 & 0,269 & 0,183 & 0,417 \\
+ & V4-K240 & 240 & 0,536 & 0,536 & 0,276 & 0,260 & 0,449 \\
+ & V5 & 208 & 0,644 & 0,644 & 0,280 & 0,364 & 0,509 \\
+\midrule
+Holdout & V4 & 100 & 0,452 & 0,452 & 0,310 & 0,142 & 0,432 \\
+ & V4-K240 & 240 & 0,541 & 0,541 & 0,321 & 0,219 & 0,482 \\
+ & V5 & 236 & 0,666 & 0,666 & 0,332 & 0,333 & 0,545 \\
+\bottomrule
+\end{tabular}
+\par\smallskip{\footnotesize\raggedright Ghi chú: định nghĩa ở Mục~\ref{sec:metrics}; Oracle@50 trùng candidate recall đến ba chữ số nên không ghi.\par}
+\end{table}
