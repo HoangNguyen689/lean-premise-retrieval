@@ -14,7 +14,7 @@ trên Windows. Lệnh Spark dùng `.venv-spark/Scripts/python`.
 
 | # | Vai trò | Người chính | Dự phòng | Sản phẩm tuần (theo hướng dẫn) | Trạng thái |
 |---|---|---|---|---|---|
-| 1 | Data/extraction | Nguyễn Đức Hoàng | Nguyễn Ngọc Minh | T1 benchmark spec, 20 truy vấn kiểm tra; T2 Parquet sample, data dictionary, query set | Xong; còn ký xác nhận 20 truy vấn và chốt spec với Nhóm 4 |
+| 1 | Data/extraction | Nguyễn Đức Hoàng | Nguyễn Ngọc Minh | T1 benchmark spec, 20 truy vấn kiểm tra; T2 Parquet sample, data dictionary, query set | Xong; gói chung N3/N4 đã ghim (`docs/n4_shared_benchmark.md`); còn ký xác nhận 20 truy vấn |
 | 2 | Indexing | Trần Duy Khánh | người làm Serving | T2 index sample; T6 index manifest; T7 index size, build time | Xong |
 | 3 | BM25 baseline | Nguyễn Mạnh Cường | người làm Structural | T3 baseline end-to-end, raw ranking; T4 biến thể retrieval, unit test | Xong |
 | 4 | Structural features | **chưa chốt** (Kiên / Dũng) | Nguyễn Mạnh Cường | T5 ablation plan, model v0.1 | Xong; cần chốt người |
@@ -26,8 +26,10 @@ trên Windows. Lệnh Spark dùng `.venv-spark/Scripts/python`.
 ## 1. Data/extraction
 
 **Phụ trách:** `scripts/download_data.py`, `src/n3/extract/leandojo.py`, `scripts/make_subsets.py`, `scripts/make_sample.py`,
-`scripts/make_check_queries.py`, `scripts/make_data_dictionary.py`; tài liệu `docs/benchmark_spec.md` (cùng vai trò 6),
-`docs/data_card.md`, `docs/data_dictionary.md`, `docs/check_queries.md`, `docs/license_note.md`.
+`scripts/make_check_queries.py`, `scripts/make_data_dictionary.py`; benchmark chung với Nhóm 4: `src/n3/shared.py`,
+`scripts/export_n4_shared.py`, `scripts/verify_n4_shared.py`, `configs/n4_shared_manifest.json`; tài liệu
+`docs/benchmark_spec.md` (cùng vai trò 6), `docs/n4_shared_benchmark.md`, `docs/data_card.md`, `docs/data_dictionary.md`,
+`docs/check_queries.md`, `docs/license_note.md`.
 
 **Chạy lại**
 
@@ -37,11 +39,13 @@ python -m n3.extract.leandojo            # → data/processed/*.parquet, extract
 python scripts/make_subsets.py           # tập đánh giá + index con 10K/50K/100K
 python scripts/make_check_queries.py     # 20 truy vấn kiểm tra → docs/check_queries.md
 python scripts/make_data_dictionary.py   # → docs/data_dictionary.md
-python -m pytest -q tests/test_extract.py
+python scripts/export_n4_shared.py --zip # gói chung N3/N4 → data/n4_shared/, dừng nếu SHA-256 khác bản ghim
+python -m pytest -q tests/test_extract.py tests/test_shared_data.py
 ```
 
 Kết quả đúng: 180.957 premise; 315.014 truy vấn; 674.628 qrels; dead-letter gồm 115.736 premise đúng không có trong corpus,
-20.544 truy vấn bị loại, 16 premise trùng; 20/20 truy vấn kiểm tra đạt C1–C4.
+20.544 truy vấn bị loại, 16 premise trùng; 20/20 truy vấn kiểm tra đạt C1–C4. Gói chung: 180.907 premise, 898 truy vấn,
+SHA-256 khớp `configs/n4_shared_manifest.json`.
 
 **Phải giải thích được**
 - Data contract: truy vấn = `state_before`; premise đúng = `annotated_tactic[1]`; không lưu text của tactic vì nó chứa tên premise.
@@ -58,8 +62,13 @@ Kết quả đúng: 180.957 premise; 315.014 truy vấn; 674.628 qrels; dead-let
 - *Vì sao index con phải lồng nhau và chứa premise đúng?* Nếu index 10K không chứa đáp án thì recall gần 0 do thiếu đáp án,
   không do hệ thống. Lồng nhau thì khác biệt giữa các mức chỉ do thêm premise gây nhiễu.
 - *LeanDojo ra bản mới thì sao?* md5 và phiên bản ghi trong manifest; `premise_id` sẽ đổi nên phải nâng phiên bản spec và cả hai nhóm chạy lại.
+- *Vì sao gói chung có 180.907 premise chứ không phải 180.957?* Gói định danh premise bằng `full_name` và giữ lần xuất
+  hiện đầu, nên 50 bản ghi của 45 tên có ở cả Lean core lẫn Mathlib bị gộp (`docs/n4_shared_benchmark.md`, mục 2).
+- *Vì sao báo thêm lát `signature`?* 158 truy vấn của gói còn chứa chứng minh, và chứng minh thường gọi thẳng tên premise
+  đúng; lát này bỏ các truy vấn đó (mục 4).
 
-**Còn phải làm:** ký xác nhận 20 truy vấn trong `docs/check_queries.md`; chốt các mục **[cần chốt]** của spec với Nhóm 4.
+**Còn phải làm:** ký xác nhận 20 truy vấn trong `docs/check_queries.md`; thống nhất với Nhóm 4 cách xử lý 158 truy vấn
+còn chứa chứng minh (giữ gói v1.0 và báo thêm lát `signature`, hay ra phiên bản gói mới).
 
 ---
 
@@ -237,6 +246,7 @@ python scripts/ablation_significance.py      # KTC cho ablation
 python scripts/error_analysis.py             # lát cắt + 30 failure case
 bash report/latex/build.sh                   # sinh bảng, hình và biên dịch report/report.pdf
 python scripts/fuse_rrf.py --runs results/runs/<run_V4>.tsv <run_nhom4>.tsv --eval random_test_all   # khi có run của Nhóm 4
+python scripts/eval_shared.py --external N4-dense=<run_dense>.csv   # N3 và Nhóm 4 trên benchmark chung (n4_shared)
 ```
 
 **Phải giải thích được**
@@ -252,7 +262,8 @@ python scripts/fuse_rrf.py --runs results/runs/<run_V4>.tsv <run_nhom4>.tsv --ev
   hướng tiếp theo là hybrid với dense của Nhóm 4 hoặc tăng K.
 - *Tại sao chọn split random làm chính?* Nó phản ánh tình huống tìm trong thư viện có sẵn; `novel_premises` báo kèm để đo
   trường hợp premise đúng chưa từng được dùng trong train.
-- *So sánh với Nhóm 4 thế nào?* Cùng spec, cùng định dạng run file; trộn bằng `fuse_rrf.py` và kiểm định bằng paired bootstrap.
+- *So sánh với Nhóm 4 thế nào?* Trên gói chung `n4_shared` (898 theorem của random/test): `eval_shared.py` chấm run file
+  của hai nhóm cùng một quy tắc eligible và kiểm định hoán vị ghép cặp; kết quả N3 đã có ở `results/figures/shared_benchmark.md`.
 
 **Còn phải làm:** hai người gán nhãn độc lập 30 failure case (`results/figures/failure_cases.md`) rồi đối chiếu và ghi tỉ
 lệ đồng thuận; bảng so sánh với Nhóm 4 khi có run file của họ; kiểm tra trích dẫn trong báo cáo.

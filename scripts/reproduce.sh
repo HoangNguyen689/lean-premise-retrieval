@@ -20,6 +20,7 @@ $PY -m n3.extract.leandojo
 $PY scripts/make_subsets.py
 $PY scripts/make_holdout.py
 $PY scripts/build_dependency_stats.py
+$PY scripts/export_n4_shared.py   # gói benchmark chung N3/N4, dừng nếu SHA-256 khác bản ghim
 
 if [ $TUNING = 1 ]; then
   echo "== 2. Tinh tham số trên val (chỉ validation, không chạm tập kiểm tra)"
@@ -49,6 +50,7 @@ $PY scripts/summarize_quality.py > /dev/null
 $PY scripts/make_check_queries.py > /dev/null
 $PY scripts/make_data_dictionary.py > /dev/null   # cần index V2 đến V4 đã build ở bước 4
 $PY scripts/profile_latency.py > /dev/null
+$PY scripts/eval_shared.py         # B0, V2, V4, V5 trên benchmark chung → results/figures/shared_benchmark.md
 
 echo "== 5. Ablation, phân tích lỗi và độ bền"
 $PY scripts/ablation.py

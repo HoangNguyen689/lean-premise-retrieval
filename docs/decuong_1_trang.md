@@ -18,15 +18,15 @@
 
 **Kiến trúc bản nháp:** Extractor → document fields → Tokenizer (giữ từ + ký hiệu Lean) → Inverted index → BM25 baseline → Structural features / field weights → Hybrid reranker → REST API hoặc CLI.
 
-**Phân vai (6 người — bản tạm, chi tiết trong `phan_vai_tam.md`):**
+**Phân vai (6 người, theo `contributions.md`):**
 | Vai | Người | Dự phòng |
 |-----|-------|----------|
-| Data/Extraction | TV1 [TẠM] | TV6 (giữ mock corpus theo contract) |
-| Indexing | TV2 [TẠM] | TV3 |
-| BM25 Baseline | TV3 [TẠM] | TV4 |
-| Structural Features | TV4 [TẠM] | TV3 |
-| Serving/Performance | TV5 [TẠM] | TV6 |
-| **Evaluation/Error Analysis** | **← TÔI (TV6)** | TV3 |
+| Data/Extraction | Nguyễn Đức Hoàng | Nguyễn Ngọc Minh |
+| Indexing | Trần Duy Khánh | người phụ trách Serving |
+| BM25 Baseline | Nguyễn Mạnh Cường | người phụ trách Structural |
+| Structural Features | chưa chốt (Vũ Trung Kiên hoặc Trần Đình Dũng) | Nguyễn Mạnh Cường |
+| Serving/Performance | chưa chốt (Vũ Trung Kiên hoặc Trần Đình Dũng) | Trần Duy Khánh |
+| Evaluation/Error Analysis | Nguyễn Ngọc Minh | Nguyễn Đức Hoàng |
 
 **Rủi ro và phương án dự phòng:**
 1. Data contract với Nhóm 4 trễ → họp chung tuần 1, contract 1 trang, hai nhóm đồng ký; có snapshot/mock riêng để không bị chặn.

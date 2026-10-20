@@ -30,7 +30,9 @@ bash build.sh --update         # chủ ý cập nhật báo cáo bằng đầu v
 
 Ở chế độ mặc định, `scripts/verify_report_inputs.py` so SHA-256 của mọi tệp đầu vào với giá trị trong `tables/SOURCES.md`
 và `figures/SOURCES.md`; nếu có tệp thiếu hoặc lệch, build dừng thay vì âm thầm tạo bảng khác bản đã phát hành. Biến
-`PYTHON` chọn trình thông dịch (mặc định `.venv` của kho mã), biến `TECTONIC` chọn đường dẫn Tectonic.
+`PYTHON` chọn trình thông dịch (mặc định `.venv` của kho mã), biến `TECTONIC` chọn đường dẫn Tectonic (mặc định tìm
+trong PATH rồi `tools/tectonic/` của kho). SHA-256 của tệp văn bản được so ở dạng xuống dòng LF hoặc CRLF, vì Git đổi
+xuống dòng khi checkout.
 
 Biên dịch thủ công: `tectonic -X compile main.tex` hoặc `xelatex main.tex` hai lần. Trên Overleaf: tải cả thư mục này lên
 (gồm `tables/` và `figures/`) và chọn trình biên dịch XeLaTeX.

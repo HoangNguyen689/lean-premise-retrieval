@@ -3,6 +3,10 @@
 Bài tập lớn INT4418 Dữ liệu lớn (PTIT, AI4Math). Hệ thống tìm các định lý/bổ đề (premise) trong mathlib4 phù hợp
 với một trạng thái chứng minh Lean, bằng chỉ mục đảo BM25/BM25F và tín hiệu cấu trúc, trước khi gọi bộ chứng minh.
 
+Repo gộp hai phần việc của nhóm: pipeline truy hồi `src/n3` (trước ở repo `big-data-n3`) và gói benchmark chung N3/N4 của
+Data/extraction. Lịch sử Git của cả hai được giữ. Pipeline mức theorem cũ trùng chức năng với `src/n3` đã được gỡ, vẫn xem
+được trong lịch sử đến commit `b1fbb35`.
+
 **Câu hỏi nghiên cứu**
 - RQ1. BM25 có đủ mạnh cho dữ liệu Lean, hay cần thêm trường ký hiệu, namespace và dependency?
 - RQ2. Kết hợp sparse score với tín hiệu cấu trúc có tăng Recall@k mà vẫn giữ độ trễ thấp không?
@@ -11,7 +15,8 @@ với một trạng thái chứng minh Lean, bằng chỉ mục đảo BM25/BM25
 
 ## Kết quả chính
 
-Toàn bộ tập kiểm tra, 180.957 premise ứng viên, trung bình theo truy vấn. Số liệu lấy từ các lần chạy đã ghim trong
+Benchmark mức tactic của báo cáo (`docs/benchmark_spec.md`), toàn bộ tập kiểm tra, 180.957 premise ứng viên, trung bình
+theo truy vấn. Số liệu lấy từ các lần chạy đã ghim trong
 `results/figures/report_manifest.json`. Khoảng tin cậy từ bootstrap theo cụm theorem; giá trị p hai phía từ kiểm định
 hoán vị ghép cặp theo cụm theorem, hiệu chỉnh Holm (`results/figures/robustness.md`).
 
@@ -45,6 +50,25 @@ hoán vị ghép cặp theo cụm theorem, hiệu chỉnh Holm (`results/figures
 Bảng đầy đủ: `report/latex/tables/` (sinh bởi `scripts/make_report_tables.py`, nguồn ghi trong `SOURCES.md`),
 `results/figures/robustness.md`, `results/figures/scale_tables.md`, `results/figures/ablation_significance.md`,
 `results/figures/latency_profile.md`, `results/figures/error_slices.md`, `results/figures/failure_cases.md`.
+
+## Benchmark chung với Nhóm 4
+
+So sánh với Nhóm 4 dùng gói đóng băng `n4_shared` (`leandojo-benchmark-4@29dcec07+split-v1.0`): 180.907 premise định danh
+bằng `full_name`, 898 theorem của `random/test`, truy vấn là statement của theorem (`docs/n4_shared_benchmark.md`).
+`scripts/export_n4_shared.py` dựng lại gói từ dữ liệu gốc đúng từng byte và dừng nếu SHA-256 khác giá trị ghim trong
+`configs/n4_shared_manifest.json`, nên không cần chuyền tay tệp zip. R@10 của Nhóm 3 trên gói này
+(`results/figures/shared_benchmark.md`):
+
+| Hệ thống | R@10, 882 truy vấn có nhãn | R@10, lát `signature` (727) |
+|---|---|---|
+| B0 | 0,215 | 0,190 |
+| V2 | 0,313 | 0,240 |
+| V4 | 0,418 | 0,347 |
+| V5 | 0,432 | 0,369 |
+
+158 truy vấn của gói còn chứa phần chứng minh, và phần này thường gọi thẳng tên premise đúng; lát `signature` bỏ các truy
+vấn đó. Hai benchmark khác đơn vị truy vấn nên số liệu ở đây không so trực tiếp với bảng phía trên. Khi có run file của
+Nhóm 4: `python scripts/eval_shared.py --external N4-dense=<run_dense>.csv`.
 
 ## Kiến trúc
 
@@ -86,19 +110,24 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements/main
 .venv-spark/Scripts/python -m pip install -r requirements/spark.lock.txt && .venv-spark/Scripts/python -m pip install -e .
 # Môi trường Linux cho thí nghiệm xây chỉ mục: docker/spark-linux.Dockerfile và docker/run_build2_linux.sh
 # Lucene (scripts/lucene_baseline.py): Anserini 2.3.0, SHA-1 824831091154cf9eba36aa1066f08ff70b7835d4
-curl -L -o anserini-2.3.0-fatjar.jar https://repo1.maven.org/maven2/io/anserini/anserini/2.3.0/anserini-2.3.0-fatjar.jar
-# Báo cáo LaTeX: Tectonic 0.15.0 hoặc XeLaTeX (report/latex/README.md)
+mkdir -p tools/anserini && curl -L -o tools/anserini/anserini-2.3.0-fatjar.jar https://repo1.maven.org/maven2/io/anserini/anserini/2.3.0/anserini-2.3.0-fatjar.jar
+# Báo cáo LaTeX: Tectonic 0.15.0 (đặt tectonic.exe vào tools/tectonic/ hoặc PATH) hoặc XeLaTeX (report/latex/README.md)
 ```
 
-Phiên bản đã dùng cũng được ghi trong mỗi run record (`results/raw/**.json`, trường `software`).
+Phiên bản đã dùng cũng được ghi trong mỗi run record (`results/raw/**.json`, trường `software`). Dữ liệu lớn (`data/`,
+`indexes/`, `results/runs/`) và công cụ ngoài (`tools/`) không có trong Git: tạo lại bằng `bash scripts/reproduce.sh`
+(bước 1 tải dữ liệu từ Zenodo), hoặc chép từ máy đã chạy.
 
 ## Chạy nhanh
 
 ```bash
-python -m pytest -q                                   # 53 test, gồm các ví dụ tính tay của slide Chương 4
+python -m pytest -q                                   # 68 test, gồm các ví dụ tính tay của slide Chương 4
 python -m n3.serving.cli --query-id "random:val:0:1" --mode V4 -k 5
 uvicorn n3.serving.api:app --port 8000 --workers 4    # rồi POST /search {"query": "...", "k": 10, "mode": "V4"}
 python -m n3.eval.run_eval --config configs/b0_bm25_default.yaml --eval random_test_all
+python scripts/export_n4_shared.py --zip              # gói chung N3/N4 → data/n4_shared/ và data/n4_shared.zip
+python scripts/verify_n4_shared.py data/n4_shared.zip # kiểm tra một gói nhận được: SHA-256, schema, quy tắc self
+python scripts/eval_shared.py                         # B0, V2, V4, V5 trên gói chung
 ```
 
 Không có dữ liệu đầy đủ: `data_sample/` có 1.000 premise và 200 truy vấn (JSONL) để đọc thử định dạng.
@@ -106,7 +135,7 @@ Không có dữ liệu đầy đủ: `data_sample/` có 1.000 premise và 200 tr
 ## Tái tạo toàn bộ kết quả
 
 ```bash
-bash scripts/reproduce.sh                 # dữ liệu → huấn luyện → đánh giá → đối chứng, holdout → ablation → phân tích
+bash scripts/reproduce.sh                 # dữ liệu, gói chung → huấn luyện → đánh giá (cả gói chung) → đối chứng, holdout → ablation → phân tích
 bash scripts/reproduce.sh --with-tuning   # chạy lại cả quá trình chọn tham số (lưới BM25 cơ bản và mở rộng, BM25F, V5)
 bash scripts/reproduce.sh --with-scale    # thí nghiệm quy mô, tải và Lucene (~4 giờ)
 bash scripts/reproduce.sh --report        # sinh bảng, hình và biên dịch report/report.pdf
@@ -117,25 +146,30 @@ Mỗi lần chạy ghi một run record theo Phụ lục B (run_id, timestamp, g
 software, parameters, seed, metrics, status, log). Các lần chạy dùng cho báo cáo được ghim trong
 `results/figures/report_manifest.json` và `report_records.json` (`scripts/pin_runs.py`); bảng và hình của báo cáo sinh từ
 các lần chạy đã ghim, không phụ thuộc lần chạy mới nhất, và `report/latex/build.sh` dừng nếu một tệp đầu vào khác SHA-256
-đã ghi (xem `report/latex/README.md`). Mọi bảng và biểu đồ trong `results/figures/` sinh bằng script từ `results/raw/`.
+đã ghi (xem `report/latex/README.md`). SHA-256 của tệp văn bản được tính ở dạng xuống dòng LF (`n3.runlog.file_sha256`),
+nên kiểm tra này cho cùng kết quả trên Windows và Linux, với mọi cấu hình `core.autocrlf`. Mọi bảng và biểu đồ trong
+`results/figures/` sinh bằng script từ `results/raw/`.
 
 ## Cấu trúc thư mục
 
 | Thư mục | Nội dung |
 |---|---|
-| `src/n3/` | extract, analysis (tokenizer), index (tuần tự, Spark, codec), retrieval (BM25F, đặc trưng, reranker), serving, eval |
-| `configs/` | mỗi biến thể một file YAML; lưới tinh tham số; `configs/ablation/` sinh tự động |
-| `scripts/` | tải dữ liệu, tập con, thống kê phụ thuộc, huấn luyện, thí nghiệm quy mô, ablation, error analysis, biểu đồ |
-| `tests/` | unit test (codec, tokenizer, metric, extract, index so với oracle, bộ lọc truy cập được) |
+| `src/n3/` | extract, analysis (tokenizer), index (tuần tự, Spark, codec), retrieval (BM25F, đặc trưng, reranker), serving, eval, shared (gói benchmark chung N3/N4) |
+| `configs/` | mỗi biến thể một file YAML; lưới tinh tham số; `configs/ablation/` sinh tự động; `n4_shared_manifest.json` ghim gói chung |
+| `scripts/` | tải dữ liệu, tập con, thống kê phụ thuộc, huấn luyện, thí nghiệm quy mô, ablation, error analysis, biểu đồ, gói chung N3/N4 |
+| `tests/` | unit test (codec, tokenizer, metric, extract, index so với oracle, bộ lọc truy cập được, gói chung) |
 | `data_sample/` | mẫu hợp pháp để chạy thử |
 | `results/raw/` | run record JSON, metric từng truy vấn, kết quả tinh tham số |
 | `results/figures/` | bảng và hình sinh bằng script |
 | `results/models/` | trọng số reranker (JSON, vài KB) |
-| `docs/` | benchmark spec, 20 truy vấn kiểm tra, data card, data dictionary, ablation plan, hướng dẫn vai trò, system card, AI-use statement, license note |
+| `docs/` | benchmark spec, gói chung N3/N4, đề cương, 20 truy vấn kiểm tra, data card, data dictionary, ablation plan, hướng dẫn vai trò, system card, AI-use statement, license note |
+| `data/`, `indexes/`, `tools/` | dữ liệu, chỉ mục và công cụ ngoài, chỉ có trên máy (không đưa vào Git) |
 
 ## Tài liệu
 - `report/report.pdf`: báo cáo chính thức (nguồn LaTeX trong `report/latex/`, biên dịch bằng `bash report/latex/build.sh`); `report/report.md` là bản nháp cũ
-- `docs/benchmark_spec.md`: benchmark đề xuất dùng chung với Nhóm 4 (các mục **[cần chốt]** chờ Nhóm 4 trả lời)
+- `docs/benchmark_spec.md`: benchmark mức tactic dùng trong báo cáo
+- `docs/n4_shared_benchmark.md`: gói benchmark chung với Nhóm 4 (schema, SHA-256, quy tắc eligible, cách chấm, lưu ý về truy vấn còn chứa chứng minh)
+- `docs/decuong_1_trang.md`: đề cương 1 trang nộp tuần 1 (Phụ lục A)
 - `docs/check_queries.md`: 20 truy vấn kiểm tra định nghĩa benchmark (tuần 1)
 - `docs/data_dictionary.md`: mô tả từng cột của mọi bảng (tuần 2)
 - `docs/ablation_plan.md`: giả thuyết, biến thể và quy tắc kết luận của ablation (tuần 5)

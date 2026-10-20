@@ -3,6 +3,11 @@
 Trạng thái: **bản nháp do Nhóm 3 đề xuất**. Mọi mục dưới đây đã được cài đặt và chạy được trong repo; khi
 Nhóm 4 xác nhận hoặc đề nghị sửa, nâng phiên bản (v0.2) và chạy lại. Những mục cần Nhóm 4 trả lời được đánh dấu **[cần chốt]**.
 
+Cập nhật 2026-10-20: benchmark để so sánh với Nhóm 4 đã được ghim riêng ở mức theorem (gói `n4_shared`, xem
+`docs/n4_shared_benchmark.md`, kết quả của Nhóm 3 ở `results/figures/shared_benchmark.md`). Spec này vẫn định nghĩa
+benchmark mức tactic dùng cho mọi bảng trong báo cáo; các mục **[cần chốt]** chỉ còn áp dụng nếu hai nhóm muốn so sánh
+thêm ở mức tactic.
+
 ## 1. Dữ liệu nguồn
 
 | Mục | Giá trị |
