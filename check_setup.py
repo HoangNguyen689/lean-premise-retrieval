@@ -74,15 +74,23 @@ def main() -> int:
         "src/evaluation/metrics.py": "evaluation metrics",
         "src/retrieval/systems.py": "retrieval systems",
         "tests/test_metrics.py": "unit tests",
-        "results/real/eval_summary.csv": "precomputed evaluation summary",
         "results/real/qrels_s3.csv": "ground-truth qrels",
-        "results/real/run_hybrid_s3.csv": "hybrid run file",
         "docs/report_draft.md": "report draft",
     }
     for rel, desc in required.items():
         status = OK if (ROOT / rel).exists() else FAIL
         report(status, f"{rel} — {desc}",
                "missing file — re-download the project archive")
+
+    print("\n[2b] Generated artifacts (optional until you run retrieval)")
+    generated = {
+        "results/real/eval_summary.csv": "evaluation summary",
+        "results/real/run_hybrid_s3.csv": "hybrid run file",
+    }
+    for rel, desc in generated.items():
+        status = OK if (ROOT / rel).exists() else WARN
+        report(status, f"{rel} — {desc}",
+               "run: python scripts/run_real_retrieval.py")
 
     # ── 3. Python libraries ──
     print("\n[3] Python libraries")
