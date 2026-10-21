@@ -1,11 +1,14 @@
-"""Generate optional artifacts on top of the real corpus.
+"""Bổ sung các minh chứng còn thiếu so với đề bài (kiểm tra 2026-10-15):
 
-1. Convert CSV files to Parquet.
-2. Measure index size for each system/scale.
-3. Analyze failure cases by symbol count / statement length (if available).
-4. Run hybrid S3 three times to measure runtime variance.
+1. **Parquet** (tuần 2): chuyển corpus/queries/qrels CSV → Parquet.
+2. **Index size + index manifest** (tuần 6, mục 9): đo index size MB mỗi hệ/scale,
+   ghi index_manifest.json + index_size.csv.
+3. **Error analysis theo ký hiệu/độ dài** (tuần 8): bổ sung slice symbol_heavy /
+   statement length cho failure cases (ghép vào taxonomy).
+4. **Lặp 3 lần runtime** (mục 8): chạy lại hybrid S3 3 lần, ghi median + min/max
+   → results/real/runtime_repeats.csv.
 
-Run: python scripts/fill_gaps.py
+Chạy:  python scripts/fill_gaps.py
 """
 from __future__ import annotations
 
