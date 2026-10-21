@@ -1,14 +1,12 @@
-"""Pinned N3/N4 LeanDojo Benchmark 4 corpus/query validator (Hoàng)."""
+"""Pinned cross-team N3/N4 LeanDojo Benchmark 4 corpus/query validator."""
 from __future__ import annotations
 
 import hashlib
-import io
 import json
-import re
 import zipfile
 from collections import Counter
 from pathlib import Path
-from typing import BinaryIO, Iterator
+from typing import IO, Iterator
 
 DATA_VERSION = 'leandojo-benchmark-4@29dcec07+split-v1.0'
 SOURCE_COMMIT = '29dcec074de168ac2bf835a77ef68bbe069194c5'
@@ -25,14 +23,14 @@ class ContractError(ValueError):
     """Source data violates the agreed frozen N3/N4 contract."""
 
 
-def checksum(stream: BinaryIO) -> str:
+def checksum(stream: IO[bytes]) -> str:
     digest = hashlib.sha256()
     for part in iter(lambda: stream.read(1024*1024), b''):
         digest.update(part)
     return digest.hexdigest()
 
 
-def _iter_jsonl(raw: BinaryIO, label: str) -> Iterator[tuple[int,dict]]:
+def _iter_jsonl(raw: IO[bytes], label: str) -> Iterator[tuple[int,dict]]:
     for line_no, line in enumerate(raw, 1):
         if not line.strip():
             raise ContractError(f'{label}:{line_no}: blank line')
@@ -60,7 +58,7 @@ def eligible(premise_id: str, query_id: str) -> bool:
     return premise_id != theorem_id(query_id)
 
 
-def load_and_validate(corpus_stream: BinaryIO, query_stream: BinaryIO, *, strict_counts: bool = True) -> dict:
+def load_and_validate(corpus_stream: IO[bytes], query_stream: IO[bytes], *, strict_counts: bool = True) -> dict:
     """Validate exact shared schema, referential integrity and frozen query pool.
 
     Returns provenance/quality report, not an altered/reconstructed dataset.
