@@ -124,6 +124,16 @@ split** when comparing N3 and N4. To validate the supplied snapshot:
 python scripts/verify_n4_shared.py data_raw/n4_shared.zip
 ```
 
+> **Note on line endings:** The canonical `n4_shared.zip` uses Windows-style
+> line endings (`CRLF`, `\r\n`) for `corpus.jsonl` and `queries.jsonl`.
+> If you regenerate the package with `scripts/export_n4_shared.py`, it already
+> writes `CRLF`; manually created files must use `CRLF` to match the frozen
+> SHA-256 hashes below.
+>
+> Frozen SHA-256:
+> - `corpus.jsonl`:  `c9157bd1381ca4147aa931f14b9985ac9bfe5cbfe892a982a24a133ff4221efd`
+> - `queries.jsonl`: `c2b764fafe981755ae7ca2614912498f0559317ea5427bcb7a7150cb45166004`
+
 See [`docs/HOANG_DATA_HANDOFF.md`](docs/HOANG_DATA_HANDOFF.md) for exact
 schema, SHA-256 hashes, query eligibility, and handoff rules. Existing scripts
 remain available; this validator is non-destructive.
