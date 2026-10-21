@@ -6,7 +6,7 @@ seed/timeout, metrics, status/log.
 
 Ví dụ:
 
-    from run_logger import RunLogger
+    from run_logger import RunLogger  # type: ignore[import]
     log = RunLogger(parameters={"index": "bm25", "k": 50}, seed=42)
     try:
         ...chạy thí nghiệm...

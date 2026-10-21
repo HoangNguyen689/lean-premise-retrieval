@@ -23,7 +23,7 @@ RAW = ROOT / "results" / "raw"
 FIG = ROOT / "results" / "figures"
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from metrics import evaluate_from_files  # noqa: E402
+from metrics import evaluate_from_files  # noqa: E402  # type: ignore[import]
 
 SCALES = ["s1", "s2", "s3"]
 SCALE_LABEL = {"s1": "10K", "s2": "50K", "s3": "full (100K)"}

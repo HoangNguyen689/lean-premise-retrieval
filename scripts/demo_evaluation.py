@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from metrics import evaluate_from_files
+from metrics import evaluate_from_files  # type: ignore[import]
 
 random.seed(42)
 

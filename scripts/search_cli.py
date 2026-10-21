@@ -23,7 +23,7 @@ ROOT = Path(__file__).parent.parent
 REAL = ROOT / "results" / "real"
 sys.path.insert(0, str(ROOT / "src" / "retrieval"))
 
-from systems import RetrievalSystem  # noqa: E402
+from systems import RetrievalSystem  # noqa: E402  # type: ignore[import]
 
 _cache: dict[str, RetrievalSystem] = {}
 

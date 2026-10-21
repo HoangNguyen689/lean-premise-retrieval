@@ -26,8 +26,8 @@ REAL = ROOT / "results" / "real"
 sys.path.insert(0, str(ROOT / "src" / "retrieval"))
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from systems import RetrievalSystem  # noqa: E402
-from run_logger import RunLogger  # noqa: E402
+from systems import RetrievalSystem  # noqa: E402  # type: ignore[import]
+from run_logger import RunLogger  # noqa: E402  # type: ignore[import]
 
 DATA_VERSION = "leandojo-benchmark-4@29dcec07+split-v1.0"
 SCALE = "s2"  # load test trên 50K corpus (đại diện; s3 quá nặng cho máy cá nhân)

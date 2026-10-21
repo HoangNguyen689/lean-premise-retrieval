@@ -26,7 +26,7 @@ REAL = ROOT / "results" / "real"
 OUT = ROOT / "results" / "raw"
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from metrics import QueryResult, load_qrels_csv, load_run_csv, recall_at_k  # noqa: E402
+from metrics import QueryResult, load_qrels_csv, load_run_csv, recall_at_k  # noqa: E402  # type: ignore[import]
 
 SYSTEMS = ["hybrid", "bm25", "bm25_fielddrop"]  # chính + đối chứng (dữ liệu thật)
 SCALE = "s3"               # phân tích trên scale lớn nhất

@@ -62,7 +62,7 @@ def task_parquet() -> None:
 
 def task_index_size() -> None:
     """Đo index size thật (inverted index RAM serialize + bytes corpus) mỗi hệ/scale."""
-    from systems import RetrievalSystem
+    from systems import RetrievalSystem  # type: ignore[import]
     rows, manifest = [], {}
     for scale in SCALES:
         corpus = list(csv.DictReader(open(REAL / f"corpus_{scale}.csv", encoding="utf-8")))
@@ -138,7 +138,7 @@ def task_error_slices() -> None:
 
 def task_runtime_repeats() -> None:
     """Mục 8: runtime biến động chạy ≥3 lần — đo hybrid S3 3 lần."""
-    from systems import RetrievalSystem
+    from systems import RetrievalSystem  # type: ignore[import]
     corpus = list(csv.DictReader(open(REAL / "corpus_s3.csv", encoding="utf-8")))
     queries = list(csv.DictReader(open(REAL / "queries_s3.csv", encoding="utf-8")))
     rows = []

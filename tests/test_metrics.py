@@ -14,7 +14,7 @@ if sys.stderr.encoding and sys.stderr.encoding.lower() not in ("utf-8", "utf8"):
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "evaluation"))
 
-from metrics import QueryResult, dcg_at_k, evaluate, ndcg_at_k, recall_at_k, reciprocal_rank
+from metrics import QueryResult, dcg_at_k, evaluate, ndcg_at_k, recall_at_k, reciprocal_rank  # type: ignore[import]
 
 PASS = 0
 FAIL = 0

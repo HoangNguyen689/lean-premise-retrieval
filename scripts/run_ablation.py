@@ -22,8 +22,8 @@ RAW = ROOT / "results" / "raw"
 FIG = ROOT / "results" / "figures"
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from metrics import evaluate_from_files  # noqa: E402
-from run_logger import RunLogger  # noqa: E402
+from metrics import evaluate_from_files  # noqa: E402  # type: ignore[import]
+from run_logger import RunLogger  # noqa: E402  # type: ignore[import]
 
 # Mỗi dòng = một cấu hình ablation: (tên cấu hình, thành phần bị bỏ, run file)
 ABLATIONS = [

@@ -18,9 +18,9 @@ ROOT = Path(__file__).parent.parent
 RAW = ROOT / "results" / "raw"
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from contract import validate_csv  # noqa: E402
-from metrics import evaluate_from_files  # noqa: E402
-from run_logger import RunLogger  # RunLogger ghi JSON theo Phụ lục B
+from contract import validate_csv  # noqa: E402  # type: ignore[import]
+from metrics import evaluate_from_files  # noqa: E402  # type: ignore[import]
+from run_logger import RunLogger  # RunLogger ghi JSON theo Phụ lục B  # type: ignore[import]
 
 SYSTEMS = [
     # (tên, mô tả, nhóm sở hữu)

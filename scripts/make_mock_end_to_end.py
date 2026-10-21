@@ -38,7 +38,7 @@ ROOT = Path(__file__).parent.parent
 RAW = ROOT / "results" / "raw"
 sys.path.insert(0, str(ROOT / "src" / "evaluation"))
 
-from contract import validate_csv  # noqa: E402
+from contract import validate_csv  # noqa: E402  # type: ignore[import]
 
 random.seed(42)
 DATA_VERSION = "mock-v0+split-v1.0"

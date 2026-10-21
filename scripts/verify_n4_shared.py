@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
-from data.shared import ContractError,verify_archive,verify_directory
+from data.shared import ContractError,verify_archive,verify_directory  # type: ignore[import]
 
 
 def main() -> int:
