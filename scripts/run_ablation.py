@@ -1,4 +1,4 @@
-"""Ablation study — phân tích đóng góp của từng thành phần.
+"""Ablation study - phân tích đóng góp của từng thành phần.
 
 Câu hỏi ablation trả lời (theo hướng dẫn môn, mục 8 của Nhóm 3):
   - BM25 mặc định vs field-aware (thêm namespace/field weights)
@@ -27,7 +27,7 @@ from run_logger import RunLogger  # noqa: E402  # type: ignore[import]
 
 # Mỗi dòng = một cấu hình ablation: (tên cấu hình, thành phần bị bỏ, run file)
 ABLATIONS = [
-    ("full_hybrid",      "— (đầy đủ: sparse + ký hiệu + namespace + structural)", "hybrid"),
+    ("full_hybrid",      "- (đầy đủ: sparse + ký hiệu + namespace + structural)", "hybrid"),
     ("no_structural",    "bỏ structural reranking (chỉ BM25 + field weights)",    "bm25"),
     ("no_lean_symbols",  "bỏ tokenizer ký hiệu Lean",                             "bm25_fielddrop"),
     ("baseline_only",    "baseline thuần: BM25 mặc định trên statement tách từ",  "bm25"),
@@ -87,7 +87,7 @@ def main() -> int:
     ax.set_xticks([x + width for x in xs])
     ax.set_xticklabels(["full\nhybrid", "no\nstructural", "no lean\nsymbols", "baseline\nonly"])
     ax.set_ylabel(METRIC)
-    ax.set_title("Ablation — đóng góp từng thành phần (mock data, seed=42)")
+    ax.set_title("Ablation - đóng góp từng thành phần (mock data, seed=42)")
     ax.legend(title="Scale")
     fig.tight_layout()
     fig_path = FIG / "ablation_recall10.png"

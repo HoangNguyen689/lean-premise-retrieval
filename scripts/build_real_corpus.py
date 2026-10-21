@@ -1,12 +1,12 @@
 """Build real corpus, queries, and qrels from LeanDojo Benchmark 4.
 
-TV1 (Data/Extraction) — run once after extracting data_raw/leandojo_benchmark_4/.
+TV1 (Data/Extraction) - run once after extracting data_raw/leandojo_benchmark_4/.
 
 Outputs (written to results/real/):
-  corpus_{s1,s2,s3,full}.csv   — declarations
-  queries_{s1,s2,s3,full}.csv  — test queries with premise ground truth
-  qrels_{s1,s2,s3,full}.csv    — relevance labels (2 = direct premise, 1 = same-file)
-  split_manifest.json          — checksums + counts + data_version
+  corpus_{s1,s2,s3,full}.csv   - declarations
+  queries_{s1,s2,s3,full}.csv  - test queries with premise ground truth
+  qrels_{s1,s2,s3,full}.csv    - relevance labels (2 = direct premise, 1 = same-file)
+  split_manifest.json          - checksums + counts + data_version
 
 Scales S1/S2/S3 are nested subsets sorted by id (corpus) and full_name (queries).
 """

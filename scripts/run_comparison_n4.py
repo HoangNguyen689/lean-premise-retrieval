@@ -1,10 +1,10 @@
-"""Comparison Nhóm 3 (sparse/hybrid) vs Nhóm 4 (dense/ANN) — nhiệm vụ tuần 9.
+"""Comparison Nhóm 3 (sparse/hybrid) vs Nhóm 4 (dense/ANN) - nhiệm vụ tuần 9.
 
 Đọc eval_summary.csv (N3 tự tính) + run_dense_*.csv (N4 giao, theo data contract
 §7) và sinh:
-  - results/raw/comparison_table.csv  — bảng so sánh trên cùng split
-  - results/figures/comparison_recall10_by_scale.png — biểu đồ cột theo scale
-  - results/figures/comparison_tradeoff.png — trade-off chất lượng (x) vs chi phí (y)
+  - results/raw/comparison_table.csv  - bảng so sánh trên cùng split
+  - results/figures/comparison_recall10_by_scale.png - biểu đồ cột theo scale
+  - results/figures/comparison_tradeoff.png - trade-off chất lượng (x) vs chi phí (y)
 
 Quy tắc công bằng (theo data contract §6): cùng split, cùng qrels, cùng quy ước
 Recall (nhãn 2), cùng phần cứng. Nếu N4 chưa giao run file thật → dùng run file
@@ -28,9 +28,9 @@ from metrics import evaluate_from_files  # noqa: E402  # type: ignore[import]
 SCALES = ["s1", "s2", "s3"]
 SCALE_LABEL = {"s1": "10K", "s2": "50K", "s3": "full (100K)"}
 N3_SYSTEMS = ["bm25", "hybrid"]
-N4_SYSTEMS = ["dense"]  # Nhóm 4: exact cosine và ANN — mock 1 cột, thay khi N4 giao thật
+N4_SYSTEMS = ["dense"]  # Nhóm 4: exact cosine và ANN - mock 1 cột, thay khi N4 giao thật
 
-# Chi phí mô phỏng (index size MB, build time s, P95 ms) — thay bằng đo thật tuần 7.
+# Chi phí mô phỏng (index size MB, build time s, P95 ms) - thay bằng đo thật tuần 7.
 # Đây là chỗ duy nhất TV5 phải cập nhật số liệu thật; đánh giá chất lượng không phụ thuộc.
 COST_MOCK = {
     "s1": {"bm25": (2.1, 4.2, 1.8), "hybrid": (2.4, 5.1, 2.3), "dense": (12.8, 38.0, 6.5)},
@@ -52,7 +52,7 @@ def main() -> int:
     metrics = load_metrics()
 
     # Nếu N4 giao run file thật (run_dense_real_*.csv) → dùng thay mock
-    dense_source = "mock (N4 chưa giao run thật — đánh dấu trong báo cáo)"
+    dense_source = "mock (N4 chưa giao run thật - đánh dấu trong báo cáo)"
     for scale in SCALES:
         real = RAW / f"run_dense_real_{scale}.csv"
         if real.exists():
@@ -78,7 +78,7 @@ def main() -> int:
         w.writerow(["scale", "corpus_size", "system", "owner", "Recall@10", "MRR",
                     "p95_ms", "index_mb", "build_s"])
         w.writerows(rows)
-    print(f"Đã ghi {out.relative_to(ROOT)} — nguồn dense: {dense_source}\n")
+    print(f"Đã ghi {out.relative_to(ROOT)} - nguồn dense: {dense_source}\n")
 
     hdr = f"{'Scale':<14} {'Hệ thống':<10} {'Owner':<5} {'Recall@10':>10} {'MRR':>8} {'P95 ms':>8}"
     print(hdr)

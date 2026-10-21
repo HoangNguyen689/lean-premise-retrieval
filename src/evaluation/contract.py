@@ -3,7 +3,7 @@
 TV1 (Data/Extraction) dùng hàm `validate_contract` để kiểm tra corpus/query
 trước khi giao cho TV2/TV3. TV6 dùng để kiểm tra qrels trước khi chấm điểm.
 
-Contract: docs/data_contract_v1.md — 6 field bắt buộc.
+Contract: docs/data_contract_v1.md - 6 field bắt buộc.
 """
 from __future__ import annotations
 
@@ -42,13 +42,13 @@ class ContractReport:
 
     def summary(self) -> str:
         status = "PASS" if self.ok else f"FAIL ({len(self.errors)} lỗi)"
-        return f"{self.path}: {self.n_rows} dòng — {status}"
+        return f"{self.path}: {self.n_rows} dòng - {status}"
 
 
 def validate_csv(path: str | Path, artifact: str = "corpus") -> ContractReport:
     """Kiểm tra một tệp CSV theo contract v1.
 
-    artifact: 'corpus' | 'queries' | 'qrels' — quy định field bắt buộc.
+    artifact: 'corpus' | 'queries' | 'qrels' - quy định field bắt buộc.
     """
     path = Path(path)
     report = ContractReport(path=str(path), n_rows=0)

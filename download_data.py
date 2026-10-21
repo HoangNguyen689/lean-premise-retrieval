@@ -109,15 +109,15 @@ def print_manual_download_instructions() -> None:
 def step_deps() -> None:
     print("\n[1/4] Checking libraries (pyarrow, pandas)...")
     if importlib.util.find_spec("pyarrow") and importlib.util.find_spec("pandas"):
-        print("  ✓ pyarrow + pandas found — Parquet files will be generated.")
+        print("  ✓ pyarrow + pandas found - Parquet files will be generated.")
     else:
-        print("  ⚠ pyarrow/pandas missing — trying pip install...")
+        print("  ⚠ pyarrow/pandas missing - trying pip install...")
         r = subprocess.run([sys.executable, "-m", "pip", "install", "pyarrow", "pandas"])
         if r.returncode == 0:
             print("  ✓ Installation complete.")
         else:
             print("  ⚠ Installation failed. CSV files will still be built; only Parquet is skipped.")
-            print("    (The assignment requires Parquet — install manually: pip install pyarrow pandas)")
+            print("    (The assignment requires Parquet - install manually: pip install pyarrow pandas)")
 
 
 def verify_zenodo_file() -> dict:
@@ -127,7 +127,7 @@ def verify_zenodo_file() -> dict:
         with urllib.request.urlopen(req, timeout=30) as resp:
             meta = json.load(resp)
         f = meta["files"][0]
-        print(f"  Zenodo OK: {f['key']} — {f['size'] / 1e6:.1f} MB (confirmed by server)")
+        print(f"  Zenodo OK: {f['key']} - {f['size'] / 1e6:.1f} MB (confirmed by server)")
         return meta
     except Exception as e:
         print(f"  ✗ Cannot reach Zenodo: {e}")
@@ -141,12 +141,12 @@ def download_tarball() -> None:
     if TARBALL.exists():
         actual = sha256_of(TARBALL)
         if actual == EXPECTED_SHA256:
-            print("  ✓ Tarball already present and checksum matches — skipping download.")
+            print("  ✓ Tarball already present and checksum matches - skipping download.")
             return
         if TARBALL.stat().st_size < 1_000_000:
-            print(f"  ⚠ Existing tarball too small ({TARBALL.stat().st_size} bytes) — likely an error page, deleting.")
+            print(f"  ⚠ Existing tarball too small ({TARBALL.stat().st_size} bytes) - likely an error page, deleting.")
         else:
-            print("  ⚠ Existing tarball checksum mismatch (network interrupted?) — deleting and re-downloading.")
+            print("  ⚠ Existing tarball checksum mismatch (network interrupted?) - deleting and re-downloading.")
         safe_unlink(TARBALL)
 
     verify_zenodo_file()
@@ -175,47 +175,47 @@ def download_tarball() -> None:
                     next_report += 10 * 1024 * 1024
     except KeyboardInterrupt:
         tmp.unlink(missing_ok=True)
-        print("  ✗ Download cancelled by user — rerun to start from the beginning.")
+        print("  ✗ Download cancelled by user - rerun to start from the beginning.")
         sys.exit(1)
     except Exception as e:
         tmp.unlink(missing_ok=True)
         print(f"  ✗ Download failed: {e}")
-        print("    Partial .part file removed — rerun to retry.")
+        print("    Partial .part file removed - rerun to retry.")
         sys.exit(1)
 
     if total != EXPECTED_SIZE:
         tmp.unlink(missing_ok=True)
-        print(f"  ✗ Size mismatch: received {total} ≠ {EXPECTED_SIZE} bytes — download incomplete, removed.")
+        print(f"  ✗ Size mismatch: received {total} ≠ {EXPECTED_SIZE} bytes - download incomplete, removed.")
         print("    Rerun the script to retry.")
         sys.exit(1)
 
     actual = sha256_of(tmp)
     if actual != EXPECTED_SHA256:
         tmp.unlink(missing_ok=True)
-        print("  ✗ SHA-256 mismatch — file corrupted, removed. Rerun the script to retry.")
+        print("  ✗ SHA-256 mismatch - file corrupted, removed. Rerun the script to retry.")
         sys.exit(1)
 
     move_into_place(tmp, TARBALL)
-    print(f"  ✓ Downloaded {total / 1e6:.1f} MB in {time.time() - t0:.0f}s — SHA-256 matches ✓")
+    print(f"  ✓ Downloaded {total / 1e6:.1f} MB in {time.time() - t0:.0f}s - SHA-256 matches ✓")
 
 
 def step_extract() -> None:
     print("\n[3/4] Extracting...")
     if all((EXTRACTED / r).exists() for r in REQUIRED_AFTER_EXTRACT):
-        print("  ✓ Already fully extracted — skipping.")
+        print("  ✓ Already fully extracted - skipping.")
         return
     if not TARBALL.exists():
-        print("  ✗ Tarball missing — rerun the script (step 2 will download it).")
+        print("  ✗ Tarball missing - rerun the script (step 2 will download it).")
         sys.exit(1)
     EXTRACTED.parent.mkdir(parents=True, exist_ok=True)
     import tarfile
 
     t0 = time.time()
     with tarfile.open(TARBALL, "r:gz") as tf:
-        tf.extractall(EXTRACTED.parent)  # noqa: S202 — official Zenodo archive
+        tf.extractall(EXTRACTED.parent)  # noqa: S202 - official Zenodo archive
     missing = [r for r in REQUIRED_AFTER_EXTRACT if not (EXTRACTED / r).exists()]
     if missing:
-        print(f"  ✗ Missing after extraction: {missing} — tarball may be corrupt. Delete data_raw/ and rerun.")
+        print(f"  ✗ Missing after extraction: {missing} - tarball may be corrupt. Delete data_raw/ and rerun.")
         sys.exit(1)
     print(f"  ✓ Extracted in {time.time() - t0:.0f}s → {EXTRACTED.name}/")
 
@@ -223,7 +223,7 @@ def step_extract() -> None:
 def step_build() -> None:
     print("\n[4/4] Building corpus + queries + qrels for 3 scales...")
     if not run_py(ROOT / "scripts" / "build_real_corpus.py", "build real corpus"):
-        print("    This step is required — cannot continue.")
+        print("    This step is required - cannot continue.")
         sys.exit(1)
     print("\n→ Adding Parquet + data dictionary + index size + repeats...")
     if not run_py(ROOT / "scripts" / "fill_gaps.py", "fill gaps (Parquet/index/repeats)"):
@@ -240,7 +240,7 @@ def main() -> int:
 
     for required in ["scripts/build_real_corpus.py", "scripts/fill_gaps.py"]:
         if not (ROOT / required).exists():
-            print(f"✗ Missing file: {required} — project archive is incomplete.")
+            print(f"✗ Missing file: {required} - project archive is incomplete.")
             return 1
 
     step_deps()
@@ -249,7 +249,7 @@ def main() -> int:
     step_build()
 
     print("\n" + "=" * 60)
-    print(" ✓ Done — real data is ready")
+    print(" ✓ Done - real data is ready")
     print("=" * 60)
     print(" Verify:   python check_setup.py")
     print(' Demo:     python scripts/search_cli.py "Every finite integral domain is a field" --top 5')

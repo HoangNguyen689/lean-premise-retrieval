@@ -1,13 +1,13 @@
-"""Failure analysis — 30 failure cases được phân loại (nhiệm vụ tuần 8 của TV6).
+"""Failure analysis - 30 failure cases được phân loại (nhiệm vụ tuần 8 của TV6).
 
 Với mỗi query, hệ thống bị coi là FAIL khi Recall@10 < 1.0 (bỏ sót premise
 relevant trực tiếp trong top-10). Script:
   1. Xếp hạng query tệ nhất theo Recall@10 của phương pháp chính (hybrid)
   2. Rút 30 case tệ nhất, phân loại lỗi theo taxonomy (xem docs/evaluation_protocol.md):
        - empty_overlap : query không khớp token nào với gold premise
-       - symbol_heavy  : statement chứa nhiều ký hiệu Lean (≥ 3) — tokenizer yếu
-       - few_gold      : gold premise ít (≤ 2) — 1 premise trượt là mất nặng recall
-       - many_gold     : gold premise nhiều (≥ 5) — khó gom đủ trong top-10
+       - symbol_heavy  : statement chứa nhiều ký hiệu Lean (≥ 3) - tokenizer yếu
+       - few_gold      : gold premise ít (≤ 2) - 1 premise trượt là mất nặng recall
+       - many_gold     : gold premise nhiều (≥ 5) - khó gom đủ trong top-10
        - cross_topic   : gold premise nằm lệch namespace/query topic
   3. Ghi results/raw/failure_cases.csv (30 dòng, mỗi dòng 1 case có phân loại)
   4. Ghi results/raw/failure_taxonomy.csv (tổng hợp theo loại)
@@ -104,7 +104,7 @@ def main() -> int:
         rows.append([
             qid, system, q.get("namespace", ""), f"{r10:.2f}",
             len(qr.gold_premises),
-            ";".join(sorted(missing)) or "—",
+            ";".join(sorted(missing)) or "-",
             ";".join(labels),
         ])
 

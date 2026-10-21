@@ -1,4 +1,4 @@
-"""Run logger — ghi đủ 10 trường theo Phụ lục B của hướng dẫn môn học.
+"""Run logger - ghi đủ 10 trường theo Phụ lục B của hướng dẫn môn học.
 
 Mọi thí nghiệm (tuần 7+) phải dùng module này để ghi metadata một lần chạy:
 run_id, timestamp, git_commit, data_version, machine, software, parameters,

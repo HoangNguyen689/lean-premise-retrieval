@@ -4,7 +4,7 @@ Một lệnh thay thế toàn bộ mock: đọc results/real/{corpus,queries,qre
 chạy bm25 / bm25_fielddrop / bm25_field / hybrid, ghi:
   results/real/run_{system}_{scale}.csv   (run file chuẩn: query_id, premise_id)
   results/real/eval_summary.csv           (metrics thật)
-  results/real/latency_{scale}.csv        (P50/P95 ms mỗi hệ — đo thật)
+  results/real/latency_{scale}.csv        (P50/P95 ms mỗi hệ - đo thật)
   results/raw/eval_summary_real.csv       (bản tổng hợp cho các script TV6 cũ)
 
 Chạy:  python scripts/run_real_retrieval.py
@@ -16,7 +16,7 @@ import sys
 import time
 from pathlib import Path
 
-# Windows console (CMD) thường dùng cp1252/cp437 — không chứa chữ tiếng Việt.
+# Windows console (CMD) thường dùng cp1252/cp437 - không chứa chữ tiếng Việt.
 if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 if sys.stderr.encoding and sys.stderr.encoding.lower() not in ("utf-8", "utf8"):

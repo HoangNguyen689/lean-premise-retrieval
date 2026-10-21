@@ -1,12 +1,12 @@
-"""export_n4_shared.py — Xuất gói chia sẻ đúng schema Nhóm 4 yêu cầu (thống nhất 2026-10-18).
+"""export_n4_shared.py - Xuất gói chia sẻ đúng schema Nhóm 4 yêu cầu (thống nhất 2026-10-18).
 
 Nhóm 4 đề nghị 6 mục thống nhất; 5/6 đã có trong data contract v1.1. Script này
 sinh đúng 2 file JSONL họ nêu + checksum, đặt vào results/n4_shared/:
-  - corpus.jsonl   — {id, name, statement, namespace, source_commit}
-  - queries.jsonl  — {id, statement, relevant_ids, split:"test", pool_id:"shared-frozen-pool"}
-  - checksums.txt  — SHA-256 của corpus.jsonl + queries.jsonl (để N4 xác nhận)
+  - corpus.jsonl   - {id, name, statement, namespace, source_commit}
+  - queries.jsonl  - {id, statement, relevant_ids, split:"test", pool_id:"shared-frozen-pool"}
+  - checksums.txt  - SHA-256 của corpus.jsonl + queries.jsonl (để N4 xác nhận)
 
-Chỉ dùng file có sẵn (results/real/) — KHÔNG cần dataset raw.
+Chỉ dùng file có sẵn (results/real/) - KHÔNG cần dataset raw.
 
 Chạy:  python scripts/export_n4_shared.py
 """
@@ -41,18 +41,18 @@ def main() -> int:
     qrels_path = REAL / "qrels_s3.csv"
     for p in [corpus_path, queries_path, qrels_path]:
         if not p.exists():
-            print(f"✗ Thiếu {p.name} — chạy download_data.py trước.")
+            print(f"✗ Thiếu {p.name} - chạy download_data.py trước.")
             return 1
     OUT.mkdir(parents=True, exist_ok=True)
 
-    # ── corpus.jsonl — schema N4: id, name, statement, namespace, source_commit ──
+    # ── corpus.jsonl - schema N4: id, name, statement, namespace, source_commit ──
     n = 0
     with open(OUT / "corpus.jsonl", "w", encoding="utf-8") as out, \
          open(corpus_path, encoding="utf-8") as f:
         for row in csv.DictReader(f):
             out.write(json.dumps({
                 "id": row["id"],
-                "name": row["id"],  # name = full_name (không tách được name riêng — ghi chú trong contract)
+                "name": row["id"],  # name = full_name (không tách được name riêng - ghi chú trong contract)
                 "statement": row["statement"],
                 "namespace": row["namespace"],
                 "source_commit": MATHLIB_COMMIT,
@@ -60,7 +60,7 @@ def main() -> int:
             n += 1
     print(f"✓ corpus.jsonl: {n:,} declarations")
 
-    # ── queries.jsonl — schema N4: id, statement, relevant_ids, split, pool_id ──
+    # ── queries.jsonl - schema N4: id, statement, relevant_ids, split, pool_id ──
     # relevant_ids = các premise nhãn 2 (đúng trực tiếp từ proof trace)
     golds: dict[str, list[str]] = {}
     with open(qrels_path, encoding="utf-8") as f:
@@ -85,7 +85,7 @@ def main() -> int:
 
     # ── checksums.txt ──
     with open(OUT / "checksums.txt", "w", encoding="utf-8") as out:
-        out.write(f"# Gói chia sẻ N3→N4 — {DATA_VERSION}\n")
+        out.write(f"# Gói chia sẻ N3→N4 - {DATA_VERSION}\n")
         out.write(f"# pool_id: {POOL_ID}\n")
         for name in ["corpus.jsonl", "queries.jsonl"]:
             out.write(f"{sha256(OUT / name)}  {name}\n")
@@ -95,15 +95,15 @@ def main() -> int:
     (OUT / "eligible_rule.txt").write_text(
         "QUY TẮC ELIGIBLE PREMISE (N3 xác nhận, khớp đề nghị của N4):\n"
         "1. Theorem truy vấn KHÔNG được phép xuất hiện trong kết quả truy hồi của chính nó\n"
-        "   (đã cài trong src/retrieval/systems.py — lọc self trước khi cắt top_k).\n"
+        "   (đã cài trong src/retrieval/systems.py - lọc self trước khi cắt top_k).\n"
         "2. Premise pool = toàn bộ corpus.jsonl trừ chính theorem truy vấn (frozen trước\n"
-        "   mọi run — pool_id: shared-frozen-pool).\n"
-        "3. 56 nhãn-2 là theorem thuộc test split KHÁC được dùng làm premise của query —\n"
+        "   mọi run - pool_id: shared-frozen-pool).\n"
+        "3. 56 nhãn-2 là theorem thuộc test split KHÁC được dùng làm premise của query -\n"
         "   hợp lệ (premise giữa các theorem test với nhau), giữ nguyên trong relevant_ids.\n",
         encoding="utf-8")
     print(f"✓ eligible_rule.txt")
 
-    print(f"\nGói: {OUT} — gửi cho N4 (nén zip ~15 MB).")
+    print(f"\nGói: {OUT} - gửi cho N4 (nén zip ~15 MB).")
     return 0
 
 

@@ -24,9 +24,9 @@ from run_logger import RunLogger  # RunLogger ghi JSON theo Phụ lục B  # typ
 
 SYSTEMS = [
     # (tên, mô tả, nhóm sở hữu)
-    ("bm25", "BM25 baseline (TV3) — TF-IDF/BM25 mặc định trên statement tách từ", "N3"),
+    ("bm25", "BM25 baseline (TV3) - TF-IDF/BM25 mặc định trên statement tách từ", "N3"),
     ("bm25_fielddrop", "Ablation: BM25 không thấy ký hiệu Lean (TV4)", "N3"),
-    ("hybrid", "Hybrid sparse+structural reranker (TV4) — phương pháp chính N3", "N3"),
+    ("hybrid", "Hybrid sparse+structural reranker (TV4) - phương pháp chính N3", "N3"),
     ("dense", "Dense/ANN (Nhóm 4)", "N4"),
 ]
 SCALES = ["s1", "s2", "s3"]

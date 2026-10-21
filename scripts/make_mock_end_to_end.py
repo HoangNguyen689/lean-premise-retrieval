@@ -1,15 +1,15 @@
-"""Mock end-to-end data — thay người khác khi họ chậm (kịch bản phòng hờ TV6).
+"""Mock end-to-end data - thay người khác khi họ chậm (kịch bản phòng hờ TV6).
 
 Tạo đầy đủ artifact theo data_contract_v1.md cho MỌI mức scale, để TV6
 (Evaluation) chạy được toàn bộ pipeline mà không phụ thuộc TV1-TV5 hay Nhóm 4:
   - corpus_{s1,s2,full}.csv   (premise pool, 6 field contract)
   - queries_{s1,s2,full}.csv  (query set, 6 field contract)
   - qrels_{s1,s2,full}.csv    (nhãn 0/1/2, pooling)
-  - run_bm25_{s1,s2,full}.csv         (TV3 — BM25 baseline)
-  - run_bm25_fielddrop_{s1,s2,full}.csv (TV4 — BM25 bỏ field ký hiệu — ablation)
-  - run_hybrid_{s1,s2,full}.csv       (TV4 — hybrid reranker — phương pháp chính)
-  - run_dense_{s1,s2,full}.csv        (Nhóm 4 — dense/ANN)
-  - run_latency_{s1,s2,full}.csv      (TV5 — P50/P95 latency mỗi hệ)
+  - run_bm25_{s1,s2,full}.csv         (TV3 - BM25 baseline)
+  - run_bm25_fielddrop_{s1,s2,full}.csv (TV4 - BM25 bỏ field ký hiệu - ablation)
+  - run_hybrid_{s1,s2,full}.csv       (TV4 - hybrid reranker - phương pháp chính)
+  - run_dense_{s1,s2,full}.csv        (Nhóm 4 - dense/ANN)
+  - run_latency_{s1,s2,full}.csv      (TV5 - P50/P95 latency mỗi hệ)
 
 Cách mô phỏng "thực tế vừa đủ": mỗi query được gán premise "tốt" dựa trên
 match token giữa statement query và statement premise (giống BM25 thật hơn là
@@ -19,7 +19,7 @@ ngẫu nhiên thuần), sau đó mỗi hệ thống thêm nhiễu khác nhau:
   - hybrid:    BM25 + boost từ namespace/dependency → recall cao hơn
   - dense:     semantic, tốt với câu tự nhiên nhưng yếu với ký hiệu Lean
 Mức thân thiện được hiệu chỉnh để hybrid > dense > bm25 > fielddrop về Recall@10
-— phản ánh giả thuyết RQ1/RQ2; khi có dữ liệu thật, thay run file bằng kết quả
+- phản ánh giả thuyết RQ1/RQ2; khi có dữ liệu thật, thay run file bằng kết quả
 thật, mọi script đánh giá không đổi.
 
 Chạy:  python scripts/make_mock_end_to_end.py
@@ -76,7 +76,7 @@ NATURAL = {
 }
 SYMBOLS = ["∀", "∃", "∈", "⊆", "⋃", "↦", "ℕ", "ℤ", "→", "∧", "∨", "¬", "=", "+", "×", "∘"]
 
-# seed theorems của query set v0 — dùng đúng statement đã chốt ở tuần 1
+# seed theorems của query set v0 - dùng đúng statement đã chốt ở tuần 1
 QUERY_STATEMENTS: dict[str, tuple[str, str]] = {}
 for row in csv.DictReader(open(ROOT / "configs" / "query_set_v0.csv", encoding="utf-8")):
     QUERY_STATEMENTS[row["query_id"]] = (row["topic"], row["statement_raw"])
@@ -108,7 +108,7 @@ def build_corpus(n: int) -> list[dict]:
             "namespace": ns.split(".")[-1],
             "file_path": f"{ns.replace('.', '/')}.lean",
             "line_start": random.randint(1, 900),
-            "topic": topic,  # cột nội bộ — validator bỏ qua cột thừa
+            "topic": topic,  # cột nội bộ - validator bỏ qua cột thừa
         })
     return rows
 

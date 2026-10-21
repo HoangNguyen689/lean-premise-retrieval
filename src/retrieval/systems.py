@@ -1,12 +1,12 @@
-"""Retrieval systems THẬT cho Nhóm 3 — TV2 (index) + TV3 (BM25) + TV4 (structural).
+"""Retrieval systems THẬT cho Nhóm 3 - TV2 (index) + TV3 (BM25) + TV4 (structural).
 
 4 hệ thống trên corpus thật (LeanDojo Benchmark 4):
-  1. bm25           — BM25 mặc định trên statement tách từ (baseline bắt buộc của môn)
-  2. bm25_fielddrop — BM25 bỏ ký hiệu Lean (ablation RQ1: "có/không ký hiệu")
-  3. bm25_field     — field-aware: BM25 nhiều field (statement + full_name + namespace)
-  4. hybrid         — bm25_field + structural reranking (namespace match + file proximity)
+  1. bm25           - BM25 mặc định trên statement tách từ (baseline bắt buộc của môn)
+  2. bm25_fielddrop - BM25 bỏ ký hiệu Lean (ablation RQ1: "có/không ký hiệu")
+  3. bm25_field     - field-aware: BM25 nhiều field (statement + full_name + namespace)
+  4. hybrid         - bm25_field + structural reranking (namespace match + file proximity)
 
-Cùng dữ liệu, cùng split, cùng máy — theo QUY TẮC BASELINE của đề.
+Cùng dữ liệu, cùng split, cùng máy - theo QUY TẮC BASELINE của đề.
 
 Dùng rank_bm25 nếu có, không có thì BM25 thuần Python (không phụ thuộc mạng).
 """
@@ -40,7 +40,7 @@ def tokenize(text: str, keep_symbols: bool = True) -> list[str]:
     """Tách statement Lean thành tokens.
 
     keep_symbols=True  → giữ ký hiệu Lean (dùng cho bm25_field, hybrid)
-    keep_symbols=False → bỏ ký hiệu (dùng cho bm25_fielddrop — ablation)
+    keep_symbols=False → bỏ ký hiệu (dùng cho bm25_fielddrop - ablation)
     """
     if not keep_symbols:
         text = "".join(ch if ch not in LEAN_SYMBOLS else " " for ch in text)
@@ -144,7 +144,7 @@ class RetrievalSystem:
 
         Quy tắc eligible premise (data contract v1.2 §5.4, thống nhất với Nhóm 4):
         theorem truy vấn KHÔNG được phép xuất hiện trong kết quả (không dùng chính nó
-        làm premise). Vì query nằm trong corpus, lọc self trước khi cắt top_k —
+        làm premise). Vì query nằm trong corpus, lọc self trước khi cắt top_k -
         hệ vẫn trả đủ top_k kết quả hiệu dụng.
         """
         self_name = query["id"][1:] if query["id"].startswith("Q") else query["id"]
@@ -162,7 +162,7 @@ class RetrievalSystem:
             # stage 1: BM25 field-aware lấy top-200 (lấy dư để lọc self không rỗng top_k)
             text = " ".join([query["statement"], query["id"].replace("Q", ""), query["namespace"]])
             cand = self.index.search(tokenize(text, True), 200)
-            # stage 2: structural rerank — cộng điểm namespace match + file proximity
+            # stage 2: structural rerank - cộng điểm namespace match + file proximity
             q_ns = query["namespace"]
             q_file = query.get("file_path", "")
             reranked = []

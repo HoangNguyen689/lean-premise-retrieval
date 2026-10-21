@@ -1,11 +1,11 @@
-"""Unit test cho metrics.py — kết quả đối chiếu tính tay.
+"""Unit test cho metrics.py - kết quả đối chiếu tính tay.
 
 Chạy: python tests/test_metrics.py
 """
 import sys
 from pathlib import Path
 
-# Windows console (CMD) thường dùng cp1252/cp437 — không chứa chữ tiếng Việt.
+# Windows console (CMD) thường dùng cp1252/cp437 - không chứa chữ tiếng Việt.
 # Buộc stdout/stderr dùng UTF-8 (Python 3.7+) để không crash khi in tiếng Việt.
 if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]

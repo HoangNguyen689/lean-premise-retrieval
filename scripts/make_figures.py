@@ -1,10 +1,10 @@
 """Sinh toàn bộ biểu đồ từ raw results (yêu cầu môn: figure = script từ raw).
 
 Các biểu đồ:
-  1. scale_recall10.png       — Recall@10 của 4 hệ thống qua 3 mức corpus
-  2. scale_mrr.png            — MRR qua 3 mức
-  3. ablation_recall10.png    — (sinh bởi run_ablation.py, script này bỏ qua nếu có)
-  4. comparison_n3_n4.png     — (sinh bởi run_comparison_n4.py)
+  1. scale_recall10.png       - Recall@10 của 4 hệ thống qua 3 mức corpus
+  2. scale_mrr.png            - MRR qua 3 mức
+  3. ablation_recall10.png    - (sinh bởi run_ablation.py, script này bỏ qua nếu có)
+  4. comparison_n3_n4.png     - (sinh bởi run_comparison_n4.py)
 
 Chạy:  python scripts/make_figures.py
 """

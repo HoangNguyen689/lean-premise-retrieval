@@ -1,8 +1,8 @@
-"""Load test — 1/10/50 truy vấn đồng thời trên hệ hybrid (tuần 7, mức tải).
+"""Load test - 1/10/50 truy vấn đồng thời trên hệ hybrid (tuần 7, mức tải).
 
 Đo QPS và P50/P95 latency khi nhiều client gọi search song song.
 Dùng ThreadPoolExecutor để mô phỏng đồng thời; index build 1 lần, share readonly
-— đúng kịch bản serving thật (index dùng chung, request song song).
+- đúng kịch bản serving thật (index dùng chung, request song song).
 
 Chạy:  python scripts/run_load_test.py
 """
@@ -15,7 +15,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-# Windows console (CMD) thường dùng cp1252/cp437 — không chứa chữ tiếng Việt.
+# Windows console (CMD) thường dùng cp1252/cp437 - không chứa chữ tiếng Việt.
 if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 if sys.stderr.encoding and sys.stderr.encoding.lower() not in ("utf-8", "utf8"):
@@ -45,7 +45,7 @@ def main() -> int:
     corpus = list(csv.DictReader(open(REAL / f"corpus_{SCALE}.csv", encoding="utf-8")))
     queries = list(csv.DictReader(open(REAL / f"queries_{SCALE}.csv", encoding="utf-8")))
     system = RetrievalSystem("hybrid", corpus)
-    print(f"Load test trên hybrid/{SCALE.upper()} — {len(corpus)} declarations, "
+    print(f"Load test trên hybrid/{SCALE.upper()} - {len(corpus)} declarations, "
           f"{len(queries)} queries pool")
 
     rows = []

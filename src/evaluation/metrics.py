@@ -1,4 +1,4 @@
-"""Evaluation metrics cho Nhóm 3 — Lean Premise Retrieval.
+"""Evaluation metrics cho Nhóm 3 - Lean Premise Retrieval.
 
 TV6 (Evaluation) dùng module này để tính Recall@k, MRR, nDCG@k
 từ danh sách ranking của bất kỳ hệ thống truy hồi nào (BM25, hybrid, ...).
@@ -20,7 +20,7 @@ class QueryResult:
     Attributes:
         query_id: định danh truy vấn.
         ranked_premises: danh sách premise ID xếp theo hệ thống, index 0 = hạng 1.
-        gold_premises: set premise ID liên quan (nhãn 2 — relevant trực tiếp).
+        gold_premises: set premise ID liên quan (nhãn 2 - relevant trực tiếp).
         gold_partial: set premise ID liên quan gián tiếp (nhãn 1). Optional.
     """
 
@@ -62,7 +62,7 @@ def ndcg_at_k(result: QueryResult, k: int) -> float:
     """nDCG@k của một truy vấn. rel=2 cho gold, rel=1 cho partial, còn lại 0.
 
     IDCG tính trên toàn bộ relevant của query (kể cả premise chưa xuất hiện
-    trong ranked list) — theo định nghĩa chuẩn của Burges et al.
+    trong ranked list) - theo định nghĩa chuẩn của Burges et al.
     """
     gold = set(result.gold_premises)
     partial = set(result.gold_partial)

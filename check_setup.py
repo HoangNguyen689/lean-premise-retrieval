@@ -79,8 +79,8 @@ def main() -> int:
     }
     for rel, desc in required.items():
         status = OK if (ROOT / rel).exists() else FAIL
-        report(status, f"{rel} — {desc}",
-               "missing file — re-download the project archive")
+        report(status, f"{rel} - {desc}",
+               "missing file - re-download the project archive")
 
     print("\n[2b] Generated artifacts (optional until you run retrieval)")
     generated = {
@@ -89,7 +89,7 @@ def main() -> int:
     }
     for rel, desc in generated.items():
         status = OK if (ROOT / rel).exists() else WARN
-        report(status, f"{rel} — {desc}",
+        report(status, f"{rel} - {desc}",
                "run: python scripts/run_real_retrieval.py")
 
     # ── 3. Python libraries ──
@@ -132,7 +132,7 @@ def main() -> int:
     else:
         report(FAIL, "unit tests metrics failed after retry")
         print_tail(metrics_test)
-        problems.append("unit tests metrics failed — see details above")
+        problems.append("unit tests metrics failed - see details above")
 
     if corpus_s3.exists():
         query = "Every finite integral domain is a field"
@@ -145,7 +145,7 @@ def main() -> int:
         else:
             report(FAIL, "search CLI failed after retry")
             print_tail(cli_test)
-            problems.append("search CLI failed — see details above")
+            problems.append("search CLI failed - see details above")
     else:
         report(WARN, "search CLI not tested (no corpus yet)",
                "run download_data.py, then re-run this check")
@@ -153,7 +153,7 @@ def main() -> int:
     # ── Summary ──
     print("\n" + "=" * 60)
     if not problems:
-        print(" ✓ Environment ready — try the demo:")
+        print(" ✓ Environment ready - try the demo:")
         print('    python scripts/search_cli.py "Every finite integral domain is a field" --top 5')
     else:
         print(f" {len(problems)} issue(s) to fix:")

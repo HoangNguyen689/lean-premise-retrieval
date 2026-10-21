@@ -1,4 +1,4 @@
-"""Search CLI — truy vấn premise mathlib4 từ dòng lệnh (sản phẩm bàn giao TV5).
+"""Search CLI - truy vấn premise mathlib4 từ dòng lệnh (sản phẩm bàn giao TV5).
 
 Ví dụ:
     python scripts/search_cli.py "Every finite integral domain is a field"
@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 
-# Windows console (CMD) thường dùng cp1252/cp437 — không chứa chữ tiếng Việt.
+# Windows console (CMD) thường dùng cp1252/cp437 - không chứa chữ tiếng Việt.
 if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 if sys.stderr.encoding and sys.stderr.encoding.lower() not in ("utf-8", "utf8"):
