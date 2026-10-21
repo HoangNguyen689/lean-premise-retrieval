@@ -89,7 +89,7 @@ def main() -> int:
         out.write(f"# pool_id: {POOL_ID}\n")
         for name in ["corpus.jsonl", "queries.jsonl"]:
             out.write(f"{sha256(OUT / name)}  {name}\n")
-    print(f"✓ checksums.txt (SHA-256)")
+    print("✓ checksums.txt (SHA-256)")
 
     # ── meta:eligible-rule xác nhận ──
     (OUT / "eligible_rule.txt").write_text(
@@ -101,7 +101,7 @@ def main() -> int:
         "3. 56 nhãn-2 là theorem thuộc test split KHÁC được dùng làm premise của query -\n"
         "   hợp lệ (premise giữa các theorem test với nhau), giữ nguyên trong relevant_ids.\n",
         encoding="utf-8")
-    print(f"✓ eligible_rule.txt")
+    print("✓ eligible_rule.txt")
 
     print(f"\nGói: {OUT} - gửi cho N4 (nén zip ~15 MB).")
     return 0
