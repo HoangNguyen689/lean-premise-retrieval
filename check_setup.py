@@ -14,7 +14,6 @@ Báo cáo từng hạng mục ✓/⚠/✗ kèm CÁCH SỬA cụ thể nếu thi�
 from __future__ import annotations
 
 import importlib
-import shutil
 import subprocess
 import sys
 import time
@@ -74,7 +73,7 @@ def main() -> int:
     print("\n[3] Thư viện Python")
     for mod in ["pyarrow", "pandas", "matplotlib"]:
         try:
-            m = importlib.import_module(mod if mod != "pyarrow" else "pyarrow")
+            m = importlib.import_module(mod)
             report(OK, f"{mod} {getattr(m, '__version__', '?')}")
         except ImportError:
             if mod == "matplotlib":
