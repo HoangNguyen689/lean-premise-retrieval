@@ -129,7 +129,6 @@ class RetrievalSystem:
         elif self.name == "bm25_fielddrop":
             # "mù" ký hiệu: tokenize bỏ ký hiệu trên statement (ablation RQ1)
             idx = BM25Index(self.docs, {"statement": 1.0})
-            orig = tokenize
             self.index = idx
             self._drop = True
         elif self.name == "bm25_field":
