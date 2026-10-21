@@ -7,6 +7,7 @@ and generates Parquet/index files. Each step is resumable.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import os
 import shutil
@@ -107,11 +108,9 @@ def print_manual_download_instructions() -> None:
 # ── Steps ───────────────────────────────────────────────────────────────────
 def step_deps() -> None:
     print("\n[1/4] Checking libraries (pyarrow, pandas)...")
-    try:
-        import pyarrow  # type: ignore[import]  # optional dependency, checked at runtime
-        import pandas  # type: ignore[import]  # optional dependency, checked at runtime
+    if importlib.util.find_spec("pyarrow") and importlib.util.find_spec("pandas"):
         print("  ✓ pyarrow + pandas found — Parquet files will be generated.")
-    except ImportError:
+    else:
         print("  ⚠ pyarrow/pandas missing — trying pip install...")
         r = subprocess.run([sys.executable, "-m", "pip", "install", "pyarrow", "pandas"])
         if r.returncode == 0:
