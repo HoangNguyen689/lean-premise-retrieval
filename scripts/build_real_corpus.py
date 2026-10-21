@@ -16,7 +16,7 @@ import csv
 import hashlib
 import json
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 
 # Windows consoles often use cp1252/cp437; force UTF-8 so Unicode symbols print correctly.
