@@ -45,7 +45,7 @@ def sha256(path: Path) -> str:
 
 def task_parquet() -> None:
     try:
-        import pandas as pd
+        import pandas as pd  # type: ignore[import]
     except ImportError:
         print("⚠ Bỏ qua Parquet (thiếu pandas/pyarrow) — CSV vẫn dùng được đầy đủ.")
         print("  Cài thêm nếu muốn Parquet:  pip install pyarrow pandas")
