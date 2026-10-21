@@ -19,7 +19,7 @@ import sys
 import time
 from pathlib import Path
 
-# Windows console (CMD) thường dùng cp1252/cp437 — không chứa chữ tiếng Việt.
+# Windows consoles often use cp1252/cp437 - force UTF-8 so Unicode symbols print correctly.
 if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 if sys.stderr.encoding and sys.stderr.encoding.lower() not in ("utf-8", "utf8"):
@@ -47,8 +47,8 @@ def task_parquet() -> None:
     try:
         import pandas as pd  # type: ignore[import]
     except ImportError:
-        print("⚠ Bỏ qua Parquet (thiếu pandas/pyarrow) — CSV vẫn dùng được đầy đủ.")
-        print("  Cài thêm nếu muốn Parquet:  pip install pyarrow pandas")
+        print("⚠ Skipping Parquet (pandas/pyarrow missing) - CSV files are still complete.")
+        print("  Install to enable Parquet:  pip install pyarrow pandas")
         return
     for scale in SCALES + ["full"]:
         for kind in ["corpus", "queries", "qrels"]:
@@ -57,11 +57,11 @@ def task_parquet() -> None:
                 df = pd.read_csv(src, dtype=str, keep_default_na=False,
                                  na_filter=False)
                 df.to_parquet(src.with_suffix(".parquet"), index=False)
-    print("✓ Parquet: corpus/queries/qrels × 4 (s1/s2/s3/full) —", len(list(REAL.glob('*.parquet'))), "files")
+    print("✓ Parquet: corpus/queries/qrels × 4 (s1/s2/s3/full) -", len(list(REAL.glob('*.parquet'))), "files")
 
 
 def task_index_size() -> None:
-    """Đo index size thật (inverted index RAM serialize + bytes corpus) mỗi hệ/scale."""
+    """Measure real index size by serializing the inverted index for each system/scale."""
     from systems import RetrievalSystem  # type: ignore[import]
     rows, manifest = [], {}
     for scale in SCALES:
@@ -70,7 +70,7 @@ def task_index_size() -> None:
             t0 = time.time()
             system = RetrievalSystem(name, corpus)
             build_s = time.time() - t0
-            # đo kích thước index: pickle toàn bộ cấu trúc inv + df
+            # measure index size: pickle the entire inv + df structure
             import pickle
             blob = pickle.dumps({"inv": system.index.inv, "df": system.index.df,
                                  "doc_len": system.index.doc_len})
@@ -98,11 +98,11 @@ def task_index_size() -> None:
 
 
 def task_error_slices() -> None:
-    """Bổ sung slice theo ký hiệu + độ dài vào failure taxonomy (tuần 8)."""
+    """Add symbol-count / statement-length slices to the failure taxonomy."""
     queries = {q["id"]: q for q in csv.DictReader(open(REAL / "queries_s3.csv", encoding="utf-8"))}
     cases_path = RAW / "failure_cases.csv"
     if not cases_path.exists():
-        print(f"⚠ {cases_path.name} not found — skipping error slices. "
+        print(f"⚠ {cases_path.name} not found - skipping error slices. "
               "Run failure analysis first: python scripts/run_failure_analysis.py")
         return
     cases = list(csv.DictReader(open(cases_path, encoding="utf-8")))
@@ -120,24 +120,24 @@ def task_error_slices() -> None:
         if len(stmt) < 40:
             slice_counts["short_statement_lt40"] += 1
 
-    # merge vào taxonomy file
+    # merge into taxonomy file
     with open(RAW / "failure_taxonomy.csv", "a", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         for k, v in slice_counts.items():
             w.writerow([k, v, "slice"])
 
-    # Ghi file slice riêng cho báo cáo
+    # write separate slice file for the report
     with open(RAW / "failure_slices.csv", "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow(["slice", "definition", "n_cases"])
-        w.writerow(["symbol_heavy_statement", "≥5 ký hiệu Lean trong statement query", slice_counts["symbol_heavy_statement"]])
-        w.writerow(["long_statement_gt200", ">200 ký tự", slice_counts["long_statement_gt200"]])
-        w.writerow(["short_statement_lt40", "<40 ký tự", slice_counts["short_statement_lt40"]])
-    print(f"✓ error slices theo ký hiệu/độ dài: {slice_counts}")
+        w.writerow(["symbol_heavy_statement", "≥5 Lean symbols in query statement", slice_counts["symbol_heavy_statement"]])
+        w.writerow(["long_statement_gt200", ">200 characters", slice_counts["long_statement_gt200"]])
+        w.writerow(["short_statement_lt40", "<40 characters", slice_counts["short_statement_lt40"]])
+    print(f"✓ error slices by symbol count / statement length: {slice_counts}")
 
 
 def task_runtime_repeats() -> None:
-    """Mục 8: runtime biến động chạy ≥3 lần — đo hybrid S3 3 lần."""
+    """Section 8: measure runtime variance by running hybrid S3 three times."""
     from systems import RetrievalSystem  # type: ignore[import]
     corpus = list(csv.DictReader(open(REAL / "corpus_s3.csv", encoding="utf-8")))
     queries = list(csv.DictReader(open(REAL / "queries_s3.csv", encoding="utf-8")))
@@ -147,7 +147,7 @@ def task_runtime_repeats() -> None:
         system = RetrievalSystem("hybrid", corpus)
         build_s = time.time() - t0
         t1 = time.perf_counter()
-        for q in queries[:100]:  # 100 query đủ để đo biến động, tránh quá lâu
+        for q in queries[:100]:  # 100 queries enough to measure variance without taking too long
             system.search(q, top_k=50)
         search_s = time.perf_counter() - t1
         rows.append([run, f"{build_s:.2f}", f"{search_s / 100 * 1000:.1f}"])
@@ -161,7 +161,7 @@ def task_runtime_repeats() -> None:
         w.writerow(["median", f"{statistics.median(builds):.2f}", f"{statistics.median(searches):.1f}"])
         w.writerow(["min", f"{min(builds):.2f}", f"{min(searches):.1f}"])
         w.writerow(["max", f"{max(builds):.2f}", f"{max(searches):.1f}"])
-    print(f"✓ runtime_repeats.csv — median search {statistics.median(searches)} ms/query (3 repeats)")
+    print(f"✓ runtime_repeats.csv - median search {statistics.median(searches)} ms/query (3 repeats)")
 
 
 if __name__ == "__main__":
