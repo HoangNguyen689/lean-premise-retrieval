@@ -56,7 +56,7 @@ def main() -> int:
                 "statement": row["statement"],
                 "namespace": row["namespace"],
                 "source_commit": MATHLIB_COMMIT,
-            }, ensure_ascii=False) + "\n")
+            }, ensure_ascii=False) + "\r\n")
             n += 1
     print(f"✓ corpus.jsonl: {n:,} declarations")
 
@@ -78,7 +78,7 @@ def main() -> int:
                 "relevant_ids": sorted(golds.get(qid, [])),
                 "split": "test",
                 "pool_id": POOL_ID,
-            }, ensure_ascii=False) + "\n")
+            }, ensure_ascii=False) + "\r\n")
             n += 1
     print(f"✓ queries.jsonl: {n:,} queries (relevant_ids = nhãn 2, mean "
           f"{sum(len(v) for v in golds.values()) / max(len(golds), 1):.1f}/query)")
