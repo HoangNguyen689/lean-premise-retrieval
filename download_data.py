@@ -108,8 +108,8 @@ def print_manual_download_instructions() -> None:
 def step_deps() -> None:
     print("\n[1/4] Checking libraries (pyarrow, pandas)...")
     try:
-        import pyarrow  # noqa: F401
-        import pandas  # noqa: F401
+        import pyarrow  # type: ignore[import]  # optional dependency, checked at runtime
+        import pandas  # type: ignore[import]  # optional dependency, checked at runtime
         print("  ✓ pyarrow + pandas found — Parquet files will be generated.")
     except ImportError:
         print("  ⚠ pyarrow/pandas missing — trying pip install...")
