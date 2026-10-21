@@ -141,7 +141,12 @@ def task_index_size() -> None:
 def task_error_slices() -> None:
     """Bổ sung slice theo ký hiệu + độ dài vào failure taxonomy (tuần 8)."""
     queries = {q["id"]: q for q in csv.DictReader(open(REAL / "queries_s3.csv", encoding="utf-8"))}
-    cases = list(csv.DictReader(open(RAW / "failure_cases.csv", encoding="utf-8")))
+    cases_path = RAW / "failure_cases.csv"
+    if not cases_path.exists():
+        print(f"⚠ {cases_path.name} not found — skipping error slices. "
+              "Run failure analysis first: python scripts/run_failure_analysis.py")
+        return
+    cases = list(csv.DictReader(open(cases_path, encoding="utf-8")))
 
     slice_counts = {"symbol_heavy_statement": 0, "long_statement_gt200": 0,
                     "short_statement_lt40": 0}

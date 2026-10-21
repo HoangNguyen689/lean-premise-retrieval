@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Download and build the LeanDojo Benchmark 4 dataset.
+"""Prepare the LeanDojo Benchmark 4 dataset: download, extract, and build.
 
-Resumable: each step skips work already done. Run:
-
-    python download_data.py
+This script does more than just download: it also builds corpus/queries/qrels
+and generates Parquet/index files. Each step is resumable.
 """
 from __future__ import annotations
 
