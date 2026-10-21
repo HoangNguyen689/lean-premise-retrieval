@@ -46,7 +46,7 @@ def print_tail(proc: subprocess.CompletedProcess[str], prefix: str = "      | ")
 
 def main() -> int:
     print("=" * 60)
-    print(" Environment Check — Lean Premise Retrieval")
+    print(" Environment Check - Lean Premise Retrieval")
     print("=" * 60)
 
     # ── 1. Python ──
