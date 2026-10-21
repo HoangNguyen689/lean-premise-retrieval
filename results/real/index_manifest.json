@@ -1,0 +1,116 @@
+{
+  "data_version": "leandojo-benchmark-4@29dcec07+split-v1.0",
+  "indexes": {
+    "bm25:s1": {
+      "index_size_mb": 1.2,
+      "build_s": 0.26,
+      "n_docs": 10000,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "bm25_field:s1": {
+      "index_size_mb": 1.2,
+      "build_s": 0.3,
+      "n_docs": 10000,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0,
+        "id": 2.0,
+        "namespace": 3.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "hybrid:s1": {
+      "index_size_mb": 1.2,
+      "build_s": 0.3,
+      "n_docs": 10000,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0,
+        "id": 2.0,
+        "namespace": 3.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "bm25:s2": {
+      "index_size_mb": 5.4,
+      "build_s": 1.24,
+      "n_docs": 50000,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "bm25_field:s2": {
+      "index_size_mb": 5.7,
+      "build_s": 1.46,
+      "n_docs": 50000,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0,
+        "id": 2.0,
+        "namespace": 3.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "hybrid:s2": {
+      "index_size_mb": 5.7,
+      "build_s": 1.48,
+      "n_docs": 50000,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0,
+        "id": 2.0,
+        "namespace": 3.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "bm25:s3": {
+      "index_size_mb": 23.7,
+      "build_s": 4.54,
+      "n_docs": 180907,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "bm25_field:s3": {
+      "index_size_mb": 24.6,
+      "build_s": 5.86,
+      "n_docs": 180907,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0,
+        "id": 2.0,
+        "namespace": 3.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "hybrid:s3": {
+      "index_size_mb": 24.6,
+      "build_s": 5.43,
+      "n_docs": 180907,
+      "tokenizer": "lean-camelcase+symbols",
+      "field_weights": {
+        "statement": 1.0,
+        "id": 2.0,
+        "namespace": 3.0
+      },
+      "k1": 1.5,
+      "b": 0.75
+    }
+  }
+}
