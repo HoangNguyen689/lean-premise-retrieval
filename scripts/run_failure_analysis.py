@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Failure analysis — 30 failure cases được phân loại (nhiệm vụ tuần 8 của TV6).
 
 Với mỗi query, hệ thống bị coi là FAIL khi Recall@10 < 1.0 (bỏ sót premise

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Evaluation metrics cho Nhóm 3 — Lean Premise Retrieval.
 
 TV6 (Evaluation) dùng module này để tính Recall@k, MRR, nDCG@k

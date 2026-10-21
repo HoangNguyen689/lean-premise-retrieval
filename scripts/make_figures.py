@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Sinh toàn bộ biểu đồ từ raw results (yêu cầu môn: figure = script từ raw).
 
 Các biểu đồ:

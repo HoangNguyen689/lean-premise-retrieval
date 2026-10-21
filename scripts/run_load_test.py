@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Load test — 1/10/50 truy vấn đồng thời trên hệ hybrid (tuần 7, mức tải).
 
 Đo QPS và P50/P95 latency khi nhiều client gọi search song song.

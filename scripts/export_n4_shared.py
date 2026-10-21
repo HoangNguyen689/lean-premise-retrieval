@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """export_n4_shared.py — Xuất gói chia sẻ đúng schema Nhóm 4 yêu cầu (thống nhất 2026-10-18).
 
 Nhóm 4 đề nghị 6 mục thống nhất; 5/6 đã có trong data contract v1.1. Script này

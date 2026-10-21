@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Smoke-test script: verify the local environment is ready to run Lean Premise Retrieval.
 
 Checks:

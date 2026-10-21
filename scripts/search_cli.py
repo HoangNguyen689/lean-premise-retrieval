@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Search CLI — truy vấn premise mathlib4 từ dòng lệnh (sản phẩm bàn giao TV5).
 
 Ví dụ:

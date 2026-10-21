@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Mock end-to-end data — thay người khác khi họ chậm (kịch bản phòng hờ TV6).
 
 Tạo đầy đủ artifact theo data_contract_v1.md cho MỌI mức scale, để TV6

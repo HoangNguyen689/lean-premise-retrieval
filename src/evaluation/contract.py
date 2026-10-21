@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Data contract loader + validator cho Nhóm 3.
 
 TV1 (Data/Extraction) dùng hàm `validate_contract` để kiểm tra corpus/query

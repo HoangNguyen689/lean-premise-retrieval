@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Build corpus + queries + qrels THẬT từ LeanDojo Benchmark 4 (Zenodo v12740403).
 
 TV1 (Data/Extraction) — chạy 1 lần sau khi tải data_raw/leandojo_benchmark_4/.

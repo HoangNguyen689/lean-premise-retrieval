@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Biểu đồ tổng hợp số THẬT: scale, latency, load test, ablation.
 
 Chạy:  python scripts/make_real_figures.py

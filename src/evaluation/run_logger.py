@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Run logger — ghi đủ 10 trường theo Phụ lục B của hướng dẫn môn học.
 
 Mọi thí nghiệm (tuần 7+) phải dùng module này để ghi metadata một lần chạy:

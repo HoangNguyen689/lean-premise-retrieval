@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chạy toàn bộ đánh giá: mọi hệ thống × mọi scale → metrics + run logs.
 
 Đây là script "một lệnh" của TV6:

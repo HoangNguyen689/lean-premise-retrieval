@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Ablation study — phân tích đóng góp của từng thành phần.
 
 Câu hỏi ablation trả lời (theo hướng dẫn môn, mục 8 của Nhóm 3):

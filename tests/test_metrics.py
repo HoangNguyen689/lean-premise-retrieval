@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit test cho metrics.py — kết quả đối chiếu tính tay.
 
 Chạy: python tests/test_metrics.py

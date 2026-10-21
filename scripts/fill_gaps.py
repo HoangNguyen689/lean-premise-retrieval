@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Bổ sung các minh chứng còn thiếu so với đề bài (kiểm tra 2026-10-15):
 
 1. **Parquet + data dictionary** (tuần 2): chuyển corpus/queries/qrels CSV → Parquet

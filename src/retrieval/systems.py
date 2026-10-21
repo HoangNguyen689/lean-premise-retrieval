@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Retrieval systems THẬT cho Nhóm 3 — TV2 (index) + TV3 (BM25) + TV4 (structural).
 
 4 hệ thống trên corpus thật (LeanDojo Benchmark 4):

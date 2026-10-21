@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Demo end-to-end evaluation pipeline (tuần 1).
 
 Mô phỏng: query set v0 (20 truy vấn) + một hệ thống BM25 giả lập trên

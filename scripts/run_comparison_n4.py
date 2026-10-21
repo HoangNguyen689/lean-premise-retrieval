@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Comparison Nhóm 3 (sparse/hybrid) vs Nhóm 4 (dense/ANN) — nhiệm vụ tuần 9.
 
 Đọc eval_summary.csv (N3 tự tính) + run_dense_*.csv (N4 giao, theo data contract

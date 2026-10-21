@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chạy 4 hệ retrieval thật trên 3 scale → run file + metrics + latency.
 
 Một lệnh thay thế toàn bộ mock: đọc results/real/{corpus,queries,qrels}_{scale}.csv,

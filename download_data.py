@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """download_data.py — Tải + build dữ liệu LeanDojo Benchmark 4 cho Nhóm 3.
 
 Viết THUẦN PYTHON (không cần Git Bash / bash) để chạy được trên mọi Windows
