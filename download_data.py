@@ -254,7 +254,7 @@ def main() -> int:
     print(" Verify:   python check_setup.py")
     print(' Demo:     python scripts/search_cli.py "Every finite integral domain is a field" --top 5')
     print(" Test:     python tests/test_metrics.py")
-    print(" Full run (~20 min):")
+    print(" Full run (tens of minutes, depending on hardware):")
     print("           python scripts/run_real_retrieval.py")
     print("           python scripts/run_load_test.py")
     print("=" * 60)
