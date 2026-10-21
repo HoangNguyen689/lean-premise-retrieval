@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prepare the LeanDojo Benchmark 4 dataset: download, extract, and build.
 
-This script does more than just download: it also builds corpus/queries/qrels
+This script downloads and also builds corpus/queries/qrels
 and generates Parquet/index files. Each step is resumable.
 """
 from __future__ import annotations
@@ -254,7 +254,7 @@ def main() -> int:
     print(" Verify:   python check_setup.py")
     print(' Demo:     python scripts/search_cli.py "Every finite integral domain is a field" --top 5')
     print(" Test:     python tests/test_metrics.py")
-    print(" Full run (tens of minutes, depending on hardware):")
+    print(" Full run:")
     print("           python scripts/run_real_retrieval.py")
     print("           python scripts/run_load_test.py")
     print("=" * 60)
