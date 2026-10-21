@@ -12,12 +12,10 @@ Dùng rank_bm25 nếu có, không có thì BM25 thuần Python (không phụ thu
 """
 from __future__ import annotations
 
-import csv
 import math
 import re
 from collections import Counter
 from dataclasses import dataclass, field
-from pathlib import Path
 
 # ── Tokenizer ──────────────────────────────────────────────────────────────
 
@@ -147,6 +145,7 @@ class RetrievalSystem:
         làm premise). Vì query nằm trong corpus, lọc self trước khi cắt top_k -
         hệ vẫn trả đủ top_k kết quả hiệu dụng.
         """
+        assert self.index is not None
         self_name = query["id"][1:] if query["id"].startswith("Q") else query["id"]
         if self.name == "bm25":
             hits = self.index.search(tokenize(query["statement"], True), top_k + 8)
