@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""check_setup.py — Kiểm tra một lệnh: máy này đã sẵn sàng chạy dự án Nhóm 3 chưa.
+"""Smoke-test script: verify the local environment is ready to run Lean Premise Retrieval.
 
-Chạy ở bất cứ đâu, bất cứ lúc nào (cả TRƯỚC khi tải dữ liệu):
-
-    python check_setup.py
-
-Báo cáo từng hạng mục ✓/⚠/✗ kèm CÁCH SỬA cụ thể nếu thiếu. Lỗi thường gặp:
-  - Python giả Microsoft Store → chạy script này bằng `py check_setup.py`
-  - Thiếu pyarrow/pandas → pip install pyarrow pandas
-  - Chưa tải dataset → python download_data.py
+Checks:
+  - Python version and SSL support
+  - Required project files
+  - Python dependencies (pyarrow, pandas, matplotlib)
+  - Dataset download/build status
+  - Unit tests and search CLI smoke test
 """
 from __future__ import annotations
 
