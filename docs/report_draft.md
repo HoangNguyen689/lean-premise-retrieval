@@ -101,7 +101,7 @@ LeanDojo Benchmark 4 (Zenodo, commit ghim)
    │  build_real_corpus.py — extractor (TV1)
    ▼
 Corpus CSV 6-field (180.907 records) ──► 3 scale + split_manifest.json (checksum)
-   │  systems.py — tokenizer + inverted index (TV2)
+   │  tokenizer.py + index.py — tokenizer + inverted index (TV2)
    ▼
 Tokenizer Lean: tách identifier (Nat.add_comm → nat/add/comm) + giữ ký hiệu (∀ ℕ →)
    │
@@ -289,7 +289,7 @@ Taxonomy trên 90 cặp hệ×query có Recall@10 < 1.0 (30 case tệ nhất, ph
 ### 8.2. Sản phẩm bàn giao
 
 - Benchmark split 3 scale + qrels + manifest checksum — **CSV + Parquet 12 file** + data dictionary (`docs/data_dictionary.md`)
-- Inverted index + tokenizer Lean (`src/retrieval/systems.py`) + **index manifest** (`results/real/index_manifest.json` — cấu hình + size + checksum mỗi index)
+- Inverted index + tokenizer Lean (`src/retrieval/rankers.py`) + **index manifest** (`results/real/index_manifest.json` — cấu hình + size + checksum mỗi index)
 - Search CLI demo được (`scripts/search_cli.py`)
 - 4 hệ retrieval + evaluation scripts chạy 1 lệnh
 - Run logger 10 trường Phụ lục B (45 run logs JSON thật) + runtime repeats 3 lần (median + min/max)

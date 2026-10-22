@@ -84,7 +84,7 @@ Cả N3 và N4 phải dùng cùng phân chia Dev/Test. Mỗi bên lưu tệp man
 
 ### 5.4. Quy tắc eligible premise (thống nhất với N4, 2026-10-18)
 
-1. **Không dùng theorem truy vấn làm premise**: theorem truy vấn KHÔNG được phép xuất hiện trong kết quả truy hồi của chính nó. Vì query nằm trong corpus, hệ phải lọc self trước khi cắt top_k (đã cài trong `src/retrieval/systems.py`).
+1. **Không dùng theorem truy vấn làm premise**: theorem truy vấn KHÔNG được phép xuất hiện trong kết quả truy hồi của chính nó. Vì query nằm trong corpus, hệ phải lọc self trước khi cắt top_k (đã cài trong `src/retrieval/rankers.py`).
 2. **Pool frozen**: premise pool = toàn bộ corpus.jsonl trừ chính theorem truy vấn, cố định trước mọi run — `pool_id: shared-frozen-pool`.
 3. **Premise giữa các theorem test với nhau hợp lệ**: một theorem test KHÁC được dùng làm premise của query vẫn tính là gold (56 nhãn-2 thuộc trường hợp này — kiểm chứng từ trace, giữ nguyên).
 
@@ -117,7 +117,7 @@ N3 xuất `results/n4_shared/` đúng schema N4 yêu cầu:
 
 ## 8. Changelog
 
-- **v1.2 (2026-10-18)** — Thống nhất 6 mục với N4: thêm §5.4 quy tắc eligible premise (không dùng theorem truy vấn làm premise + pool frozen), §5.5 gói chia sẻ schema N4 (corpus.jsonl + queries.jsonl + checksums); sửa schema §3 thêm `source_commit`; eligible rule đã cài trong `src/retrieval/systems.py` (lọc self trước top_k).
+- **v1.2 (2026-10-18)** — Thống nhất 6 mục với N4: thêm §5.4 quy tắc eligible premise (không dùng theorem truy vấn làm premise + pool frozen), §5.5 gói chia sẻ schema N4 (corpus.jsonl + queries.jsonl + checksums); sửa schema §3 thêm `source_commit`; eligible rule đã cài trong `src/retrieval/rankers.py` (lọc self trước top_k).
 - **v1.1 (2026-10-15)** — namespace cho phép rỗng (declaration cấp root của Lean, 128/180.907 trường hợp thực tế); cập nhật nguồn sang Zenodo + số liệu thật.
 - **v1.0 (tuần 1)** — bản đầu: 6 field bắt buộc, 3 mức scale, qrels 3 nhãn, protocol đánh giá, lịch giao N3↔N4.
 

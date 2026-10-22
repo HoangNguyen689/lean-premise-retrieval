@@ -62,7 +62,7 @@ def task_parquet() -> None:
 
 def task_index_size() -> None:
     """Measure real index size by serializing the inverted index for each system/scale."""
-    from systems import RetrievalSystem  # type: ignore[import]
+    from rankers import RetrievalSystem  # type: ignore[import]
     rows, manifest = [], {}
     for scale in SCALES:
         corpus = list(csv.DictReader(open(REAL / f"corpus_{scale}.csv", encoding="utf-8")))
@@ -138,7 +138,7 @@ def task_error_slices() -> None:
 
 def task_runtime_repeats() -> None:
     """Section 8: measure runtime variance by running hybrid S3 three times."""
-    from systems import RetrievalSystem  # type: ignore[import]
+    from rankers import RetrievalSystem  # type: ignore[import]
     corpus = list(csv.DictReader(open(REAL / "corpus_s3.csv", encoding="utf-8")))
     queries = list(csv.DictReader(open(REAL / "queries_s3.csv", encoding="utf-8")))
     rows = []

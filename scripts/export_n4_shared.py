@@ -95,7 +95,7 @@ def main() -> int:
     (OUT / "eligible_rule.txt").write_text(
         "QUY TẮC ELIGIBLE PREMISE (N3 xác nhận, khớp đề nghị của N4):\n"
         "1. Theorem truy vấn KHÔNG được phép xuất hiện trong kết quả truy hồi của chính nó\n"
-        "   (đã cài trong src/retrieval/systems.py - lọc self trước khi cắt top_k).\n"
+        "   (đã cài trong src/retrieval/rankers.py - lọc self trước khi cắt top_k).\n"
         "2. Premise pool = toàn bộ corpus.jsonl trừ chính theorem truy vấn (frozen trước\n"
         "   mọi run - pool_id: shared-frozen-pool).\n"
         "3. 56 nhãn-2 là theorem thuộc test split KHÁC được dùng làm premise của query -\n"

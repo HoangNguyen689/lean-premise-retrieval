@@ -75,7 +75,10 @@ nhom3/
 │   ├── report_draft.md           # BÁO CÁO v1.0 — số thật, đủ 8 mục theo Phụ lục C
 │   └── ai_use_statement.md       # Khai báo dùng AI (bắt buộc của môn)
 ├── src/
-│   ├── retrieval/systems.py      # Tokenizer Lean + BM25 + field-aware + hybrid
+│   ├── retrieval/
+│   │   ├── tokenizer.py          # Lean statement tokenizer
+│   │   ├── index.py              # BM25 inverted index
+│   │   └── rankers.py            # bm25 / bm25_field / hybrid retrieval systems
 │   └── evaluation/
 │       ├── metrics.py            # Recall@k, MRR, nDCG@k
 │       ├── contract.py           # Validator 6-field data contract
